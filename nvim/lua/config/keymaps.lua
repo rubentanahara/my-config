@@ -200,3 +200,16 @@ vim.api.nvim_set_keymap(
   ":lua require('dap').repl.open()<CR>",
   { noremap = true, silent = true, desc = "Open REPL" }
 )
+
+vim.api.nvim_set_keymap("n", "<leader>fr", ":FlutterRun<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>fh", ":FlutterHotReload<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>fd", ":FlutterDetach<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap(
+  "n",
+  "<leader>db",
+  ":lua require'dap'.toggle_breakpoint()<CR>",
+  { noremap = true, silent = true }
+)
+vim.api.nvim_set_keymap("n", "<leader>dc", ":lua require'dap'.continue()<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>do", ":lua require'dap'.step_over()<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>di", ":lua require'dap'.step_into()<CR>", { noremap = true, silent = true })
