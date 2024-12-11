@@ -1,3 +1,4 @@
+local dartls = require("lspconfig.configs.dartls")
 return {
   -- tools
   {
@@ -60,6 +61,19 @@ return {
           },
         },
         html = {},
+        dartls = {
+          cmd = { "dart", "language-server", "--protocol=lsp" },
+          filetypes = { "dart" },
+          init_options = {
+            onlyAnalyzeProjectsWithOpenFiles = true,
+            suggestFromUnimportedLibraries = true,
+          },
+          settings = {
+            dart = {
+              completeFunctionCalls = true,
+            },
+          },
+        },
         yamlls = {
           settings = {
             yaml = {
