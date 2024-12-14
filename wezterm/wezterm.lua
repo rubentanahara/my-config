@@ -21,6 +21,8 @@ config = {
 	font_size = 14,
 	font = wezterm.font("Hack Nerd Font Mono", { weight = "Regular", stretch = "Normal", style = "Normal" }),
 	color_scheme = "Material Darker (base16)",
+	-- color_scheme = "Kasugano (terminal.sexy)",
+	-- color_scheme = "Kanagawa Dragon (Gogh)",
 }
 
 return config
