@@ -128,3 +128,24 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
     vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
   end,
 })
+
+-- Automatically set fileformat to Unix (LF) when opening a file
+vim.api.nvim_create_autocmd("BufRead", {
+  group = augroup("unix_line_endings"),
+  pattern = "*",
+  callback = function()
+    if vim.bo.fileformat ~= "unix" then
+      vim.bo.fileformat = "unix"
+      vim.cmd("write") -- Save the file with the correct line endings
+    end
+  end,
+})
+
+-- Automatically remove any `^M` characters when saving the file
+-- vim.api.nvim_create_autocmd("BufWritePre", {
+--   group = augroup("remove_cr"),
+--   pattern = "*",
+--   callback = function()
+--     vim.cmd("%s/\r//g") -- Remove all `^M` characters
+--   end,
+-- })

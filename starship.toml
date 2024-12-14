@@ -12,6 +12,7 @@ $rust\
 $ruby\
 $aws\
 $docker_context\
+$dotnet\
 $jobs\
 $cmd_duration\
 $line_break\
@@ -32,6 +33,7 @@ truncate_to_repo = false
 'Downloads' = ' '
 'Music' = ' '
 'Pictures' = ' '
+'dev ' = ' '
 
 [git_branch]
 style = 'fg:green'
