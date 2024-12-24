@@ -70,7 +70,7 @@ return {
         icon = {
           folder_closed = "",
           folder_open = "",
-          folder_empty = "󰜌",
+          folder_empty = "",
           -- The next two settings are only a fallback, if you use nvim-web-devicons and configure default icons there
           -- then these will never be used.
           default = "*",
@@ -93,10 +93,10 @@ return {
             deleted = "✖", -- this can only be used in the git_status source
             renamed = "󰁕", -- this can only be used in the git_status source
             -- Status type
-            untracked = "",
-            ignored = "",
-            unstaged = "󰄱",
-            staged = "",
+            untracked = "󰅇",
+            ignored = "",
+            unstaged = "󰄨",
+            staged = "󰄲",
             conflict = "",
           },
         },
@@ -126,7 +126,6 @@ return {
       -- see `:h neo-tree-custom-commands-global`
       commands = {},
       window = {
-        position = "left",
         width = 50,
         mapping_options = {
           noremap = true,
@@ -309,7 +308,7 @@ return {
     })
 
     vim.cmd([[nnoremap \ :Neotree reveal<cr>]])
-    vim.keymap.set("n", "<leader>e", ":Neotree toggle position=left<CR>", { noremap = true, silent = true }) -- focus file explorer
+    vim.keymap.set("n", "<leader>e", ":Neotree float <CR>", { noremap = true, silent = true }) -- focus file explorer
     vim.keymap.set("n", "<leader>ngs", ":Neotree float git_status<CR>", { noremap = true, silent = true }) -- open git status window
   end,
 }

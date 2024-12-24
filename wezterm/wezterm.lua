@@ -1,12 +1,5 @@
---[[
-  WezTerm Configuration
-  A modern, GPU-accelerated terminal emulator configuration
-  with workspace management, status line, and aesthetic tweaks
---]]
-
 local wezterm = require("wezterm")
 local mux = wezterm.mux
-local act = wezterm.action
 
 -- This table will hold the configuration.
 local config = {}
@@ -17,17 +10,11 @@ if wezterm.config_builder then
 	config = wezterm.config_builder()
 end
 
--- Helpers
-local function basename(s)
-	return string.gsub(s, "(.*[/\\])(.*)", "%2")
-end
-
 -- Color scheme and visual settings
 config.color_scheme = "MaterialDarker"
 config.font = wezterm.font("Hack Nerd Font")
 config.font_size = 14
 config.line_height = 1.1
-config.window_background_opacity = 0.95
 config.text_background_opacity = 1.0
 config.window_decorations = "RESIZE"
 config.window_close_confirmation = "NeverPrompt"
@@ -64,7 +51,7 @@ config.adjust_window_size_when_changing_font_size = false
 
 -- Startup configuration
 wezterm.on("gui-startup", function(cmd)
-	local tab, pane, window = mux.spawn_window(cmd or {})
+	local window = mux.spawn_window(cmd or {})
 	window:gui_window():maximize()
 end)
 
