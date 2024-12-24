@@ -9,6 +9,8 @@ vim.scriptencoding = "utf-8"
 opt.fileencoding = "utf-8"
 opt.encoding = "utf-8"
 
+opt.guicursor = "n-v-c:block,i-ci-ve:hor20,r-cr-o:hor20,a:blinkwait700-blinkoff400-blinkon250"
+
 -- numbers
 opt.relativenumber = true -- relative line numbers
 opt.number = true -- show line numbers
@@ -69,7 +71,6 @@ opt.backspace = "indent,eol,start" -- backspace through everything
 -- backup
 opt.backup = false -- don't backup files
 opt.backupskip = { "/tmp/*", "/private/tmp/*" } -- don't backup files
-opt.swapfile = false -- don't use swap files
 
 -- undo
 opt.undofile = true -- enable undo files
