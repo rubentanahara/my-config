@@ -1,4 +1,3 @@
-local dartls = require("lspconfig.configs.dartls")
 return {
   -- tools
   {
@@ -39,9 +38,9 @@ return {
             typescript = {
               inlayHints = {
                 includeInlayParameterNameHints = "literal",
-                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayParameterNameHintsWhenArgumentMatchesName = true,
                 includeInlayFunctionParameterTypeHints = true,
-                includeInlayVariableTypeHints = false,
+                includeInlayVariableTypeHints = true,
                 includeInlayPropertyDeclarationTypeHints = true,
                 includeInlayFunctionLikeReturnTypeHints = true,
                 includeInlayEnumMemberValueHints = true,
@@ -50,7 +49,7 @@ return {
             javascript = {
               inlayHints = {
                 includeInlayParameterNameHints = "all",
-                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayParameterNameHintsWhenArgumentMatchesName = true,
                 includeInlayFunctionParameterTypeHints = true,
                 includeInlayVariableTypeHints = true,
                 includeInlayPropertyDeclarationTypeHints = true,
@@ -136,7 +135,7 @@ return {
                 unusedLocalExclude = { "_*" },
               },
               format = {
-                enable = false,
+                enable = true,
                 defaultConfig = {
                   indent_style = "space",
                   indent_size = "2",
