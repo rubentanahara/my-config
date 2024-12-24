@@ -61,7 +61,6 @@ return {
 --       },
 --
 --       plugins = { -- Uncomment the plugins that you use to highlight them
---         "dap",
 --         "gitsigns",
 --         "indent-blankline",
 --         "nvim-cmp",
