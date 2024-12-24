@@ -50,7 +50,6 @@ config.background = {
 		source = { Color = "#171616" },
 		height = "100%",
 		width = "100%",
-		opacity = 0.95,
 	},
 }
 
