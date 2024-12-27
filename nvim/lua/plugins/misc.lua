@@ -39,24 +39,12 @@ return {
       { "<c-j>", "<cmd><C-U>TmuxNavigateDown<cr>" },
       { "<c-k>", "<cmd><C-U>TmuxNavigateUp<cr>" },
       { "<c-l>", "<cmd><C-U>TmuxNavigateRight<cr>" },
-      { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
     },
   },
   -- JavaScript documentation generator
   {
     "kkoomen/vim-doge",
     run = ":call doge#install()",
-  },
-
-  -- Window picker plugin
-  {
-    "s1n7ax/nvim-window-picker",
-    name = "window-picker",
-    event = "VeryLazy",
-    version = "2.*",
-    config = function()
-      require("window-picker").setup()
-    end,
   },
 
   -- Collection of various small independent plugins/modules

@@ -67,6 +67,7 @@ return { -- Autocompletion
       Operator = "󰆕",
       TypeParameter = "󰊄",
     }
+
     cmp.setup({
       snippet = {
         expand = function(args)
@@ -169,6 +170,14 @@ return { -- Autocompletion
           })[entry.source.name]
           return vim_item
         end,
+      },
+    })
+
+    --  setup vim dadbod completion
+    cmp.setup.filetype({ "sql" }, {
+      sources = {
+        { name = "nvim-dadbod-completion" },
+        { name = "buffer" },
       },
     })
   end,
