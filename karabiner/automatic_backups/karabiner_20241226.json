@@ -1,0 +1,52 @@
+{
+  "global": {
+    "ask_for_confirmation_before_quitting": true,
+    "show_in_menu_bar": true,
+    "check_for_updates_on_startup": false
+  },
+  "profiles": [
+    {
+      "name": "Default profile",
+      "complex_modifications": {
+        "parameters": {
+          "basic.to_if_alone_timeout_miliseconds": 200,
+          "basic.to_if_held_down_threshold_miliseconds": 200
+        },
+        "rules": [
+          {
+            "description": "Change caps_lock to control if pressed with other keys, to escape if pressed alone",
+            "manipulators": [
+              {
+                "from": {
+                  "key_code": "caps_lock",
+                  "modifiers": {
+                    "optional": [
+                      "any"
+                    ]
+                  }
+                },
+                "to": [
+                  {
+                    "key_code": "left_control",
+                    "lazy": true
+                  }
+                ],
+                "to_if_alone": [
+                  {
+                    "key_code": "escape"
+                  }
+                ],
+                "to_if_held_down": [
+                  {
+                    "key_code": "left_control"
+                  }
+                ],
+                "type": "basic"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

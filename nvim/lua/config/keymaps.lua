@@ -9,8 +9,8 @@ vim.keymap.set("i", "<C-w>j", "<Down>", { noremap = true, silent = true, desc = 
 vim.keymap.set("i", "<C-w>h", "<Right>", { noremap = true, silent = true, desc = "Move Right" })
 
 -- NORMAL
-vim.keymap.set("n", "<C-j>", ":m .+1<CR>==", { noremap = true, silent = true, desc = "Move line down" })
-vim.keymap.set("n", "<C-k>", ":m .-2<CR>==", { noremap = true, silent = true, desc = "Move line up" })
+vim.keymap.set("n", "<c-j>", ":m .+1<CR>==", { noremap = true, silent = true, desc = "Move line down" })
+vim.keymap.set("n", "<c-k>", ":m .-2<CR>==", { noremap = true, silent = true, desc = "Move line up" })
 vim.keymap.set("n", "<C-s>", ":w<CR>", { noremap = true, silent = true, desc = "Save File" })
 vim.keymap.set("n", "<C-q>", ":wqa<CR>", { noremap = true, silent = true, desc = "Save and quit" })
 vim.keymap.set(
@@ -46,11 +46,6 @@ vim.keymap.set(
   "<C-\\><C-n>|:DogeGenerate<CR>",
   { noremap = true, silent = true, desc = "Generate docs" }
 )
-
-vim.keymap.set("n", "wh", "<C-w>h", { noremap = true, silent = true, desc = "Move to window left" })
-vim.keymap.set("n", "wk", "<C-w>k", { noremap = true, silent = true, desc = "Move to window up" })
-vim.keymap.set("n", "wj", "<C-w>j", { noremap = true, silent = true, desc = "Move to window down" })
-vim.keymap.set("n", "wl", "<C-w>l", { noremap = true, silent = true, desc = "Move to window right" })
 
 --VISUAL
 vim.keymap.set(
