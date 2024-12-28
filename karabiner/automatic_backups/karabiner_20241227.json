@@ -13,7 +13,6 @@
         "rules": [
           {
             "description": "Remap Caps Lock to Ctrl when held, Esc when tapped",
-            "enabled": false,
             "manipulators": [
               {
                 "from": {
@@ -116,54 +115,6 @@
                       "name": "hyper_sublayer_e",
                       "value": 0
                     }
-                  }
-                ],
-                "type": "basic"
-              },
-              {
-                "conditions": [
-                  {
-                    "name": "hyper_sublayer_e",
-                    "type": "variable_if",
-                    "value": 1
-                  }
-                ],
-                "description": "Open Unity",
-                "from": {
-                  "key_code": "t",
-                  "modifiers": {
-                    "optional": [
-                      "any"
-                    ]
-                  }
-                },
-                "to": [
-                  {
-                    "shell_command": "open -a 'Spotify.app'"
-                  }
-                ],
-                "type": "basic"
-              },
-              {
-                "conditions": [
-                  {
-                    "name": "hyper_sublayer_e",
-                    "type": "variable_if",
-                    "value": 1
-                  }
-                ],
-                "description": "Open Unity",
-                "from": {
-                  "key_code": "p",
-                  "modifiers": {
-                    "optional": [
-                      "any"
-                    ]
-                  }
-                },
-                "to": [
-                  {
-                    "shell_command": "open -a 'Unity.app'"
                   }
                 ],
                 "type": "basic"
