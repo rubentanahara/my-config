@@ -1,0 +1,42 @@
+# Config files
+.config/*
+!.config/.gitignore
+
+# Editor configs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.envrc
+.direnv/
+
+# Tool-specific
+configstore/
+github-copilot/
+gh/
+gh-dash/
+nvim/.netrwhist
+tmux/plugins/
+
+# Logs and cache
+logs/
+*.log
+.cache/
+*.cache
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Language specific
+flutter/
+karabiner/automatic_backups/
+node_modules/
+
+# Keep configurations that should be version controlled
+!.config/starship.toml
+!.config/nvim/init.lua
+!.config/tmux/tmux.conf
