@@ -1,5 +1,4 @@
 local wezterm = require("wezterm")
-local act = wezterm.action
 local mux = wezterm.mux
 
 -- Initialize the configuration
@@ -31,8 +30,9 @@ config.window_decorations = "RESIZE"
 config.enable_tab_bar = false
 config.harfbuzz_features = { "calt=0" }
 config.window_close_confirmation = "NeverPrompt"
+config.default_cursor_style = "SteadyBar"
 config.scrollback_lines = 5000 -- Updated from 10000 to 5000 for consistency
-config.default_cursor_style = "BlinkingUnderline"
+-- config.default_cursor_style = "BlinkingUnderline"
 config.cursor_blink_rate = 800
 config.max_fps = 120
 config.animation_fps = 120
