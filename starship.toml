@@ -1,51 +1,46 @@
-format = """
-$directory\
-$git_branch\
-$git_status\
-$fill\
-$dotnet\
-$lua\
-$nodejs\
-$golang\
-$python\
-$rust\
-$kotlin\
-$aws\
-$azure\
-$docker_context\
-$jobs\
-$cmd_duration\
-$line_break\
-$character"""
-
-add_newline = true
-
 [directory]
-style = 'bold fg:dark_blue'
-format = '[$path ]($style)'
-truncation_length = 3
-truncation_symbol = '…/'
-truncate_to_repo = false
+style = "sapphire"
+format = "[$path]($style)"
+truncation_length = 4
+truncation_symbol = "…/"
 
 [directory.substitutions]
-'Documents' = '󰈙'
-'Downloads' = ' '
-'Music' = ' '
-'Pictures' = ' '
-'dev ' = ' '
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = "󰝚 "
+"Pictures" = " "
+"Developer" = "󰲋 "
+
+[os]
+disabled = true
+
+[custom.giturl]
+description = "Display symbol for remote Git server"
+command = '''
+GIT_REMOTE=$(command git ls-remote --get-url 2> /dev/null)
+if [[ "$GIT_REMOTE" =~ "github" ]]; then
+    GIT_REMOTE_SYMBOL=" "
+elif [[ "$GIT_REMOTE" =~ "gitlab" ]]; then
+    GIT_REMOTE_SYMBOL=" "
+elif [[ "$GIT_REMOTE" =~ "bitbucket" ]]; then
+    GIT_REMOTE_SYMBOL=" "
+elif [[ "$GIT_REMOTE" =~ "git" ]]; then
+    GIT_REMOTE_SYMBOL=" "
+else
+    GIT_REMOTE_SYMBOL=" "
+fi
+echo "$GIT_REMOTE_SYMBOL"
+'''
+when = 'git rev-parse --is-inside-work-tree 2> /dev/null'
+format = "at $output"
 
 [git_branch]
-style = 'fg:green'
-symbol = ' '
-format = '[on](white) [$symbol$branch ]($style)'
+symbol = "[](black) "
+style = "fg:lavender bg:black"
+format = '  on [$symbol$branch]($style)[](black)'
 
 [git_status]
-style = 'fg:red'
-format = '([$all_status$ahead_behind]($style) )'
-
-[fill]
-symbol = ' '
-
+format = ' [($all_status$ahead_behind )]($style)'
 
 [dotnet]
 symbol = ''
@@ -53,56 +48,57 @@ style = 'bold purple'
 format = '[$symbol($version)]($style)'
 
 [lua]
-format = '[$symbol($version )]($style)'
 symbol = ' '
+style = 'fg:teal'
+format = '[$symbol($version)]($style)'
 
 [nodejs]
-style = 'blue'
-symbol = ' '
+symbol = ""
+style = 'fg:yellow'
+format = '[ $symbol( $version) ]($style)'
 
-
-[golang]
-style = 'blue'
-symbol = ' '
-
-[python]
-style = 'teal'
-symbol = ' '
-format = '[${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
-pyenv_version_name = true
-pyenv_prefix = ''
+[c]
+symbol = " "
+style = 'fg:red'
+format = '[[ $symbol( $version) ]]($style)'
 
 [rust]
-style = 'orange'
-symbol = ' '
+symbol = ""
+style = 'fg:orange'
+format = '[[ $symbol( $version) ]]($style)'
 
-[package]
-symbol = '󰏗 '
+[golang]
+symbol = ""
+style = 'fg:blue'
+format = '[ $symbol( $version) ]($style)'
+detect_files = ["go.mod"]
 
-[aws]
-symbol = ' '
-style = 'yellow'
-format = '[$symbol($profile )(\[$duration\] )]($style)'
+[php]
+symbol = ""
+style = 'fg:magenta'
+format = '[[ $symbol( $version) ]]($style)'
 
-[azure]
-symbol = ' '
-style = 'blue'
-format = '[$symbol($subscription )(\[$duration\] )]($style)'
+[java]
+symbol = " "
+style = 'fg:green'
+format = '[[ $symbol( $version) ]]($style)'
+
+[kotlin]
+symbol = ""
+style = 'fg:cyan'
+format = '[[ $symbol( $version) ]]($style)'
+
+[haskell]
+symbol = ""
+style = 'fg:bright-green'
+format = '[[ $symbol( $version) ]]($style)'
+
+[python]
+symbol = ""
+style = 'fg:yellow'
+format = '[[ $symbol( $version) ]]($style)'
 
 [docker_context]
-symbol = ' '
-style = 'fg:#06969A'
-format = '[$symbol]($style) $path'
-detect_files = ['docker-compose.yml', 'docker-compose.yaml', 'Dockerfile']
-detect_extensions = ['Dockerfile']
-
-[jobs]
-symbol = ' '
-style = 'red'
-number_threshold = 1
-format = '[$symbol]($style)'
-
-[cmd_duration]
-min_time = 500
-style = 'fg:gray'
-format = '[$duration]($style)'
+symbol = ""
+style = 'fg:blue'
+format = '[ $symbol( $context) ]($style)'
