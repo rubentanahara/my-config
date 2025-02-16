@@ -25,7 +25,7 @@ config.colors = {
 
 config.font = wezterm.font("Hack Nerd Font")
 config.automatically_reload_config = true
-config.font_size = 16
+config.font_size = 14
 config.line_height = 1.2
 config.window_decorations = "RESIZE"
 config.enable_tab_bar = false
