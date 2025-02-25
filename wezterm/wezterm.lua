@@ -84,7 +84,7 @@ config.hide_tab_bar_if_only_one_tab = true
 -- ============================
 -- Workspace Configuration
 -- ============================
-config.adjust_window_size_when_changing_font_size = false
+config.adjust_window_size_when_changing_font_size = true
 
 config.hyperlink_rules = {
 	-- Matches: a URL in parens: (URL)
@@ -121,6 +121,18 @@ config.hyperlink_rules = {
 	{
 		regex = "\\b\\w+@[\\w-]+(\\.[\\w-]+)+\\b",
 		format = "mailto:$0",
+	},
+}
+
+-- ============================
+-- Mouse Bindings
+-- ============================
+config.mouse_bindings = {
+	-- CMD-click to open links
+	{
+		event = { Up = { streak = 1, button = "Left" } },
+		mags = "CMD",
+		action = wezterm.action.OpenLinkAtMouseCursor,
 	},
 }
 
