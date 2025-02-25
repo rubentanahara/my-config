@@ -22,8 +22,7 @@ function M.setup()
   map({ "n", "v" }, "<leader>y", [["+y]], { noremap = true, silent = true, desc = "Yank to system clipboard" })
   map({ "n", "v" }, "<leader>Y", [["+Y]], { noremap = true, silent = true, desc = "Yank line to system clipboard" })
   map({ "n", "v" }, "<leader>p", [["+p]], { noremap = true, silent = true, desc = "Paste from system clipboard" })
-  map({ "n", "v" }, "<leader>P", [["+P]],
-    { noremap = true, silent = true, desc = "Paste from system clipboard before cursor" })
+  map({ "n", "v" }, "<leader>P", [["+P]], { noremap = true, silent = true, desc = "Paste from system clipboard before cursor" })
   map("x", "<leader>P", [["_dP]], { noremap = true, silent = true, desc = "Paste and keep register" })
 
   -- Delete to void register
@@ -39,7 +38,7 @@ function M.setup()
   map("v", "<", "<gv", { noremap = true, silent = true, desc = "Indent left" })
   map("v", ">", ">gv", { noremap = true, silent = true, desc = "Indent right" })
 
-  -- Move selected line / block of text
+  -- Move selected line / block of text in visual mode
   map("v", "J", ":m '>+1<CR>gv=gv", { noremap = true, silent = true, desc = "Move line down" })
   map("v", "K", ":m '<-2<CR>gv=gv", { noremap = true, silent = true, desc = "Move line up" })
 
@@ -65,28 +64,14 @@ function M.setup()
   map("n", "ss", ":split<CR>", { noremap = true, silent = true, desc = "Horizontal Window Split" })
   map("n", "sv", ":vsplit<CR>", { noremap = true, silent = true, desc = "Vertical Window Split" })
 
+  -- Window resizing
   map("n", "<C-w><up>", ":resize +3<CR>", { noremap = true, silent = true, desc = "Resize Horizontal Up" })
   map("n", "<C-w><down>", ":resize -3<CR>", { noremap = true, silent = true, desc = "Resize Horizontal Down" })
-  map(
-    "n",
-    "<C-w><left>",
-    ":vertical resize +3<CR>",
-    { noremap = true, silent = true, desc = "Resize Vertical Left" }
-  )
-  map(
-    "n",
-    "<C-w><right>",
-    ":vertical resize -3<CR>",
-    { noremap = true, silent = true, desc = "Resize Vertical Right" }
-  )
+  map("n", "<C-w><left>", ":vertical resize +3<CR>", { noremap = true, silent = true, desc = "Resize Vertical Left" })
+  map("n", "<C-w><right>", ":vertical resize -3<CR>", { noremap = true, silent = true, desc = "Resize Vertical Right" })
 
   -- Useful keymaps
-  map(
-    "n",
-    "x",
-    '"_x',
-    { noremap = true, silent = true, desc = "Delete single character without copying into register" }
-  )
+  map("n", "x", '"_x', { noremap = true, silent = true, desc = "Delete single character without copying into register" })
   map("n", "+", "<C-a>", { noremap = true, silent = true, desc = "Increment" })
   map("n", "-", "<C-x>", { noremap = true, silent = true, desc = "Decrement" })
 
