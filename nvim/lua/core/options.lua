@@ -6,21 +6,22 @@ function options.setup()
   local g = vim.g     -- for concise set global variables
 
   -- Global options
-  g.mapleader = " " -- set leader key to space
+  g.mapleader = ' ' -- set leader key to space
   g.autoformat = false
+  g.disable_autoformat = true
 
   -- Encoding
-  vim.scriptencoding = "utf-8"
-  opt.fileencoding = "utf-8"
-  opt.encoding = "utf-8"
+  vim.scriptencoding = 'utf-8'
+  opt.fileencoding = 'utf-8'
+  opt.encoding = 'utf-8'
 
   -- UI
   opt.number = true
   opt.relativenumber = true
   opt.termguicolors = true
   -- opt.cursorline = true
-  opt.signcolumn = "yes"
-  opt.colorcolumn = "80"
+  opt.signcolumn = 'yes'
+  opt.colorcolumn = '80'
   opt.showmode = true
   opt.showcmd = false
   opt.conceallevel = 2
@@ -34,7 +35,7 @@ function options.setup()
   opt.smartindent = true
   opt.wrap = false
   opt.breakindent = true
-  opt.showbreak = string.rep(" ", 3)
+  opt.showbreak = string.rep(' ', 3)
   opt.linebreak = true
 
   -- Behavior
@@ -43,11 +44,11 @@ function options.setup()
   opt.swapfile = false
   opt.backup = false
   opt.undofile = true
-  opt.undodir = vim.fn.stdpath("data") .. "/undodir"
+  opt.undodir = vim.fn.stdpath 'data' .. '/undodir'
   opt.ignorecase = true
   opt.smartcase = true
-  opt.clipboard = "unnamedplus"
-  opt.completeopt = "menuone,noselect"
+  opt.clipboard = 'unnamedplus'
+  opt.completeopt = 'menuone,noselect'
   opt.updatetime = 250
   opt.timeoutlen = 300
   opt.splitright = true
@@ -67,11 +68,11 @@ function options.setup()
   opt.sidescrolloff = 8
 
   -- Wild menu
-  opt.wildmode = "longest:full,full"
-  opt.wildignore = "*/node_modules/*,*/dist/*,*/.git/*"
+  opt.wildmode = 'longest:full,full'
+  opt.wildignore = '*/node_modules/*,*/dist/*,*/.git/*'
 
   -- Shell
-  opt.shell = "zsh"
+  opt.shell = 'zsh'
 end
 
 return options

@@ -14,6 +14,11 @@ return {
       -- Add your own debuggers here
       "leoluz/nvim-dap-go",
       "mfussenegger/nvim-dap-python",
+      "microsoft/vscode-js-debug",
+      "nvim-lua/plenary.nvim",
+      "mxsdev/nvim-dap-vscode-js",
+      "jbyuki/one-small-step-for-vimkind", -- Lua debugging
+      "theHamsta/nvim-dap-virtual-text",
     },
     keys = {
       {
@@ -164,6 +169,141 @@ return {
         },
       })
 
+      -- JavaScript/TypeScript setup
+      require("dap-vscode-js").setup({
+        debugger_path = vim.fn.stdpath("data") .. "/mason/packages/js-debug-adapter",
+        adapters = { 'pwa-node', 'pwa-chrome', 'pwa-msedge', 'node-terminal', 'pwa-extensionHost' },
+      })
+
+      for _, language in ipairs({ "typescript", "javascript", "typescriptreact", "javascriptreact" }) do
+        dap.configurations[language] = {
+          -- Node.js
+          {
+            type = "pwa-node",
+            request = "launch",
+            name = "Launch file (Node)",
+            program = "${file}",
+            cwd = "${workspaceFolder}",
+            sourceMaps = true,
+          },
+          {
+            type = "pwa-node",
+            request = "attach",
+            name = "Attach to Node Process",
+            processId = require("dap.utils").pick_process,
+            cwd = "${workspaceFolder}",
+            sourceMaps = true,
+          },
+          -- React/Next.js
+          {
+            type = "pwa-chrome",
+            request = "launch",
+            name = "Launch Chrome against localhost",
+            url = "http://localhost:3000",
+            webRoot = "${workspaceFolder}",
+            userDataDir = "${workspaceFolder}/.vscode/chrome-debug-profile",
+            sourceMaps = true,
+          },
+          -- NestJS
+          {
+            type = "pwa-node",
+            request = "launch",
+            name = "Debug NestJS",
+            runtimeExecutable = "npm",
+            runtimeArgs = {
+              "run",
+              "start:debug",
+            },
+            rootPath = "${workspaceFolder}",
+            cwd = "${workspaceFolder}",
+            console = "integratedTerminal",
+            sourceMaps = true,
+          },
+        }
+      end
+
+      -- C# setup
+      dap.adapters.coreclr = {
+        type = "executable",
+        command = vim.fn.stdpath("data") .. "/mason/packages/netcoredbg/netcoredbg",
+        args = { "--interpreter=vscode" },
+      }
+
+      dap.configurations.cs = {
+        {
+          type = "coreclr",
+          name = "launch - netcoredbg",
+          request = "launch",
+          program = function()
+            return vim.fn.input("Path to dll: ", vim.fn.getcwd() .. "/bin/Debug/", "file")
+          end,
+        },
+      }
+
+      -- Rust setup
+      dap.adapters.lldb = {
+        type = "executable",
+        command = "/usr/bin/lldb-vscode",
+        name = "lldb",
+      }
+
+      dap.configurations.rust = {
+        {
+          name = "Launch",
+          type = "lldb",
+          request = "launch",
+          program = function()
+            return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/target/debug/", "file")
+          end,
+          cwd = "${workspaceFolder}",
+          stopOnEntry = false,
+          args = {},
+          runInTerminal = false,
+        },
+      }
+
+      -- Dart/Flutter setup
+      dap.adapters.dart = {
+        type = "executable",
+        command = vim.fn.stdpath("data") .. "/mason/packages/dart-debug-adapter/dart-debug-adapter",
+        args = {},
+      }
+
+      dap.configurations.dart = {
+        {
+          type = "dart",
+          request = "launch",
+          name = "Launch Dart Program",
+          program = "${file}",
+          cwd = "${workspaceFolder}",
+        },
+        {
+          type = "dart",
+          request = "launch",
+          name = "Launch Flutter",
+          program = "${workspaceFolder}/lib/main.dart",
+          flutterMode = "debug",
+        },
+      }
+
+      -- Kotlin setup
+      dap.adapters.kotlin = {
+        type = "executable",
+        command = vim.fn.stdpath("data") .. "/mason/packages/kotlin-debug-adapter/kotlin-debug-adapter",
+      }
+
+      dap.configurations.kotlin = {
+        {
+          type = "kotlin",
+          request = "launch",
+          name = "Launch Kotlin Program",
+          projectRoot = "${workspaceFolder}",
+          mainClass = function()
+            return vim.fn.input("Main class: ")
+          end,
+        },
+      }
+
       -- Basic debugging keymaps
       vim.keymap.set("n", "<F5>", dap.continue, { desc = "Debug: Start/Continue" })
       vim.keymap.set("n", "<F1>", dap.step_into, { desc = "Debug: Step Into" })
@@ -250,16 +390,22 @@ return {
   -- Mason DAP adapter installer
   {
     "jay-babu/mason-nvim-dap.nvim",
-    dependencies = "williamboman/mason.nvim",
-    cmd = { "DapInstall", "DapUninstall" },
+    dependencies = { "williamboman/mason.nvim", "mfussenegger/nvim-dap" },
     opts = {
       automatic_installation = true,
-      handlers = {},
       ensure_installed = {
         "python",
-        "node2",
-        "chrome",
+        "delve",
+        "js-debug-adapter",
+        "node-debug2-adapter",
+        "chrome-debug-adapter",
+        "netcoredbg",
+        "codelldb",
+        "dart-debug-adapter",
+        "kotlin-debug-adapter",
       },
+      handlers = {},
     },
   },
-} 
+}
+
