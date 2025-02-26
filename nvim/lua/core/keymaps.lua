@@ -21,9 +21,6 @@ function M.setup()
   -- Clipboard operations
   map({ "n", "v" }, "<leader>y", [["+y]], { noremap = true, silent = true, desc = "Yank to system clipboard" })
   map({ "n", "v" }, "<leader>Y", [["+Y]], { noremap = true, silent = true, desc = "Yank line to system clipboard" })
-  map({ "n", "v" }, "<leader>p", [["+p]], { noremap = true, silent = true, desc = "Paste from system clipboard" })
-  map({ "n", "v" }, "<leader>P", [["+P]], { noremap = true, silent = true, desc = "Paste from system clipboard before cursor" })
-  map("x", "<leader>P", [["_dP]], { noremap = true, silent = true, desc = "Paste and keep register" })
 
   -- Delete to void register
   map({ "n", "v" }, "<leader>d", [["_d]], { noremap = true, silent = true, desc = "Delete to void register" })
