@@ -19,6 +19,7 @@ return {
       "mxsdev/nvim-dap-vscode-js",
       "jbyuki/one-small-step-for-vimkind", -- Lua debugging
       "theHamsta/nvim-dap-virtual-text",
+      "GustavEikaas/easy-dotnet.nvim",     -- .NET integration
     },
     keys = {
       {
@@ -222,7 +223,7 @@ return {
         }
       end
 
-      -- C# setup
+      -- C# setup with easy-dotnet integration
       dap.adapters.coreclr = {
         type = "executable",
         command = vim.fn.stdpath("data") .. "/mason/packages/netcoredbg/netcoredbg",
@@ -235,9 +236,40 @@ return {
           name = "launch - netcoredbg",
           request = "launch",
           program = function()
+            -- Try to use easy-dotnet to get the debug DLL if available
+            local has_dotnet, dotnet = pcall(require, "easy-dotnet")
+            if has_dotnet then
+              local dll_path = dotnet.get_debug_dll()
+              if dll_path and dll_path ~= "" then
+                return dll_path
+              end
+            end
+            -- Fallback to manual input
             return vim.fn.input("Path to dll: ", vim.fn.getcwd() .. "/bin/Debug/", "file")
           end,
+          cwd = "${workspaceFolder}",
+          env = function()
+            -- Try to get environment variables from easy-dotnet
+            local has_dotnet, dotnet = pcall(require, "easy-dotnet")
+            if has_dotnet then
+              local solution = dotnet.try_get_selected_solution()
+              if solution then
+                local env_vars = dotnet.get_environment_variables(solution.basename, solution.path)
+                if env_vars and next(env_vars) then
+                  return env_vars
+                end
+              end
+            end
+            return {}
+          end,
+          stopAtEntry = false,
         },
+        {
+          type = "coreclr",
+          name = "attach - netcoredbg",
+          request = "attach",
+          processId = require("dap.utils").pick_process,
+        }
       }
 
       -- Rust setup

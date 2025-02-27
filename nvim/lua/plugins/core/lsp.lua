@@ -376,6 +376,29 @@ return {
           enable_roslyn_analyzers = true,
           organize_imports_on_format = true,
           enable_import_completion = true,
+          sdk_include_prereleases = true,
+          analyze_open_documents_only = false,
+          enable_ms_build_load_projects_on_demand = true,
+          enable_editorconfig_support = true,
+          enable_package_restore = true,
+          on_attach = function(client, bufnr)
+            -- Call the default on_attach function
+            on_attach(client, bufnr)
+            
+            -- Check if easy-dotnet is available
+            local has_dotnet, dotnet = pcall(require, "easy-dotnet")
+            if has_dotnet then
+              -- Add specific keymaps for C# files
+              local map = function(mode, lhs, rhs, desc)
+                vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
+              end
+              
+              -- Add C# specific keymaps
+              map("n", "<leader>dt", function() dotnet.test() end, "Run .NET Tests")
+              map("n", "<leader>dr", function() dotnet.run() end, "Run .NET Project")
+              map("n", "<leader>db", function() dotnet.build() end, "Build .NET Project")
+            end
+          end,
         },
         dartls = {
           cmd = { 'dart', 'language-server', '--protocol=lsp' },
