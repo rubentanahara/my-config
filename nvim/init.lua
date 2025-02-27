@@ -32,6 +32,7 @@ require("lazy").setup({
     { import = "plugins.core.debug" },  -- Debugging setup
     { import = "plugins.core.tmux" },   -- Tmux integration
     { import = "plugins.core.util" },   -- Additional utilities
+    { import = "plugins.core.dotnet" }, -- .NET development tools
   },
   defaults = {
     lazy = true,                -- Every plugin is lazy-loaded by default
@@ -66,7 +67,7 @@ require("lazy").setup({
       source = "📄",
       start = "🚀",
       task = "📌",
-      lazy = "󰒲 ",
+      lazy = "�� ",
     },
   },
 })

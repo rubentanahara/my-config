@@ -416,6 +416,8 @@ return {
           vim.notify('Python formatting DISABLED - Will NOT format on save', vim.log.levels.INFO)
         end
       end, {})
+
+      -- We don't need to add .NET project file completion here since it's handled in dotnet.lua
     end,
   },
 
@@ -574,11 +576,17 @@ return {
           end,
         },
         sources = cmp.config.sources({
-          { name = 'nvim_lsp' },
-          { name = 'luasnip' },
-          { name = 'path' },
+          { name = "nvim_lsp" },
+          { name = "nvim_lsp_signature_help" },
+          { name = "luasnip" },
+          { name = "buffer" },
+          { name = "path" },
+          { name = "calc" },
+          { name = "treesitter" },
+          { name = "crates" },
+          { name = "tmux" },
         }, {
-          { name = 'buffer' },
+          { name = "buffer" },
         }),
         formatting = {
           format = function(_, item)
