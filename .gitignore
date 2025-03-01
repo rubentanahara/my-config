@@ -19,7 +19,6 @@ github-copilot/
 gh/
 gh-dash/
 nvim/.netrwhist
-tmux/plugins/
 
 # Logs and cache
 logs/

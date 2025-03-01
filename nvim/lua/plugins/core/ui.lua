@@ -1,52 +1,83 @@
-return { {
-  -- Color scheme
-  "rebelot/kanagawa.nvim",
-  lazy = false,    -- Load the theme immediately
-  priority = 1000, -- Ensure it loads first
-  config = function()
-    -- Default options:
-    require("kanagawa").setup({
-      compile = false,  -- enable compiling the colorscheme
-      undercurl = true, -- enable undercurls
-      commentStyle = {
-        italic = true
-      },
-      functionStyle = {
-        italic = true
-      },
-      keywordStyle = {
-        italic = true
-      },
-      statementStyle = {
-        bold = true
-      },
-      typeStyle = {},
-      transparent = true,    -- do not set background color
-      dimInactive = false,   -- dim inactive window `:h hl-NormalNC`
-      terminalColors = true, -- define vim.g.terminal_color_{0,17}
-      colors = {             -- add/modify theme and palette colors
-        palette = {},
-        theme = {
-          wave = {},
-          lotus = {},
-          dragon = {},
-          all = {}
+return {
+  {
+    -- Color scheme
+    "rebelot/kanagawa.nvim",
+    lazy = false,    -- Load the theme immediately
+    priority = 1000, -- Ensure it loads first
+    config = function()
+      -- Default options:
+      require("kanagawa").setup({
+        compile = false,  -- enable compiling the colorscheme
+        undercurl = true, -- enable undercurls
+        commentStyle = {
+          italic = true
+        },
+        functionStyle = {
+          italic = true
+        },
+        keywordStyle = {
+          italic = true
+        },
+        statementStyle = {
+          bold = true
+        },
+        typeStyle = {},
+        transparent = true,    -- do not set background color
+        dimInactive = false,   -- dim inactive window `:h hl-NormalNC`
+        terminalColors = true, -- define vim.g.terminal_color_{0,17}
+        colors = {             -- add/modify theme and palette colors
+          palette = {},
+          theme = {
+            wave = {},
+            lotus = {},
+            dragon = {},
+            all = {}
+          }
+        },
+        overrides = function(colors) -- add/modify highlights
+          return {}
+        end,
+        theme = "dragon",  -- Load "wave" theme when 'background' option is not set
+        background = {     -- map the value of 'background' option to a theme
+          dark = "dragon", -- try "dragon" !
+          light = "lotus"
         }
-      },
-      overrides = function(colors) -- add/modify highlights
-        return {}
-      end,
-      theme = "dragon",  -- Load "wave" theme when 'background' option is not set
-      background = {     -- map the value of 'background' option to a theme
-        dark = "dragon", -- try "dragon" !
-        light = "lotus"
-      }
-    })
+      })
 
-    -- setup must be called before loading
-    vim.cmd("colorscheme kanagawa")
-  end
-}, -- vs code like
+      -- setup must be called before loading
+      vim.cmd("colorscheme kanagawa")
+    end
+  },
+  {
+    "kdheepak/lazygit.nvim",
+    lazy = false,
+    cmd = {
+      "LazyGit",
+      "LazyGitConfig",
+      "LazyGitCurrentFile",
+      "LazyGitFilter",
+      "LazyGitFilterCurrentFile",
+    },
+    -- optional for floating window border decoration
+    dependencies = {
+      "nvim-telescope/telescope.nvim",
+      "nvim-lua/plenary.nvim",
+    },
+    config = function()
+      require("telescope").load_extension("lazygit")
+    end,
+    keys = {
+      { "<leader>gg",  "<cmd>LazyGit<cr>",                  desc = "LazyGit" },
+      { "<leader>gc",  "<cmd>LazyGitConfig<cr>",            desc = "LazyGit Config" },
+      { "<leader>gf",  "<cmd>LazyGitCurrentFile<cr>",       desc = "LazyGit Current File" },
+      { "<leader>gF",  "<cmd>LazyGitFilter<cr>",            desc = "LazyGit Filter" },
+      { "<leader>gff", "<cmd>LazyGitFilterCurrentFile<cr>", desc = "LazyGit Filter Current File" },
+      { "<leader>g?",  "<cmd>Telescope lazygit<cr>",        desc = "LazyGit Telescope" }
+    }
+  },
+  {
+    'folke/zen-mode.nvim',
+  },
   {
     "utilyre/barbecue.nvim",
     event = "VeryLazy",
@@ -312,7 +343,7 @@ return { {
           }
         },
         follow_current_file = {
-          enabled = false,                      -- This will find and focus the file in the active buffer every time
+          enabled = true,                       -- This will find and focus the file in the active buffer every time
           --               -- the current file is changed while the tree is open.
           leave_dirs_open = false               -- `false` closes auto expanded dirs, such as with `:Neotree reveal`
         },
@@ -692,12 +723,6 @@ return { {
           ["vim.lsp.util.stylize_markdown"] = true,
           ["cmp.entry.get_documentation"] = true
         },
-        hover = {
-          enabled = true,
-          silent = false,
-          view = nil,
-          opts = {}
-        },
         signature = {
           enabled = true,
           auto_open = {
@@ -875,7 +900,7 @@ return { {
           name = "+help"
         },
         ["<leader>n"] = {
-          name = "+notes"
+          group = "+dotnet"
         },
         ["<leader>o"] = {
           name = "+open"

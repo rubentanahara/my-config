@@ -15,15 +15,29 @@ function M.setup()
 
   -- Save and close
   map("n", "<C-s>", ":w<CR>", { noremap = true, silent = true, desc = "Save File" })
-  map("n", "<C-q>", ":wqa<CR>", { noremap = true, silent = true, desc = "Save and quit" })
+  map("n", "<leader>qs", ":wqa<CR>", { noremap = true, silent = true, desc = "Save and quit" })
+  -- was save?
+
+  -- quit
+  map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit All" })
 
   -- Navigate within insert mode
   map("i", "<C-b>", "<ESC>^i", { noremap = true, silent = true, desc = "Go to beginning of line" })
   map("i", "<C-e>", "<ESC>$a", { noremap = true, silent = true, desc = "Go to end of line" })
 
-  -- Better window navigation
-  map("n", "<C-j>", ":m .+1<CR>==", { noremap = true, silent = true, desc = "Move line down" })
-  map("n", "<C-k>", ":m .-2<CR>==", { noremap = true, silent = true, desc = "Move line up" })
+  -- better up/down
+  map({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { desc = "Down", expr = true, silent = true })
+  map({ "n", "x" }, "<Down>", "v:count == 0 ? 'gj' : 'j'", { desc = "Down", expr = true, silent = true })
+  map({ "n", "x" }, "k", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = true, silent = true })
+  map({ "n", "x" }, "<Up>", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = true, silent = true })
+
+  -- Move Lines
+  map("n", "<A-j>", "<cmd>execute 'move .+' . v:count1<cr>==", { desc = "Move Down" })
+  map("n", "<A-k>", "<cmd>execute 'move .-' . (v:count1 + 1)<cr>==", { desc = "Move Up" })
+  map("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move Down" })
+  map("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move Up" })
+  map("v", "<A-j>", ":<C-u>execute \"'<,'>move '>+\" . v:count1<cr>gv=gv", { desc = "Move Down" })
+  map("v", "<A-k>", ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv", { desc = "Move Up" })
 
   -- Clipboard operations
   map({ "n", "v" }, "<leader>y", [["+y]], { noremap = true, silent = true, desc = "Yank to system clipboard" })
@@ -32,11 +46,11 @@ function M.setup()
   -- Delete to void register
   map({ "n", "v" }, "<leader>d", [["_d]], { noremap = true, silent = true, desc = "Delete to void register" })
 
-  -- Resize with arrows
-  map("n", "<C-Up>", ":resize -2<CR>", { noremap = true, silent = true, desc = "Decrease window height" })
-  map("n", "<C-Down>", ":resize +2<CR>", { noremap = true, silent = true, desc = "Increase window height" })
-  map("n", "<C-Left>", ":vertical resize -2<CR>", { noremap = true, silent = true, desc = "Decrease window width" })
-  map("n", "<C-Right>", ":vertical resize +2<CR>", { noremap = true, silent = true, desc = "Increase window width" })
+  -- Resize window using <ctrl> arrow keys
+  map("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase Window Height" })
+  map("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease Window Height" })
+  map("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease Window Width" })
+  map("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase Window Width" })
 
   -- Better indenting
   map("v", "<", "<gv", { noremap = true, silent = true, desc = "Indent left" })
@@ -52,12 +66,20 @@ function M.setup()
   -- Clear search with <esc>
   map({ "i", "n" }, "<esc>", "<cmd>noh<cr><esc>", { noremap = true, silent = true, desc = "Clear hlsearch and escape" })
 
-  -- Save file
-  map({ "i", "v", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { noremap = true, silent = true, desc = "Save file" })
+  -- save file
+  map({ "i", "x", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
 
-  -- Better movement
-  map("n", "<C-d>", "<C-d>zz", { noremap = true, silent = true, desc = "Scroll down and center" })
-  map("n", "<C-u>", "<C-u>zz", { noremap = true, silent = true, desc = "Scroll up and center" })
+  --keywordprg
+  map("n", "<leader>K", "<cmd>norm! K<cr>", { desc = "Keywordprg" })
+
+  -- Clear search, diff update and redraw
+  -- taken from runtime/lua/_editor.lua
+  map(
+    "n",
+    "<leader>ur",
+    "<Cmd>nohlsearch<Bar>diffupdate<Bar>normal! <C-L><CR>",
+    { desc = "Redraw / Clear hlsearch / Diff Update" }
+  )
 
   -- Diagnostic keymaps
   map("n", "[d", vim.diagnostic.goto_prev, { noremap = true, silent = true, desc = "Previous diagnostic" })
@@ -79,19 +101,9 @@ function M.setup()
   map("n", "+", "<C-a>", { noremap = true, silent = true, desc = "Increment" })
   map("n", "-", "<C-x>", { noremap = true, silent = true, desc = "Decrement" })
 
-  --VISUAL
-  map(
-    "x",
-    "<C-j>",
-    ":move '>+1<CR>gv-gv",
-    { noremap = true, silent = true, desc = "Move lines down in visual mode" }
-  )
-  map(
-    "x",
-    "<C-k>",
-    ":move '<-2<CR>gv-gv",
-    { noremap = true, silent = true, desc = "Move lines up in visual mode" }
-  )
+  -- commenting
+  map("n", "gco", "o<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Below" })
+  map("n", "gcO", "O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Above" })
 end
 
 return M
