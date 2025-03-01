@@ -3,12 +3,39 @@ local M = {}
 function M.setup()
   local map = vim.keymap.set
 
-  -- Open Lazy command in normal mode
+  -- Lazy commads
   map("n", "<leader>l", ":Lazy<CR>", {
     noremap = true,
     silent = true,
     desc = "Open Lazy (Lazy.nvim)",
   })
+
+  map("n", "<leader>lc", ":LazyConfig<CR>", {
+    noremap = true,
+    silent = true,
+    desc = "Open Lazy Config (Lazy.nvim)",
+  })
+
+  map("n", "<leader>li", ":LazyInstall<CR>", {
+    noremap = true,
+    silent = true,
+    desc = "Install Lazy Plugins (Lazy.nvim)",
+  })
+
+  map("n", "<leader>lu", ":LazyUpdate<CR>", {
+    noremap = true,
+    silent = true,
+    desc = "Update Lazy Plugins (Lazy.nvim)",
+  })
+
+  map("n", "<leader>ld", ":LazyDebug<CR>", {
+    noremap = true,
+    silent = true,
+    desc = "Debug Lazy Plugins (Lazy.nvim)",
+  })
+
+  -- Toggle line numbers
+  map("n", "<leader>ln", ":set nu!<CR>", { noremap = true, silent = true, desc = "Toggle Line Numbers" })
 
   -- Exit insert mode
   map("i", "jk", "<ESC>", { noremap = true, silent = true, desc = "Exit insert mode" })

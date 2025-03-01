@@ -5,17 +5,17 @@ return {
     cmd = "DotnetUI",
     keys = {
       { '<leader>/',   mode = { 'n', 'v' } },
-      { '<leader>na',  "<cmd>:DotnetUI new_item<CR>",                 { desc = '.NET new item', silent = true } },
-      { '<leader>nb',  "<cmd>:DotnetUI file bootstrap<CR>",           { desc = '.NET bootstrap class', silent = true } },
-      { '<leader>nra', "<cmd>:DotnetUI project reference add<CR>",    { desc = '.NET add project reference', silent = true } },
-      { '<leader>nrr', "<cmd>:DotnetUI project reference remove<CR>", { desc = '.NET remove project reference', silent = true } },
-      { '<leader>npa', "<cmd>:DotnetUI project package add<CR>",      { desc = '.NET ada project package', silent = true } },
-      { '<leader>npr', "<cmd>:DotnetUI project package remove<CR>",   { desc = '.NET remove project package', silent = true } },
+      { '<leader>na',  "<cmd>DotnetUI new_item<cr>",                 desc = '.NET new item',                 silent = true },
+      { '<leader>nb',  "<cmd>DotnetUI file bootstrap<cr>",           desc = '.NET bootstrap class',          silent = true },
+      { '<leader>nra', "<cmd>DotnetUI project reference add<cr>",    desc = '.NET add project reference',    silent = true },
+      { '<leader>nrr', "<cmd>DotnetUI project reference remove<cr>", desc = '.NET remove project reference', silent = true },
+      { '<leader>npa', "<cmd>DotnetUI project package add<cr>",      desc = '.NET ada project package',      silent = true },
+      { '<leader>npr', "<cmd>DotnetUI project package remove<cr>",   desc = '.NET remove project package',   silent = true },
     },
     opts = {
-      -- project_selection = {
-      -- 	path_display = 'filename_first',
-      -- }
+      project_selection = {
+        path_display = 'filename_first',
+      }
     },
   },
   -- lazy.nvim
@@ -42,15 +42,16 @@ return {
       local dotnet = require("easy-dotnet")
       -- Options are not required
       dotnet.setup({
-        --Optional function to return the path for the dotnet sdk (e.g C:/ProgramFiles/dotnet/sdk/8.0.0)
-        -- easy-dotnet will resolve the path automatically if this argument is omitted, for a performance improvement you can add a function that returns a hardcoded string
-        -- You should define this function to return a hardcoded path for a performance improvement 🚀
-        get_sdk_path = get_sdk_path,
+        -- Path to the dotnet sdk in macos
+        ---@type string
+        get_sdk_path = function()
+          return "/usr/local/share/dotnet"
+        end,
         ---@type TestRunnerOptions
         test_runner = {
           ---@type "split" | "float" | "buf"
           viewmode = "float",
-          enable_buffer_test_execution = true,               --Experimental, run tests directly from buffer
+          -- enable_buffer_test_execution = true, --Experimental, run tests directly from buffer
           noBuild = true,
           noRestore = true,
           icons = {
@@ -66,12 +67,12 @@ return {
             package = "",
           },
           mappings = {
-            run_test_from_buffer = { lhs = "<leader>r", desc = "run test from buffer" },
-            filter_failed_tests = { lhs = "<leader>fe", desc = "filter failed tests" },
-            debug_test = { lhs = "<leader>d", desc = "debug test" },
-            go_to_file = { lhs = "g", desc = "got to file" },
-            run_all = { lhs = "<leader>R", desc = "run all tests" },
-            run = { lhs = "<leader>r", desc = "run test" },
+            run_test_from_buffer = { lhs = "<leader>r", desc = "Run test from buffer" },
+            filter_failed_tests = { lhs = "<leader>fe", desc = "Filter failed tests" },
+            debug_test = { lhs = "<leader>d", desc = "Debug test" },
+            go_to_file = { lhs = "g", desc = "Got to file" },
+            run_all = { lhs = "<leader>R", desc = "Run all tests" },
+            run = { lhs = "<leader>r", desc = "Run Test" },
             peek_stacktrace = { lhs = "<leader>p", desc = "peek stacktrace of failed test" },
             expand = { lhs = "o", desc = "expand" },
             expand_node = { lhs = "E", desc = "expand node" },

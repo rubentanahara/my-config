@@ -868,62 +868,53 @@ return {
     event = "VeryLazy",
     opts = {
       plugins = {
-        spelling = true
+        spelling = true,
       },
-      defaults = {
-        mode = { "n", "v" },
-        ["g"] = {
-          name = "+goto"
+      spec = {
+        {
+          mode = { "n", "v" },
+          {
+            "<leader>b",
+            group = "buffer",
+            icon = { icon = "", color = "blue" },
+            expand = function()
+              return require("which-key.extras").expand.buf()
+            end,
+          },
+          { "<leader>c", group = "code" },
+          { "<leader>d", group = "debug" },
+          { "<leader>dp", group = "profiler" },
+          { "<leader>f", group = "file/find" },
+          { "<leader>h", group = "harpoon" },
+          { "<leader>g", group = "git" },
+          { "<leader>r", group = "replace", icon = { icon = "", color = "yellow" } },
+          {
+            "<leader>l",
+            group = "lazy",
+            icon = {
+              icon = "󰒲  ",
+            }
+          },
+          { "<leader>p", group = "toggle_preview", icon = { icon = "", color = "purple" } },
+          { "<leader>m", group = "markdown", icon = { icon = " ", color = "yellow" } },
+          { "<leader>n", group = "dotnet_actions", icon = { icon = "", color = "purple" } },
+          { "<leader>q", group = "quit" },
+          { "<leader>s", group = "session", icon = { icon = " ", color = "blue" } },
+          { "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
+          { "<leader>x", group = "diagnostics/quickfix", icon = { icon = "󱖫 ", color = "green" } },
+          { "[", group = "prev" },
+          { "]", group = "next" },
+          { "g", group = "goto" },
+          {
+            "<leader>w",
+            group = "windows",
+            proxy = "<c-w>",
+            expand = function()
+              return require("which-key.extras").expand.win()
+            end,
+          },
         },
-        ["gz"] = {
-          name = "+surround"
-        },
-        ["]"] = {
-          name = "+next"
-        },
-        ["["] = {
-          name = "+prev"
-        },
-        ["<leader>b"] = {
-          name = "+buffer"
-        },
-        ["<leader>c"] = {
-          name = "+code"
-        },
-        ["<leader>f"] = {
-          name = "+file/find"
-        },
-        ["<leader>g"] = {
-          name = "+git"
-        },
-        ["<leader>h"] = {
-          name = "+help"
-        },
-        ["<leader>n"] = {
-          group = "+dotnet"
-        },
-        ["<leader>o"] = {
-          name = "+open"
-        },
-        ["<leader>q"] = {
-          name = "+quit/session"
-        },
-        ["<leader>s"] = {
-          name = "+search"
-        },
-        ["<leader>t"] = {
-          name = "+test"
-        },
-        ["<leader>u"] = {
-          name = "+ui"
-        },
-        ["<leader>w"] = {
-          name = "+windows"
-        },
-        ["<leader>x"] = {
-          name = "+diagnostics/quickfix"
-        }
-      }
+      },
     }
   }, -- Dashboard
   {
