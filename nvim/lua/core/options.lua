@@ -1,17 +1,27 @@
+---@diagnostic disable: missing-fields
 local options = {}
 
 function options.setup()
   -- BASE OPTIONS CONFIGURATION
+  -- check if vim.api is available
+  -- accessing undefined variable vim will throw an errors
+
+  if not vim then
+    -- log error message
+    print('vim.api is not available')
+    return
+  end
+
   local opt = vim.opt -- for concise set options
   local g = vim.g     -- for concise set global variables
 
   -- Global options
-  g.mapleader = ' ' -- set leader key to space
+  g.mapleader = ' ' -- Set leader key to space
   g.autoformat = false
   g.disable_autoformat = true
 
   -- Encoding
-  vim.scriptencoding = 'utf-8'
+  g.scriptencoding = 'utf-8'
   opt.fileencoding = 'utf-8'
   opt.encoding = 'utf-8'
 
@@ -20,12 +30,13 @@ function options.setup()
   opt.relativenumber = true
   opt.termguicolors = true
   opt.fillchars = {
-    foldopen = "",
-    foldclose = "",
-    fold = " ",
-    foldsep = " ",
-    diff = "╱",
-    eob = " ",
+    eob = " ", -- Character to display at the end of the buffer
+    fold = "", -- Character to indicate a folded line
+    foldopen = "", -- Character to indicate an open fold
+    foldclose = "", -- Character to indicate a closed fold
+    foldsep = "│", -- Separator between folded lines
+    diff = "╱", -- Character to indicate differences in diff mode
+    vert = "│", -- Vertical separator for splits
   }
   opt.foldlevel = 99
   -- opt.cursorline = true

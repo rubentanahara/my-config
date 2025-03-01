@@ -50,10 +50,10 @@ config.use_dead_keys = false
 -- Window Padding
 -- ============================
 config.window_padding = {
-  left = "0cell",
-  right = "0cell",
-  top = "0cell",
-  bottom = "0cell",
+  left = "0.5cell",
+  right = "0.5cell",
+  top = "0.5cell",
+  bottom = "0.5cell",
 }
 
 -- ============================
