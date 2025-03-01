@@ -19,9 +19,18 @@ function options.setup()
   opt.number = true
   opt.relativenumber = true
   opt.termguicolors = true
+  opt.fillchars = {
+    foldopen = "",
+    foldclose = "",
+    fold = " ",
+    foldsep = " ",
+    diff = "╱",
+    eob = " ",
+  }
+  opt.foldlevel = 99
   -- opt.cursorline = true
   opt.signcolumn = 'yes'
-  opt.colorcolumn = '80'
+  opt.colorcolumn = ''
   opt.showmode = true
   opt.showcmd = false
   opt.conceallevel = 2
@@ -33,7 +42,8 @@ function options.setup()
   opt.shiftwidth = 2
   opt.tabstop = 2
   opt.smartindent = true
-  opt.wrap = false
+  opt.winminwidth = 5 -- Minimum window width
+  opt.wrap = false    -- Disable line wrap
   opt.breakindent = true
   opt.showbreak = string.rep(' ', 3)
   opt.linebreak = true
