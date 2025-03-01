@@ -1,13 +1,13 @@
 return { {
   -- Color scheme
   "rebelot/kanagawa.nvim",
-  lazy = false,      -- Load the theme immediately
-  priority = 1000,   -- Ensure it loads first
+  lazy = false,    -- Load the theme immediately
+  priority = 1000, -- Ensure it loads first
   config = function()
     -- Default options:
     require("kanagawa").setup({
-      compile = false,        -- enable compiling the colorscheme
-      undercurl = true,       -- enable undercurls
+      compile = false,  -- enable compiling the colorscheme
+      undercurl = true, -- enable undercurls
       commentStyle = {
         italic = true
       },
@@ -21,10 +21,10 @@ return { {
         bold = true
       },
       typeStyle = {},
-      transparent = true,          -- do not set background color
-      dimInactive = false,         -- dim inactive window `:h hl-NormalNC`
-      terminalColors = true,       -- define vim.g.terminal_color_{0,17}
-      colors = {                   -- add/modify theme and palette colors
+      transparent = true,    -- do not set background color
+      dimInactive = false,   -- dim inactive window `:h hl-NormalNC`
+      terminalColors = true, -- define vim.g.terminal_color_{0,17}
+      colors = {             -- add/modify theme and palette colors
         palette = {},
         theme = {
           wave = {},
@@ -33,12 +33,12 @@ return { {
           all = {}
         }
       },
-      overrides = function(colors)       -- add/modify highlights
+      overrides = function(colors) -- add/modify highlights
         return {}
       end,
-      theme = "dragon",          -- Load "wave" theme when 'background' option is not set
-      background = {             -- map the value of 'background' option to a theme
-        dark = "dragon",         -- try "dragon" !
+      theme = "dragon",  -- Load "wave" theme when 'background' option is not set
+      background = {     -- map the value of 'background' option to a theme
+        dark = "dragon", -- try "dragon" !
         light = "lotus"
       }
     })
@@ -144,14 +144,14 @@ return { {
     })
 
     require("neo-tree").setup({
-      close_if_last_window = false,       -- Close Neo-tree if it is the last window left in the tab
+      close_if_last_window = false, -- Close Neo-tree if it is the last window left in the tab
       popup_border_style = "rounded",
       enable_git_status = true,
       enable_diagnostics = true,
       -- enable_normal_mode_for_inputs = false,                             -- Enable normal mode for input dialogs.
-      open_files_do_not_replace_types = { "terminal", "trouble", "qf" },     -- when opening files, do not use windows containing these filetypes or buftypes
-      sort_case_insensitive = false,                                         -- used when sorting files and directories in the tree
-      sort_function = nil,                                                   -- use a custom function for sorting files and directories in the tree
+      open_files_do_not_replace_types = { "terminal", "trouble", "qf" }, -- when opening files, do not use windows containing these filetypes or buftypes
+      sort_case_insensitive = false,                                     -- used when sorting files and directories in the tree
+      sort_function = nil,                                               -- use a custom function for sorting files and directories in the tree
       -- sort_function = function(a, b)
       --   if a.type == b.type then
       --     return a.path > b.path
@@ -165,14 +165,14 @@ return { {
         },
         indent = {
           indent_size = 2,
-          padding = 1,           -- extra padding on left hand side
+          padding = 1, -- extra padding on left hand side
           -- indent guides
           with_markers = true,
           indent_marker = "│",
           last_indent_marker = "└",
           highlight = "NeoTreeIndentMarker",
           -- expander config, needed for nesting files
-          with_expanders = nil,           -- if nil and file nesting is enabled, will enable expanders
+          with_expanders = nil, -- if nil and file nesting is enabled, will enable expanders
           expander_collapsed = "",
           expander_expanded = "",
           expander_highlight = "NeoTreeExpander"
@@ -215,19 +215,19 @@ return { {
         -- If you don't want to use these columns, you can set `enabled = false` for each of them individually
         file_size = {
           enabled = true,
-          required_width = 64           -- min width of window required to show this column
+          required_width = 64 -- min width of window required to show this column
         },
         type = {
           enabled = true,
-          required_width = 122           -- min width of window required to show this column
+          required_width = 122 -- min width of window required to show this column
         },
         last_modified = {
           enabled = true,
-          required_width = 88           -- min width of window required to show this column
+          required_width = 88 -- min width of window required to show this column
         },
         created = {
           enabled = true,
-          required_width = 110           -- min width of window required to show this column
+          required_width = 110 -- min width of window required to show this column
         },
         symlink_target = {
           enabled = false
@@ -246,11 +246,11 @@ return { {
         mappings = {
           ["<space>"] = {
             "toggle_node",
-            nowait = false             -- disable `nowait` if you have existing combos starting with this char that you want to use
+            nowait = false -- disable `nowait` if you have existing combos starting with this char that you want to use
           },
           ["<2-LeftMouse>"] = "open",
           ["<cr>"] = "open",
-          ["<esc>"] = "cancel",           -- close preview or floating neo-tree window
+          ["<esc>"] = "cancel", -- close preview or floating neo-tree window
           ["P"] = {
             "toggle_preview",
             config = {
@@ -269,17 +269,17 @@ return { {
             -- this command supports BASH style brace expansion ("x{a,b,c}" -> xa,xb,xc). see `:h neo-tree-file-actions` for details
             -- some commands may take optional config options, see `:h neo-tree-mappings` for details
             config = {
-              show_path = "none"               -- "none", "relative", "absolute"
+              show_path = "none" -- "none", "relative", "absolute"
             }
           },
-          ["A"] = "add_directory",           -- also accepts the optional config.show_path option like "add". this also supports BASH style brace expansion.
+          ["A"] = "add_directory", -- also accepts the optional config.show_path option like "add". this also supports BASH style brace expansion.
           ["d"] = "delete",
           ["r"] = "rename",
           ["y"] = "copy_to_clipboard",
           ["x"] = "cut_to_clipboard",
           ["p"] = "paste_from_clipboard",
-          ["c"] = "copy",           -- takes text input for destination, also accepts the optional config.show_path option like "add":
-          ["m"] = "move",           -- takes text input for destination, also accepts the optional config.show_path option like "add".
+          ["c"] = "copy", -- takes text input for destination, also accepts the optional config.show_path option like "add":
+          ["m"] = "move", -- takes text input for destination, also accepts the optional config.show_path option like "add".
           ["q"] = "close_window",
           ["R"] = "refresh",
           ["?"] = "show_help",
@@ -291,38 +291,38 @@ return { {
       nesting_rules = {},
       filesystem = {
         filtered_items = {
-          visible = false,           -- when true, they will just be displayed differently than normal items
+          visible = false, -- when true, they will just be displayed differently than normal items
           hide_dotfiles = false,
           hide_gitignored = false,
-          hide_hidden = false,           -- only works on Windows for hidden files/directories
+          hide_hidden = false, -- only works on Windows for hidden files/directories
           hide_by_name = { ".DS_Store", "thumbs.db", "node_modules", "__pycache__", ".virtual_documents",
             ".git", ".python-version", ".venv" },
-          hide_by_pattern = {           -- uses glob style patterns
+          hide_by_pattern = { -- uses glob style patterns
             -- "*.meta",
             -- "*/src/*/tsconfig.json",
           },
-          always_show = {           -- remains visible even if other settings would normally hide it
+          always_show = { -- remains visible even if other settings would normally hide it
             -- ".gitignored",
           },
-          never_show = {                      -- remains hidden even if visible is toggled to true, this overrides always_show
-            ".DS_Store"                       -- "thumbs.db"
+          never_show = {            -- remains hidden even if visible is toggled to true, this overrides always_show
+            ".DS_Store"             -- "thumbs.db"
           },
-          never_show_by_pattern = {           -- uses glob style patterns
+          never_show_by_pattern = { -- uses glob style patterns
             -- ".null-ls_*",
           }
         },
         follow_current_file = {
-          enabled = false,                              -- This will find and focus the file in the active buffer every time
+          enabled = false,                      -- This will find and focus the file in the active buffer every time
           --               -- the current file is changed while the tree is open.
-          leave_dirs_open = false                       -- `false` closes auto expanded dirs, such as with `:Neotree reveal`
+          leave_dirs_open = false               -- `false` closes auto expanded dirs, such as with `:Neotree reveal`
         },
-        group_empty_dirs = false,                       -- when true, empty folders will be grouped together
-        hijack_netrw_behavior = "open_default",         -- netrw disabled, opening a directory opens neo-tree
+        group_empty_dirs = false,               -- when true, empty folders will be grouped together
+        hijack_netrw_behavior = "open_default", -- netrw disabled, opening a directory opens neo-tree
         -- in whatever position is specified in window.position
         -- "open_current",  -- netrw disabled, opening a directory opens within the
         -- window like netrw would, regardless of window.position
         -- "disabled",    -- netrw left alone, neo-tree does not handle opening dirs
-        use_libuv_file_watcher = false,         -- This will use the OS level file watchers to detect changes
+        use_libuv_file_watcher = false, -- This will use the OS level file watchers to detect changes
         -- instead of relying on nvim autocmd events.
         window = {
           mappings = {
@@ -331,7 +331,7 @@ return { {
             ["H"] = "toggle_hidden",
             ["/"] = "fuzzy_finder",
             ["D"] = "fuzzy_finder_directory",
-            ["#"] = "fuzzy_sorter",             -- fuzzy sorting using the fzy algorithm
+            ["#"] = "fuzzy_sorter", -- fuzzy sorting using the fzy algorithm
             -- ["D"] = "fuzzy_sorter_directory",
             ["f"] = "filter_on_submit",
             ["<c-x>"] = "clear_filter",
@@ -374,7 +374,7 @@ return { {
               nowait = false
             }
           },
-          fuzzy_finder_mappings = {           -- define keymaps for filter popup window in fuzzy_finder_mode
+          fuzzy_finder_mappings = { -- define keymaps for filter popup window in fuzzy_finder_mode
             ["<down>"] = "move_cursor_down",
             ["<C-n>"] = "move_cursor_down",
             ["<up>"] = "move_cursor_up",
@@ -382,15 +382,15 @@ return { {
           }
         },
 
-        commands = {}         -- Add a custom command or override a global one using the same function name
+        commands = {} -- Add a custom command or override a global one using the same function name
       },
       buffers = {
         follow_current_file = {
-          enabled = true,                   -- This will find and focus the file in the active buffer every time
+          enabled = true,         -- This will find and focus the file in the active buffer every time
           --              -- the current file is changed while the tree is open.
-          leave_dirs_open = false           -- `false` closes auto expanded dirs, such as with `:Neotree reveal`
+          leave_dirs_open = false -- `false` closes auto expanded dirs, such as with `:Neotree reveal`
         },
-        group_empty_dirs = true,            -- when true, empty folders will be grouped together
+        group_empty_dirs = true,  -- when true, empty folders will be grouped together
         show_unloaded = true,
         window = {
           mappings = {
@@ -484,13 +484,13 @@ return { {
     vim.keymap.set("n", "<leader>e", ":Neotree toggle<CR>", {
       noremap = true,
       silent = true
-    })     -- focus file explorer
+    }) -- focus file explorer
     vim.keymap.set("n", "<leader>ngs", ":Neotree float git_status<CR>", {
       noremap = true,
       silent = true
-    })     -- open git status window
+    }) -- open git status window
   end
-},         -- Status line
+},     -- Status line
   {
     "nvim-lualine/lualine.nvim",
     lazy = false,
@@ -508,8 +508,8 @@ return { {
 
       local filename = {
         "filename",
-        file_status = true,     -- displays file status (readonly status, modified status)
-        path = 1                -- 0 = just filename, 1 = relative path, 2 = absolute path
+        file_status = true, -- displays file status (readonly status, modified status)
+        path = 1            -- 0 = just filename, 1 = relative path, 2 = absolute path
       }
 
       local hide_in_width = function()
@@ -539,7 +539,7 @@ return { {
           added = " ",
           modified = " ",
           removed = " "
-        },     -- changes diff symbols
+        }, -- changes diff symbols
         cond = hide_in_width
       }
 
@@ -547,7 +547,7 @@ return { {
         options = {
           icons_enabled = true,
           globalstatus = vim.o.laststatus == 3,
-          theme = "auto",       -- Set theme based on environment variable
+          theme = "auto", -- Set theme based on environment variable
           -- Some useful glyphs:
           -- https://www.nerdfonts.com/cheat-sheet
           --        
@@ -966,7 +966,90 @@ return { {
       }
     },
     dependencies = { { "nvim-tree/nvim-web-devicons" } }
-  }, -- bufferline
+  },
+  {
+    'stevearc/dressing.nvim',
+    event = "VeryLazy",
+    config = function()
+      -- Configure dressing.nvim with custom options
+      require("dressing").setup({
+        -- General settings
+        input = {
+          -- Use a border for input prompts
+          border = "rounded",  -- Border style: 'none', 'single', 'double', 'shadow', 'rounded'
+          -- Prompt title
+          title = "Input",     -- Default title for input prompts
+          -- Prompt position
+          relative = "cursor", -- Position relative to the cursor
+          -- Window transparency
+          winblend = 10,       -- Transparency level (0-100)
+          -- Mappings
+          mappings = {
+            n = {
+              ["<Esc>"] = "Close",  -- Close the input prompt with Esc
+              ["<C-c>"] = "Close",  -- Close the input prompt with Ctrl+C
+              ["<CR>"] = "Confirm", -- Confirm with Enter
+            },
+            i = {
+              ["<C-c>"] = "Close",  -- Close the input prompt with Ctrl+C
+              ["<CR>"] = "Confirm", -- Confirm with Enter
+            },
+          },
+          -- Default prompt
+          default_prompt = "❯ ", -- Custom prompt symbol
+          -- Completion settings
+          completion = "nui", -- Use nui for completion
+        },
+        select = {
+          -- Use a border for select prompts
+          border = "rounded", -- Border style: 'none', 'single', 'double', 'shadow', 'rounded'
+          -- Prompt title
+          title = "Select",   -- Default title for select prompts
+          -- Window transparency
+          winblend = 10,      -- Transparency level (0-100)
+          -- Mappings
+          mappings = {
+            n = {
+              ["<Esc>"] = "Close",  -- Close the select prompt with Esc
+              ["<C-c>"] = "Close",  -- Close the select prompt with Ctrl+C
+              ["<CR>"] = "Confirm", -- Confirm with Enter
+              ["j"] = "Next",       -- Move to next item with j
+              ["k"] = "Prev",       -- Move to previous item with k
+              ["<Down>"] = "Next",  -- Move to next item with Down arrow
+              ["<Up>"] = "Prev",    -- Move to previous item with Up arrow
+            },
+            i = {
+              ["<C-c>"] = "Close",  -- Close the select prompt with Ctrl+C
+              ["<CR>"] = "Confirm", -- Confirm with Enter
+            },
+          },
+          -- Default prompt
+          default_prompt = "❯ ", -- Custom prompt symbol
+          -- Layout settings
+          layout = {
+            width = "100%", -- Width of the select window
+            height = "30%", -- Height of the select window
+          },
+          -- Search settings
+          search = {
+            prompt = "🔍 ", -- Search prompt symbol
+            clearable = true, -- Allow clearing the search
+          },
+        },
+        -- Additional settings can be added here
+        -- Example: Override default icons
+        icons = {
+          Confirm = "", -- Confirm icon
+          Cancel = "", -- Cancel icon
+          -- Add more icons as needed
+        },
+        win_options = {
+          winhighlight = "Normal:Normal", -- Highlight settings
+        },
+      })
+    end,
+  },
+  -- bufferline
   {
     'akinsho/bufferline.nvim',
     version = "*",

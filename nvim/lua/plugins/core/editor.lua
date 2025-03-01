@@ -60,7 +60,7 @@ return {
               ["<C-n>"] = actions.cycle_history_next,
               ["<C-p>"] = actions.cycle_history_prev,
               ["<C-q>"] = actions.smart_send_to_qflist + actions.open_qflist,
-              ["<CR>"] = actions.select_default,
+              ["<C-l>"] = actions.select_default,
               ["<C-s>"] = actions.select_horizontal,
               ["<C-v>"] = actions.select_vertical,
               ["<C-t>"] = actions.select_tab,
@@ -143,18 +143,28 @@ return {
   -- Better diagnostics list and others
   {
     "folke/trouble.nvim",
-    cmd = { "TroubleToggle", "Trouble" },
-    opts = { use_diagnostic_signs = true },
+    cmd = { "Trouble" },
+    lazy = "VeryLazy",
+    opts = {
+      modes = {
+        lsp = {
+          win = { position = "right" },
+        },
+      },
+    },
     keys = {
-      { "<leader>xx", "<cmd>TroubleToggle document_diagnostics<cr>",  desc = "Document Diagnostics" },
-      { "<leader>xX", "<cmd>TroubleToggle workspace_diagnostics<cr>", desc = "Workspace Diagnostics" },
-      { "<leader>xL", "<cmd>TroubleToggle loclist<cr>",               desc = "Location List" },
-      { "<leader>xQ", "<cmd>TroubleToggle quickfix<cr>",              desc = "Quickfix List" },
+      { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>",              desc = "Diagnostics (Trouble)" },
+      { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
+      { "<leader>cs", "<cmd>Trouble symbols toggle<cr>",                  desc = "Symbols (Trouble)" },
+      { "<leader>cS", "<cmd>Trouble lsp toggle<cr>",                      desc = "LSP references/definitions/... (Trouble)" },
+      { "<leader>xL", "<cmd>Trouble loclist toggle<cr>",                  desc = "Location List (Trouble)" },
+      { "<leader>xQ", "<cmd>Trouble qflist toggle<cr>",                   desc = "Quickfix List (Trouble)" },
       {
         "[q",
         function()
-          if require("trouble").is_open() then
-            require("trouble").previous({ skip_groups = true, jump = true })
+          local trouble = require("trouble")
+          if trouble.is_open() then
+            trouble.prev({ skip_groups = true, jump = true })
           else
             local ok, err = pcall(vim.cmd.cprev)
             if not ok then
@@ -162,13 +172,14 @@ return {
             end
           end
         end,
-        desc = "Previous trouble/quickfix item",
+        desc = "Previous Trouble/Quickfix Item",
       },
       {
         "]q",
         function()
-          if require("trouble").is_open() then
-            require("trouble").next({ skip_groups = true, jump = true })
+          local trouble = require("trouble")
+          if trouble.is_open() then
+            trouble.next({ skip_groups = true, jump = true })
           else
             local ok, err = pcall(vim.cmd.cnext)
             if not ok then
@@ -176,12 +187,19 @@ return {
             end
           end
         end,
-        desc = "Next trouble/quickfix item",
+        desc = "Next Trouble/Quickfix Item",
       },
     },
   },
-
   -- Todo comments
+  -- TODO:
+  -- INFO:
+  -- BUG:
+  -- WARN:
+  -- TESTING:
+  -- PERFORMANCE:
+  -- OPTIMIZE:
+  -- FIXME:
   {
     "folke/todo-comments.nvim",
     cmd = { "TodoTrouble", "TodoTelescope" },
@@ -192,34 +210,6 @@ return {
       { "<leader>xT", "<cmd>TodoTelescope<cr>",                            desc = "Todo" },
       { "]t",         function() require("todo-comments").jump_next() end, desc = "Next todo comment" },
       { "[t",         function() require("todo-comments").jump_prev() end, desc = "Previous todo comment" },
-    },
-  },
-
-  -- Terminal
-  {
-    "akinsho/toggleterm.nvim",
-    version = "*",
-    opts = {
-      size = 20,
-      open_mapping = [[<c-\>]],
-      hide_numbers = true,
-      shade_filetypes = {},
-      shade_terminals = true,
-      shading_factor = 2,
-      start_in_insert = true,
-      insert_mappings = true,
-      persist_size = true,
-      direction = "float",
-      close_on_exit = true,
-      shell = vim.o.shell,
-      float_opts = {
-        border = "curved",
-        winblend = 0,
-        highlights = {
-          border = "Normal",
-          background = "Normal",
-        },
-      },
     },
   },
 }

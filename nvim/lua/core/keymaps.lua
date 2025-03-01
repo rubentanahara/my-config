@@ -3,6 +3,13 @@ local M = {}
 function M.setup()
   local map = vim.keymap.set
 
+  -- Open Lazy command in normal mode
+  map("n", "<leader>l", ":Lazy<CR>", {
+    noremap = true,
+    silent = true,
+    desc = "Open Lazy (Lazy.nvim)",
+  })
+
   -- Exit insert mode
   map("i", "jk", "<ESC>", { noremap = true, silent = true, desc = "Exit insert mode" })
 
@@ -15,8 +22,8 @@ function M.setup()
   map("i", "<C-e>", "<ESC>$a", { noremap = true, silent = true, desc = "Go to end of line" })
 
   -- Better window navigation
-  map("n", "<c-j>", ":m .+1<CR>==", { noremap = true, silent = true, desc = "Move line down" })
-  map("n", "<c-k>", ":m .-2<CR>==", { noremap = true, silent = true, desc = "Move line up" })
+  map("n", "<C-j>", ":m .+1<CR>==", { noremap = true, silent = true, desc = "Move line down" })
+  map("n", "<C-k>", ":m .-2<CR>==", { noremap = true, silent = true, desc = "Move line up" })
 
   -- Clipboard operations
   map({ "n", "v" }, "<leader>y", [["+y]], { noremap = true, silent = true, desc = "Yank to system clipboard" })

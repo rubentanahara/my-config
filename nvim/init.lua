@@ -25,14 +25,14 @@ require("core").setup()
 -- Initialize plugins
 require("lazy").setup({
   spec = {
-    { import = "plugins.core.ui" },     -- UI components (including theme) must be first
-    { import = "plugins.core.editor" }, -- Editor essentials
-    { import = "plugins.core.coding" }, -- Basic coding features
-    { import = "plugins.core.lsp" },    -- LSP core setup
-    { import = "plugins.core.debug" },  -- Debugging setup
-    { import = "plugins.core.tmux" },   -- Tmux integration
-    { import = "plugins.core.util" },   -- Additional utilities
-    { import = "plugins.core.dotnet" }, -- .NET development tools
+    { import = "plugins.core.ui" },         -- UI components (including theme) must be first
+    { import = "plugins.core.editor" },     -- Editor essentials
+    { import = "plugins.core.coding" },     -- Basic coding features
+    { import = "plugins.core.lsp" },        -- LSP core setup
+    { import = "plugins.core.debug" },      -- Debugging setup
+    { import = "plugins.core.navigation" }, -- Navigation
+    { import = "plugins.core.util" },       -- Additional utilities
+    { import = "plugins.core.dotnet" },     -- .NET development tools
   },
   defaults = {
     lazy = true,                -- Every plugin is lazy-loaded by default
