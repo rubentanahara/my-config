@@ -15,8 +15,7 @@ function M.setup()
 
   -- Save and close
   map("n", "<C-s>", ":w<CR>", { noremap = true, silent = true, desc = "Save File" })
-  map("n", "<leader>qs", ":wqa<CR>", { noremap = true, silent = true, desc = "Save and quit" })
-  -- was save?
+  map("n", "<C-q>", ":wqa<CR>", { noremap = true, silent = true, desc = "Save and quit" })
 
   -- quit
   map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit All" })

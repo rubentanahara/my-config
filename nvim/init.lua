@@ -67,7 +67,7 @@ require("lazy").setup({
       source = "📄",
       start = "🚀",
       task = "📌",
-      lazy = "�� ",
+      lazy = "💤"
     },
   },
 })
