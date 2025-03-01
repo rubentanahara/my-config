@@ -15,16 +15,16 @@ return {
       { "nvim-tree/nvim-web-devicons" },
     },
     keys = {
-      { "<leader>fh",       "<cmd>Telescope help_tags<cr>",   desc = "[S]earch [H]elp" },
-      { "<leader>fk",       "<cmd>Telescope keymaps<cr>",     desc = "[S]earch [K]eymaps" },
-      { "<leader>ff",       "<cmd>Telescope find_files<cr>",  desc = "[S]earch [F]iles" },
-      { "<leader>fs",       "<cmd>Telescope builtin<cr>",     desc = "[S]earch [S]elect Telescope" },
-      { "<leader>fw",       "<cmd>Telescope grep_string<cr>", desc = "[S]earch current [W]ord" },
-      { "<leader>fg",       "<cmd>Telescope live_grep<cr>",   desc = "[S]earch by [G]rep" },
-      { "<leader>fd",       "<cmd>Telescope diagnostics<cr>", desc = "[S]earch [D]iagnostics" },
-      { "<leader>fr",       "<cmd>Telescope resume<cr>",      desc = "[S]earch [R]esume" },
-      { "<leader>f.",       "<cmd>Telescope oldfiles<cr>",    desc = '[S]earch Recent Files ("." for repeat)' },
-      { "<leader><leader>", "<cmd>Telescope buffers<cr>",     desc = "[ ] Find existing buffers" },
+      { "<leader>fh",       "<cmd>Telescope help_tags<cr>",   desc = "Find Help" },
+      { "<leader>fk",       "<cmd>Telescope keymaps<cr>",     desc = "Find Keymaps" },
+      { "<leader>ff",       "<cmd>Telescope find_files<cr>",  desc = "Find Files" },
+      { "<leader>fs",       "<cmd>Telescope builtin<cr>",     desc = "Find Select Telescope" },
+      { "<leader>fw",       "<cmd>Telescope grep_string<cr>", desc = "Find current Word" },
+      { "<leader>fg",       "<cmd>Telescope live_grep<cr>",   desc = "Find by Grep" },
+      { "<leader>fd",       "<cmd>Telescope diagnostics<cr>", desc = "Find Diagnostics" },
+      { "<leader>fr",       "<cmd>Telescope resume<cr>",      desc = "Find Resume" },
+      { "<leader>f.",       "<cmd>Telescope oldfiles<cr>",    desc = "Find Recent Files" },
+      { "<leader><leader>", "<cmd>Telescope buffers<cr>",     desc = "Find existing buffers" },
       {
         "<leader>/",
         function()
@@ -33,7 +33,7 @@ return {
             previewer = false,
           }))
         end,
-        desc = "[/] Fuzzily search in current buffer",
+        desc = "Fuzzily search in current buffer",
       },
       {
         "<leader>f/",
@@ -43,7 +43,7 @@ return {
             prompt_title = "Live Grep in Open Files",
           })
         end,
-        desc = "[S]earch [/] in Open Files",
+        desc = "Find in Open Files",
       },
     },
     opts = function()
