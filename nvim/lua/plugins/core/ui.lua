@@ -269,7 +269,7 @@ return {
       -- see `:h neo-tree-custom-commands-global`
       commands = {},
       window = {
-        width = 50,
+        width = 40,
         mapping_options = {
           noremap = true,
           nowait = true
@@ -521,7 +521,8 @@ return {
       silent = true
     }) -- open git status window
   end
-},     -- Status line
+},
+  -- Status line
   {
     "nvim-lualine/lualine.nvim",
     lazy = false,
@@ -579,9 +580,6 @@ return {
           icons_enabled = true,
           globalstatus = vim.o.laststatus == 3,
           theme = "auto", -- Set theme based on environment variable
-          -- Some useful glyphs:
-          -- https://www.nerdfonts.com/cheat-sheet
-          --        
           section_separators = {
             left = "",
             right = ""
@@ -619,7 +617,10 @@ return {
             }
           } },
           lualine_z = { function()
-            return " " .. os.date("%R")
+            -- 12-hour format with AM/PM
+            return " " .. os.date("%I:%M %p")
+            -- 24 format
+            -- return " " .. os.date("%R")
           end }
         },
         inactive_sections = {
@@ -744,7 +745,8 @@ return {
       }
     },
     dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify" }
-  }, -- Better notifications
+  },
+  -- Better notifications
   {
     "rcarriga/nvim-notify",
     keys = { {
@@ -760,10 +762,10 @@ return {
     opts = {
       timeout = 3000,
       max_height = function()
-        return math.floor(vim.o.lines * 0.75)
+        return math.floor(vim.o.lines * 0.5)
       end,
       max_width = function()
-        return math.floor(vim.o.columns * 0.75)
+        return math.floor(vim.o.columns * 0.5)
       end,
       on_open = function(win)
         vim.api.nvim_win_set_config(win, {
@@ -771,14 +773,14 @@ return {
         })
       end,
       stages = "fade",
-      background_colour = "#000000",
+      background_colour = "#1a1a1e",
       icons = {
-        ERROR = "",
-        WARN = "",
-        INFO = "",
-        DEBUG = "",
-        TRACE = "✎"
-      }
+        ERROR = "", -- Cross mark (alternative: "✖" or "❌")
+        WARN  = "", -- Warning triangle (alternative: "⚠" or "▲")
+        INFO  = "", -- Information circle (alternative: "ℹ" or "🛈")
+        DEBUG = "", -- Bug icon (alternative: "🐞")
+        TRACE = "✎" -- Keeping your custom trace icon
+      },
     }
   }, -- Indent guides
   {
@@ -796,7 +798,8 @@ return {
           "toggleterm", "lazyterm" }
       }
     }
-  }, -- Active indent guide and indent text objects
+  },
+  -- Active indent guide and indent text objects
   {
     "echasnovski/mini.indentscope",
     version = false,
@@ -1022,7 +1025,7 @@ return {
           -- Prompt title
           title = "Select",   -- Default title for select prompts
           -- Window transparency
-          winblend = 10,      -- Transparency level (0-100)
+          winblend = 10,      -- Transparency level (0-100)]
           -- Mappings
           mappings = {
             n = {

@@ -3,8 +3,6 @@ local options = {}
 
 function options.setup()
   -- BASE OPTIONS CONFIGURATION
-  -- check if vim.api is available
-  -- accessing undefined variable vim will throw an errors
 
   if not vim then
     -- log error message
@@ -39,7 +37,7 @@ function options.setup()
     vert = "│", -- Vertical separator for splits
   }
   opt.foldlevel = 99
-  -- opt.cursorline = true
+  opt.cursorline = true
   opt.signcolumn = 'yes'
   opt.colorcolumn = ''
   opt.showmode = true
