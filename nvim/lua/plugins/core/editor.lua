@@ -200,6 +200,7 @@ return {
   -- PERFORMANCE:
   -- OPTIMIZE:
   -- FIXME:
+  -- NOTE:
   {
     "folke/todo-comments.nvim",
     cmd = { "TodoTrouble", "TodoTelescope" },
