@@ -33,11 +33,12 @@ require("lazy").setup({
     { import = "plugins.core.navigation" }, -- Navigation
     { import = "plugins.core.util" },       -- Additional utilities
     { import = "plugins.core.dotnet" },     -- .NET development tools
+    -- { import = "plugins.core.ai" }          -- AI tools
   },
-  -- defaults = {
-  --   lazy = true,                -- Every plugin is lazy-loaded by default
-  --   version = false,            -- Try installing the latest stable versions of plugins
-  -- },
+  defaults = {
+    lazy = true,                -- Every plugin is lazy-loaded by default
+    version = false,            -- Try installing the latest stable versions of plugins
+  },
   checker = { enabled = true }, -- Automatically check for plugin updates
   performance = {
     rtp = {
