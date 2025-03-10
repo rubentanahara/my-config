@@ -22,8 +22,8 @@ config.colors = {
   cursor_border = "#9B96B5",
 }
 
--- config.font = wezterm.font('FiraCode Nerd Font Mono', { weight = "Regular" })
-config.font = wezterm.font("JetBrains Mono", { weight = "Regular" })
+config.font = wezterm.font('FiraCode Nerd Font Mono', { weight = "Regular" })
+-- config.font = wezterm.font("JetBrains Mono", { weight = "Regular" })
 config.automatically_reload_config = true
 config.font_size = 14
 config.line_height = 1.2
@@ -42,7 +42,7 @@ config.prefer_egl = true
 config.text_background_opacity = 1.0
 config.window_background_opacity = 0.67
 config.macos_window_background_blur = 12
-config.audible_bell = "SystemBeep"
+config.audible_bell = "Disabled"
 config.use_dead_keys = false
 
 -- ============================
