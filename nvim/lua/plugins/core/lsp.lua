@@ -209,8 +209,7 @@ return {
 
       -- LSP servers configuration
       local lspconfig = require 'lspconfig'
-      local capabilities = vim.tbl_deep_extend('force', {}, vim.lsp.protocol.make_client_capabilities(),
-        require('cmp_nvim_lsp').default_capabilities())
+      local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
       local function on_attach(client, bufnr)
         -- Keymaps
@@ -299,6 +298,12 @@ return {
         end
       end
 
+      local dartExcludedFolders = {
+        vim.fn.expand("$HOME/AppData/Local/Pub/Cache"),
+        vim.fn.expand("$HOME/.pub-cache"),
+        vim.fn.expand("/opt/homebrew/"),
+        vim.fn.expand("$HOME/tools/flutter/"),
+      }
       -- Server configurations
       local servers = {
         lua_ls = {
@@ -384,7 +389,7 @@ return {
           on_attach = function(client, bufnr)
             -- Call the default on_attach function
             on_attach(client, bufnr)
-            
+
             -- Check if easy-dotnet is available
             local has_dotnet, dotnet = pcall(require, "easy-dotnet")
             if has_dotnet then
@@ -392,7 +397,7 @@ return {
               local map = function(mode, lhs, rhs, desc)
                 vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
               end
-              
+
               -- Add C# specific keymaps
               map("n", "<leader>dt", function() dotnet.test() end, "Run .NET Tests")
               map("n", "<leader>dr", function() dotnet.run() end, "Run .NET Project")
@@ -400,20 +405,36 @@ return {
             end
           end,
         },
+        dcmls = {
+          capabilities = capabilities,
+          cmd = {
+            "dcm",
+            "start-server",
+          },
+          filetypes = { "dart", "yaml" },
+          settings = {
+            dart = {
+              analysisExcludedFolders = dartExcludedFolders,
+            },
+          },
+        },
         dartls = {
+          capabilities = capabilities,
           cmd = { 'dart', 'language-server', '--protocol=lsp' },
           filetypes = { 'dart' },
           init_options = {
             closingLabels = true,
             flutterOutline = true,
-            onlyAnalyzeProjectsWithOpenFiles = true,
+            onlyAnalyzeProjectsWithOpenFiles = false,
             outline = true,
             suggestFromUnimportedLibraries = true,
           },
           settings = {
             dart = {
+              updateImportsOnRename = true,
               completeFunctionCalls = true,
               showTodos = true,
+              analysisExcludedFolders = dartExcludedFolders,
             },
           },
         },

@@ -4,7 +4,7 @@ return {
     'nvim-treesitter/nvim-treesitter',
     version = false,
     build = ':TSUpdate',
-    event = { 'BufReadPost', 'BufNewFile' },
+    lazy = false,
     dependencies = {
       'nvim-treesitter/nvim-treesitter-textobjects',
       'windwp/nvim-ts-autotag',
@@ -43,6 +43,7 @@ return {
         'rust',
         'toml',
         'c_sharp',
+        'dart',
         'kotlin',
         'dart',
         'xml',

@@ -33,6 +33,7 @@ require("lazy").setup({
     { import = "plugins.core.navigation" }, -- Navigation
     { import = "plugins.core.util" },       -- Additional utilities
     { import = "plugins.core.dotnet" },     -- .NET development tools
+    { import = "plugins.core.flutter" }
     -- { import = "plugins.core.ai" }          -- AI tools
   },
   defaults = {
