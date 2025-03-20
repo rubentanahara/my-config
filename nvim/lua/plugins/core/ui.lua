@@ -1,14 +1,13 @@
 return {
   {
-    -- Color scheme
-    "rebelot/kanagawa.nvim",
-    lazy = false,    -- Load the theme immediately
-    priority = 1000, -- Ensure it loads first
+    "Mofiqul/vscode.nvim",
+    lazy = false,
+    priority = 1000,
     config = function()
-      -- Default options:
-      require("kanagawa").setup({
-        compile = false,  -- enable compiling the colorscheme
-        undercurl = true, -- enable undercurls
+      -- local c = require('vscode.colors').get_colors()
+      require('vscode').setup({
+        -- Alternatively set style in setup
+        -- style = 'light'
         commentStyle = {
           italic = true
         },
@@ -21,33 +20,88 @@ return {
         statementStyle = {
           bold = true
         },
-        typeStyle = {},
+
+        -- Enable transparent background
         transparent = true,    -- do not set background color
         dimInactive = false,   -- dim inactive window `:h hl-NormalNC`
         terminalColors = true, -- define vim.g.terminal_color_{0,17}
-        colors = {             -- add/modify theme and palette colors
-          palette = {},
-          theme = {
-            wave = {},
-            lotus = {},
-            dragon = {},
-            all = {}
-          }
-        },
-        overrides = function(colors) -- add/modify highlights
-          return {}
-        end,
-        theme = "dragon",  -- Load "wave" theme when 'background' option is not set
-        background = {     -- map the value of 'background' option to a theme
-          dark = "dragon", -- try "dragon" !
-          light = "lotus"
-        }
-      })
 
-      -- setup must be called before loading
-      vim.cmd("colorscheme kanagawa")
+        -- Enable italic comment
+        italic_comments = true,
+
+        -- Underline `@markup.link.*` variants
+        underline_links = true,
+
+        -- Disable nvim-tree background color
+        disable_nvimtree_bg = true,
+
+        -- Apply theme colors to terminal
+        terminal_colors = true,
+
+        -- Override colors (see ./lua/vscode/colors.lua)
+        -- color_overrides = {
+        --   vscLineNumber = '#FFFFFF',
+        -- },
+
+        -- Override highlight groups (see ./lua/vscode/theme.lua)
+        -- group_overrides = {
+        --   -- this supports the same val table as vim.api.nvim_set_hl
+        --   -- use colors from this colorscheme by requiring vscode.colors!
+        --   Cursor = { fg = c.vscDarkBlue, bg = c.vscLightGreen, bold = true },
+        -- }
+      })
+      vim.cmd("colorscheme vscode")
     end
   },
+  -- {
+  -- Color scheme
+  --   "rebelot/kanagawa.nvim",
+  --   lazy = false,    -- Load the theme immediately
+  --   priority = 1000, -- Ensure it loads first
+  --   config = function()
+  --     -- Default options:
+  --     require("kanagawa").setup({
+  --       compile = false,  -- enable compiling the colorscheme
+  --       undercurl = true, -- enable undercurls
+  --       commentStyle = {
+  --         italic = true
+  --       },
+  --       functionStyle = {
+  --         italic = true
+  --       },
+  --       keywordStyle = {
+  --         italic = true
+  --       },
+  --       statementStyle = {
+  --         bold = true
+  --       },
+  --       typeStyle = {},
+  --       transparent = true,    -- do not set background color
+  --       dimInactive = false,   -- dim inactive window `:h hl-NormalNC`
+  --       terminalColors = true, -- define vim.g.terminal_color_{0,17}
+  --       colors = {             -- add/modify theme and palette colors
+  --         palette = {},
+  --         theme = {
+  --           wave = {},
+  --           lotus = {},
+  --           dragon = {},
+  --           all = {}
+  --         }
+  --       },
+  --       overrides = function(colors) -- add/modify highlights
+  --         return {}
+  --       end,
+  --       theme = "dragon",  -- Load "wave" theme when 'background' option is not set
+  --       background = {     -- map the value of 'background' option to a theme
+  --         dark = "dragon", -- try "dragon" !
+  --         light = "lotus"
+  --       }
+  --     })
+  --
+  --     -- setup must be called before loading
+  --     vim.cmd("colorscheme kanagawa")
+  --   end
+  -- },
   {
     "kdheepak/lazygit.nvim",
     lazy = false,
@@ -212,6 +266,7 @@ return {
           folder_closed = "",
           folder_open = "",
           folder_empty = "",
+          folder_empty_open = "",
           default = "",
           symlink = "",
           symlink_arrow = "➜",
@@ -559,8 +614,8 @@ return {
           hint = "󰌵"
         },
         colored = true,
-        update_in_insert = false,
-        always_visible = false,
+        update_in_insert = true,
+        always_visible = true,
         cond = hide_in_width
       }
 
@@ -694,29 +749,29 @@ return {
       popupmenu = {
         enabled = true,
         backend = "nui",
-        kind_icons = {
-          Class = " ",
-          Color = " ",
-          Constant = " ",
-          Constructor = " ",
-          Enum = "了 ",
-          EnumMember = " ",
-          Field = " ",
-          File = " ",
-          Folder = " ",
-          Function = " ",
-          Interface = " ",
-          Keyword = " ",
-          Method = "ƒ ",
-          Module = " ",
-          Property = " ",
-          Snippet = " ",
-          Struct = " ",
-          Text = " ",
-          Unit = " ",
-          Value = " ",
-          Variable = " "
-        }
+        -- kind_icons = {
+        --   Class = " ",
+        --   Color = " ",
+        --   Constant = " ",
+        --   Constructor = " ",
+        --   Enum = "了 ",
+        --   EnumMember = " ",
+        --   Field = " ",
+        --   File = " ",
+        --   Folder = " ",
+        --   Function = " ",
+        --   Interface = " ",
+        --   Keyword = " ",
+        --   Method = "ƒ ",
+        --   Module = " ",
+        --   Property = " ",
+        --   Snippet = " ",
+        --   Struct = " ",
+        --   Text = " ",
+        --   Unit = " ",
+        --   Value = " ",
+        --   Variable = " "
+        -- }
       },
       lsp = {
         override = {
@@ -1131,20 +1186,19 @@ return {
           end,
           offsets = { {
             filetype = "neo-tree",
-            text = "File Explorer",
+            text = "Explorer",
             highlight = "Directory",
             text_align = "left",
             separator = true
           } },
-          always_show_bufferline = false,
+          always_show_bufferline = true,
           separator_style = "thin",
           modified_icon = "●",
           close_icon = "✗",
           left_trunc_marker = "",
-          right_trunc_marker = "",
           max_name_length = 30,
           tab_size = 21,
-          diagnostics_update_in_insert = false,
+          diagnostics_update_in_insert = true,
           color_icons = true,
           show_buffer_icons = true,
           show_buffer_close_icons = true,
@@ -1152,9 +1206,13 @@ return {
           show_duplicate_prefix = true,
           persist_buffer_sort = true,
           move_wraps_at_ends = true,
+          right_mouse_command = "bdelete! %d",
+          right_trunc_marker = "",
+          show_tab_indicators = true,
+
           indicator = {
-            icon = "▎",
-            style = "icon"
+            style = "icon",
+            icon = " ",
           },
           name_formatter = function(buf)
             return buf.name
@@ -1172,18 +1230,47 @@ return {
           end
         },
         highlights = {
-          buffer_selected = {
-            bold = true,
-            italic = false
+          fill = {
+            fg = { attribute = "fg", highlight = "Normal" },
+            bg = { attribute = "bg", highlight = "StatusLineNC" },
           },
-          indicator_selected = {
-            fg = {
-              attribute = "fg",
-              highlight = "Function"
-            },
-            italic = false
-          }
-        }
+          -- background = {
+          --   fg = { attribute = "fg", highlight = "Normal" },
+          --   bg = { attribute = "bg", highlight = "StatusLine" },
+          -- },
+          buffer_visible = {
+            fg = { attribute = "fg", highlight = "Normal" },
+            bg = { attribute = "bg", highlight = "Normal" },
+          },
+          buffer_selected = {
+            fg = { attribute = "fg", highlight = "Normal" },
+            bg = { attribute = "bg", highlight = "Normal" },
+          },
+          -- separator = {
+          --   fg = { attribute = "fg", highlight = "Normal" },
+          --   bg = { attribute = "bg", highlight = "StatusLine" },
+          -- },
+          separator_selected = {
+            fg = { attribute = "fg", highlight = "Special" },
+            bg = { attribute = "bg", highlight = "Normal" },
+          },
+          separator_visible = {
+            fg = { attribute = "fg", highlight = "Normal" },
+            bg = { attribute = "bg", highlight = "StatusLineNC" },
+          },
+          -- close_button = {
+          --   fg = { attribute = "fg", highlight = "Normal" },
+          --   bg = { attribute = "bg", highlight = "StatusLine" },
+          -- },
+          close_button_selected = {
+            fg = { attribute = "fg", highlight = "Normal" },
+            bg = { attribute = "bg", highlight = "Normal" },
+          },
+          close_button_visible = {
+            fg = { attribute = "fg", highlight = "Normal" },
+            bg = { attribute = "bg", highlight = "Normal" },
+          },
+        },
       })
 
       -- Auto-command to handle Neo-tree buffer visibility
