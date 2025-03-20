@@ -606,7 +606,7 @@ return {
       local diagnostics = {
         "diagnostics",
         sources = { "nvim_diagnostic" },
-        sections = { "error", "warn" },
+        sections = { "error", "warn", "info", "hint" },
         symbols = {
           error = " ",
           warn = " ",
@@ -634,7 +634,7 @@ return {
         options = {
           icons_enabled = true,
           globalstatus = vim.o.laststatus == 3,
-          theme = "auto", -- Set theme based on environment variable
+          theme = "vscode", -- Set theme based on environment variable
           section_separators = {
             left = "",
             right = ""
@@ -1198,7 +1198,7 @@ return {
           left_trunc_marker = "",
           max_name_length = 30,
           tab_size = 21,
-          diagnostics_update_in_insert = true,
+          update_in_insert = true,
           color_icons = true,
           show_buffer_icons = true,
           show_buffer_close_icons = true,
