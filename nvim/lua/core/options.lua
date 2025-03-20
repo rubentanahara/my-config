@@ -45,6 +45,7 @@ function options.setup()
   opt.conceallevel = 2
   opt.laststatus = 3
   opt.cmdheight = 1
+  vim.o.background = 'dark'
 
   -- Editing
   opt.expandtab = true
