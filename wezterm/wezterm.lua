@@ -19,8 +19,9 @@ local config = wezterm.config_builder()
 -- =============================================================
 
 -- Set the color scheme to 'MaterialDarker'. Uncomment the line below to switch to 'rose-pine'.
-config.color_scheme = "MaterialDarker"
+-- config.color_scheme = "MaterialDarker"
 -- config.color_scheme = "rose-pine"
+config.color_scheme = 'Vs Code Dark+ (Gogh)'
 
 -- Customize specific colors
 config.colors = {
@@ -124,7 +125,7 @@ config.adjust_window_size_when_changing_font_size = true
 -- =============================================================
 wezterm.on("gui-startup", function()
   -- Spawn a new window on GUI startup
-  local tab, pane, window = mux.spawn_window({})
+  local window = mux.spawn_window({})
   -- Maximize the new window
   window:gui_window():maximize()
 end)
