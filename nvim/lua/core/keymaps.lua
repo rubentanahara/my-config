@@ -3,7 +3,6 @@ local M = {}
 function M.setup()
   local map = vim.keymap.set
 
-  -- Lazy commads
   map("n", "<leader>l", ":Lazy<CR>", {
     noremap = true,
     silent = true,
@@ -79,12 +78,12 @@ function M.setup()
   map("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase Window Width" })
 
   -- Better indenting
-  map("v", "<", "<gv", { noremap = true, silent = true, desc = "Indent left" })
-  map("v", ">", ">gv", { noremap = true, silent = true, desc = "Indent right" })
+  -- map("v", "<", "<gv", { noremap = true, silent = true, desc = "Indent left" })
+  -- map("v", ">", ">gv", { noremap = true, silent = true, desc = "Indent right" })
 
   -- Move selected line / block of text in visual mode
-  map("v", "J", ":m '>+1<CR>gv=gv", { noremap = true, silent = true, desc = "Move line down" })
-  map("v", "K", ":m '<-2<CR>gv=gv", { noremap = true, silent = true, desc = "Move line up" })
+  -- map("v", "J", ":m '>+1<CR>gv=gv", { noremap = true, silent = true, desc = "Move line down" })
+  -- map("v", "K", ":m '<-2<CR>gv=gv", { noremap = true, silent = true, desc = "Move line up" })
 
   -- Better paste
   map("v", "p", '"_dP', { noremap = true, silent = true, desc = "Better paste" })
@@ -128,8 +127,8 @@ function M.setup()
   map("n", "-", "<C-x>", { noremap = true, silent = true, desc = "Decrement" })
 
   -- commenting
-  map("n", "gco", "o<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Below" })
-  map("n", "gcO", "O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Above" })
+  map("n", "gcb", "o<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Below" })
+  map("n", "gca", "O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Above" })
 end
 
 return M

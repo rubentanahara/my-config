@@ -7,7 +7,7 @@ function M.setup()
 
   -- Disable the concealing in some file formats
   vim.api.nvim_create_autocmd("FileType", {
-    pattern = {"json", "jsonc", "markdown"},
+    pattern = { "json", "jsonc", "markdown" },
     callback = function()
       vim.opt.conceallevel = 0
     end
@@ -23,7 +23,7 @@ function M.setup()
     end,
   })
 
-    -- Close some filetypes with <q>
+  -- Close some filetypes with <q>
   vim.api.nvim_create_autocmd("FileType", {
     group = augroup("close_with_q"),
     pattern = {
@@ -41,8 +41,7 @@ function M.setup()
       vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = event.buf, silent = true })
     end,
   })
-
- 
 end
 
-return M 
+return M
+

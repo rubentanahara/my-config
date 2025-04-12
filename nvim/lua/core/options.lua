@@ -1,9 +1,7 @@
 ---@diagnostic disable: missing-fields
-local options = {}
+local M = {}
 
-function options.setup()
-  -- BASE OPTIONS CONFIGURATION
-
+function M.setup()
   if not vim then
     -- log error message
     print('vim.api is not available')
@@ -53,7 +51,7 @@ function options.setup()
   opt.tabstop = 2
   opt.smartindent = true
   opt.winminwidth = 5 -- Minimum window width
-  opt.wrap = false    -- Disable line wrap
+  opt.wrap = true
   opt.breakindent = true
   opt.showbreak = string.rep(' ', 3)
   opt.linebreak = true
@@ -69,8 +67,6 @@ function options.setup()
   opt.smartcase = true
   opt.clipboard = 'unnamedplus'
   opt.completeopt = 'menuone,noselect'
-  opt.updatetime = 250
-  opt.timeoutlen = 300
   opt.splitright = true
   opt.splitbelow = true
 
@@ -95,4 +91,4 @@ function options.setup()
   opt.shell = 'zsh'
 end
 
-return options
+return M
