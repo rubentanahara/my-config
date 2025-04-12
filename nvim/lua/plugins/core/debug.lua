@@ -1,4 +1,35 @@
 return {
+  {
+    "leoluz/nvim-dap-go",
+    ft = { "go" },
+    dependencies = { "mfussenegger/nvim-dap" },
+    config = function(_, opts)
+      -- key maps
+      vim.keymap.set("n", "<leader>gG", function()
+        require("gap").debug()
+      end, { desc = "Debug Go" })
+
+      vim.keymap.set("n", "<leader>gC", function()
+        require("gap").continue()
+      end, { desc = "Continue Go" })
+
+      vim.keymap.set("n", "<leader>gS", function()
+        require("gap").step_into()
+      end, { desc = "Step Into Go" })
+
+      vim.keymap.set("n", "<leader>gO", function()
+        require("gap").step_out()
+      end, { desc = "Step Out Go" })
+
+      vim.keymap.set("n", "<leader>gB", function()
+        require("gap").toggle_breakpoint()
+      end, { desc = "Toggle Breakpoint Go" })
+
+      vim.keymap.set("n", "<leader>gR", function()
+        require("gap").repl()
+      end, { desc = "Repl Go" })
+    end
+  },
   -- Debug Adapter Protocol
   {
     "mfussenegger/nvim-dap",
