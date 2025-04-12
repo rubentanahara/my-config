@@ -21,6 +21,7 @@ return {
       ensure_installed = {
         'bash',
         'c',
+        'go',
         'html',
         'javascript',
         'json',
@@ -238,6 +239,7 @@ return {
         dart = { 'dart' },
         bash = { 'shfmt' },
         sh = { 'shfmt' },
+        go = { 'gofmt', 'goimports', 'golines' }
       },
       -- Configure formatters
       formatters = {
@@ -446,6 +448,7 @@ return {
         rust = { 'rustfmt' },
         kotlin = { 'ktlint' },
         c_sharp = { 'cspell' },
+        go = { 'golangci-lint' }
       }
 
       -- Configure linters

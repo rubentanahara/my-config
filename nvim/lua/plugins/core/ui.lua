@@ -1,68 +1,13 @@
 return {
-  {
-    "Mofiqul/vscode.nvim",
-    lazy = false,
-    priority = 1000,
-    config = function()
-      -- local c = require('vscode.colors').get_colors()
-      require('vscode').setup({
-        -- Alternatively set style in setup
-        -- style = 'light'
-        commentStyle = {
-          italic = true
-        },
-        functionStyle = {
-          italic = true
-        },
-        keywordStyle = {
-          italic = true
-        },
-        statementStyle = {
-          bold = true
-        },
-
-        -- Enable transparent background
-        transparent = true,    -- do not set background color
-        dimInactive = false,   -- dim inactive window `:h hl-NormalNC`
-        terminalColors = true, -- define vim.g.terminal_color_{0,17}
-
-        -- Enable italic comment
-        italic_comments = true,
-
-        -- Underline `@markup.link.*` variants
-        underline_links = true,
-
-        -- Disable nvim-tree background color
-        disable_nvimtree_bg = true,
-
-        -- Apply theme colors to terminal
-        terminal_colors = true,
-
-        -- Override colors (see ./lua/vscode/colors.lua)
-        -- color_overrides = {
-        --   vscLineNumber = '#FFFFFF',
-        -- },
-
-        -- Override highlight groups (see ./lua/vscode/theme.lua)
-        -- group_overrides = {
-        --   -- this supports the same val table as vim.api.nvim_set_hl
-        --   -- use colors from this colorscheme by requiring vscode.colors!
-        --   Cursor = { fg = c.vscDarkBlue, bg = c.vscLightGreen, bold = true },
-        -- }
-      })
-      vim.cmd("colorscheme vscode")
-    end
-  },
   -- {
-  -- Color scheme
-  --   "rebelot/kanagawa.nvim",
-  --   lazy = false,    -- Load the theme immediately
-  --   priority = 1000, -- Ensure it loads first
+  --   "Mofiqul/vscode.nvim",
+  --   lazy = false,
+  --   priority = 1000,
   --   config = function()
-  --     -- Default options:
-  --     require("kanagawa").setup({
-  --       compile = false,  -- enable compiling the colorscheme
-  --       undercurl = true, -- enable undercurls
+  --     -- local c = require('vscode.colors').get_colors()
+  --     require('vscode').setup({
+  --       -- Alternatively set style in setup
+  --       -- style = 'light'
   --       commentStyle = {
   --         italic = true
   --       },
@@ -75,33 +20,88 @@ return {
   --       statementStyle = {
   --         bold = true
   --       },
-  --       typeStyle = {},
+  --
+  --       -- Enable transparent background
   --       transparent = true,    -- do not set background color
   --       dimInactive = false,   -- dim inactive window `:h hl-NormalNC`
   --       terminalColors = true, -- define vim.g.terminal_color_{0,17}
-  --       colors = {             -- add/modify theme and palette colors
-  --         palette = {},
-  --         theme = {
-  --           wave = {},
-  --           lotus = {},
-  --           dragon = {},
-  --           all = {}
-  --         }
-  --       },
-  --       overrides = function(colors) -- add/modify highlights
-  --         return {}
-  --       end,
-  --       theme = "dragon",  -- Load "wave" theme when 'background' option is not set
-  --       background = {     -- map the value of 'background' option to a theme
-  --         dark = "dragon", -- try "dragon" !
-  --         light = "lotus"
-  --       }
-  --     })
   --
-  --     -- setup must be called before loading
-  --     vim.cmd("colorscheme kanagawa")
+  --       -- Enable italic comment
+  --       italic_comments = true,
+  --
+  --       -- Underline `@markup.link.*` variants
+  --       underline_links = true,
+  --
+  --       -- Disable nvim-tree background color
+  --       disable_nvimtree_bg = true,
+  --
+  --       -- Apply theme colors to terminal
+  --       terminal_colors = true,
+  --
+  --       -- Override colors (see ./lua/vscode/colors.lua)
+  --       -- color_overrides = {
+  --       --   vscLineNumber = '#FFFFFF',
+  --       -- },
+  --
+  --       -- Override highlight groups (see ./lua/vscode/theme.lua)
+  --       -- group_overrides = {
+  --       --   -- this supports the same val table as vim.api.nvim_set_hl
+  --       --   -- use colors from this colorscheme by requiring vscode.colors!
+  --       --   Cursor = { fg = c.vscDarkBlue, bg = c.vscLightGreen, bold = true },
+  --       -- }
+  --     })
+  --     vim.cmd("colorscheme vscode")
   --   end
   -- },
+  {
+    -- Color scheme
+    "rebelot/kanagawa.nvim",
+    lazy = false,    -- Load the theme immediately
+    priority = 1000, -- Ensure it loads first
+    config = function()
+      -- Default options:
+      require("kanagawa").setup({
+        compile = false,  -- enable compiling the colorscheme
+        undercurl = true, -- enable undercurls
+        commentStyle = {
+          italic = true
+        },
+        functionStyle = {
+          italic = true
+        },
+        keywordStyle = {
+          italic = true
+        },
+        statementStyle = {
+          bold = true
+        },
+        typeStyle = {},
+        transparent = true,    -- do not set background color
+        dimInactive = false,   -- dim inactive window `:h hl-NormalNC`
+        terminalColors = true, -- define vim.g.terminal_color_{0,17}
+        colors = {             -- add/modify theme and palette colors
+          palette = {},
+          theme = {
+            wave = {},
+            lotus = {},
+            dragon = {},
+            all = {}
+          }
+        },
+        overrides = function(colors) -- add/modify highlights
+          return {}
+        end,
+        theme = "dragon",  -- Load "wave" theme when 'background' option is not set
+        background = {     -- map the value of 'background' option to a theme
+          dark = "dragon", -- try "dragon" !
+          light = "lotus"
+        }
+      })
+
+      -- setup must be called before loading
+      vim.cmd("colorscheme kanagawa")
+    end
+  },
   {
     "kdheepak/lazygit.nvim",
     lazy = false,

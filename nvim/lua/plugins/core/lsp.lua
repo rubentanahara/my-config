@@ -4,7 +4,7 @@ return {
   {
     'williamboman/mason.nvim',
     cmd = 'Mason',
-    keys = { { '<leader>cm', '<cmd>Mason<cr>', desc = 'Mason' } },
+    keys = { { '<leader>cm', '<cmd>Mason<cr>', desc = 'Open Mason' } },
     build = ':MasonUpdate',
     opts = {
       ensure_installed = {
@@ -40,6 +40,7 @@ return {
         'typescript-language-server',
         'html-lsp',
         'css-lsp',
+        'gopls',
         'tailwindcss-language-server',
         'rust-analyzer',
         'csharp-language-server',
@@ -149,8 +150,8 @@ return {
       references = {
         telescope = require('telescope.themes').get_dropdown { hide_preview = false },
       },
-      focus_on_open = true,
-      dismiss_on_move = false,
+      focus_on_open = false,
+      dismiss_on_move = true,
       force_close = true,
       bufhidden = 'wipe',
       stack_floating_preview_windows = true,
@@ -209,7 +210,7 @@ return {
 
       -- LSP servers configuration
       local lspconfig = require 'lspconfig'
-      local capabilities = require("cmp_nvim_lsp").default_capabilities()
+      local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
       local function on_attach(client, bufnr)
         -- Keymaps
@@ -226,83 +227,13 @@ return {
         map('n', '<leader>ca', vim.lsp.buf.code_action, 'Code Action')
         map('n', '<leader>cr', vim.lsp.buf.rename, 'Rename')
         map({ 'n', 'v' }, '<leader>cf', vim.lsp.buf.format, 'Format')
-
-        -- Check if we're in a React Native project
-        local is_react_native = false
-        local package_json = vim.fn.findfile('package.json', vim.fn.expand '%:p:h' .. ';')
-
-        if package_json ~= '' then
-          local content = vim.fn.readfile(package_json)
-          local package_content = table.concat(content, '\n')
-          if package_content:match 'react%-native' then
-            is_react_native = true
-          end
-        end
-
-        -- For React Native projects, be more careful with autoformatting
-        if is_react_native then
-          -- Only autoformat if React Native formatting is explicitly enabled
-          if not vim.g.react_native_format then
-            -- Don't autoformat on save for React Native projects by default
-            -- Users can manually format with <leader>cf or :ReactNativeFormat
-            return
-          end
-        end
-
-        -- For Python files, respect the Python formatting toggle
-        if vim.bo[bufnr].filetype == 'python' then
-          if vim.g.python_format == false then
-            -- Don't autoformat on save for Python files if disabled
-            -- Users can manually format with <leader>cf or :BlackFormat
-            return
-          end
-        end
-
-        -- Autoformat on save
-        if client.supports_method 'textDocument/formatting' then
-          local augroup = vim.api.nvim_create_augroup('LspFormat.' .. bufnr, {})
-          vim.api.nvim_create_autocmd('BufWritePre', {
-            group = augroup,
-            buffer = bufnr,
-            callback = function()
-              -- Skip formatting for large files
-              local max_filesize = 100 * 1024 -- 100 KB
-              local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(bufnr))
-              if ok and stats and stats.size > max_filesize then
-                return
-              end
-
-              -- Skip formatting for certain filetypes
-              local skip_filetypes = { 'NvimTree', 'TelescopePrompt', 'Trouble', 'help' }
-              for _, ft in ipairs(skip_filetypes) do
-                if ft == vim.bo[bufnr].filetype then
-                  return
-                end
-              end
-
-              -- Format with error handling
-              local ok, err = pcall(function()
-                vim.lsp.buf.format {
-                  bufnr = bufnr,
-                  filter = function(c)
-                    return c.id == client.id
-                  end,
-                }
-              end)
-
-              if not ok then
-                vim.notify('Format on save error: ' .. tostring(err), vim.log.levels.WARN)
-              end
-            end,
-          })
-        end
       end
 
       local dartExcludedFolders = {
-        vim.fn.expand("$HOME/AppData/Local/Pub/Cache"),
-        vim.fn.expand("$HOME/.pub-cache"),
-        vim.fn.expand("/opt/homebrew/"),
-        vim.fn.expand("$HOME/tools/flutter/"),
+        vim.fn.expand '$HOME/AppData/Local/Pub/Cache',
+        vim.fn.expand '$HOME/.pub-cache',
+        vim.fn.expand '/opt/homebrew/',
+        vim.fn.expand '$HOME/tools/flutter/',
       }
       -- Server configurations
       local servers = {
@@ -317,6 +248,23 @@ return {
               },
               telemetry = { enable = false },
               completion = { callSnippet = 'Replace' },
+            },
+          },
+        },
+        gopls = {
+          capabilities = capabilities,
+          cmd = { 'gopls' },
+          filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
+          root_dir = 'auto',
+          settings = {
+            gopls = {
+              analysis = {
+                unusedparams = true,
+              },
+              completeUnimported = true,
+              usePlaceholders = true,
+              updateImportsOnRename = true,
+              completeFunctionCalls = true,
             },
           },
         },
@@ -377,6 +325,8 @@ return {
         },
         csharp_ls = {},
         omnisharp = {
+          capabilities = capabilities,
+          filetypes = { 'cs' },
           cmd = { 'omnisharp' },
           enable_roslyn_analyzers = true,
           organize_imports_on_format = true,
@@ -391,7 +341,7 @@ return {
             on_attach(client, bufnr)
 
             -- Check if easy-dotnet is available
-            local has_dotnet, dotnet = pcall(require, "easy-dotnet")
+            local has_dotnet, dotnet = pcall(require, 'easy-dotnet')
             if has_dotnet then
               -- Add specific keymaps for C# files
               local map = function(mode, lhs, rhs, desc)
@@ -399,19 +349,25 @@ return {
               end
 
               -- Add C# specific keymaps
-              map("n", "<leader>dt", function() dotnet.test() end, "Run .NET Tests")
-              map("n", "<leader>dr", function() dotnet.run() end, "Run .NET Project")
-              map("n", "<leader>db", function() dotnet.build() end, "Build .NET Project")
+              map('n', '<leader>dt', function()
+                dotnet.test()
+              end, 'Run .NET Tests')
+              map('n', '<leader>dr', function()
+                dotnet.run()
+              end, 'Run .NET Project')
+              map('n', '<leader>db', function()
+                dotnet.build()
+              end, 'Build .NET Project')
             end
           end,
         },
         dcmls = {
           capabilities = capabilities,
           cmd = {
-            "dcm",
-            "start-server",
+            'dcm',
+            'start-server',
           },
-          filetypes = { "dart", "yaml" },
+          filetypes = { 'dart', 'yaml' },
           settings = {
             dart = {
               analysisExcludedFolders = dartExcludedFolders,
