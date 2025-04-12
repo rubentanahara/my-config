@@ -161,8 +161,8 @@ function M.setup()
   autocmd({ "VimResized" }, {
     callback = function()
       local current_tab = vim.fn.tabpagenr()
-      cmd("tabdo wincmd =")
-      cmd("tabnext " .. current_tab)
+      vim.cmd("tabdo wincmd =")
+      vim.cmd("tabnext " .. current_tab)
     end,
   })
 
