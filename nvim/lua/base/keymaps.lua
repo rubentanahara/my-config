@@ -1,7 +1,7 @@
 local M = {}
 
 function M.setup()
-  local map = vim.keymap.set
+  local map = require("base").utils.map
 
   map("n", "<leader>l", ":Lazy<CR>", {
     noremap = true,
@@ -44,7 +44,7 @@ function M.setup()
   map("n", "<C-q>", ":wqa<CR>", { noremap = true, silent = true, desc = "Save and quit" })
 
   -- quit
-  map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit All" })
+  map("n", "<leader>qq", "<cmd>qa!<cr>", { desc = "Quit All Force" })
 
   -- Navigate within insert mode
   map("i", "<C-b>", "<ESC>^i", { noremap = true, silent = true, desc = "Go to beginning of line" })

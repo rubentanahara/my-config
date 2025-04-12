@@ -1,9 +1,9 @@
 local M = {}
 
 function M.setup()
-  require("core.options").setup()
-  require("core.keymaps").setup()
-  require("core.autocmds").setup()
+  require("base.options").setup()
+  require("base.keymaps").setup()
+  require("base.autocmds").setup()
 end
 
 M.utils = {
