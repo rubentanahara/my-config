@@ -1,11 +1,8 @@
--- Set up leader key early
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
--- Enable termguicolors for proper color support
 vim.opt.termguicolors = true
 
--- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
@@ -19,25 +16,22 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Set up core configuration
 require("core").setup()
 
--- Initialize plugins
 require("lazy").setup({
   spec = {
-    { import = "plugins.core.ui" },         -- UI components (including theme) must be first
-    { import = "plugins.core.editor" },     -- Editor essentials
-    { import = "plugins.core.coding" },     -- Basic coding features
-    { import = "plugins.core.lsp" },        -- LSP core setup
-    { import = "plugins.core.debug" },      -- Debugging setup
-    { import = "plugins.core.navigation" }, -- Navigation
-    { import = "plugins.core.util" },       -- Additional utilities
-    { import = "plugins.core.dotnet" },     -- .NET development tools
-    { import = "plugins.core.flutter" }
+    { import = "plugins.ui" },
+    { import = "plugins.editor" },
+    { import = "plugins.coding" },
+    { import = "plugins.lsp" },
+    { import = "plugins.debug" },
+    { import = "plugins.navigation" },
+    { import = "plugins.util" },
+    { import = "plugins.dotnet" },
+    { import = "plugins.flutter" }
   },
   performance = {
     rtp = {
-      -- Disable some rtp plugins
       disabled_plugins = {
         "gzip",
         "matchit",
