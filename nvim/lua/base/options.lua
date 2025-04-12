@@ -14,7 +14,8 @@ function M.setup()
 
   -- Globals --------------------------------------------------------------------
 
-  g.mapleader = ' ' -- Set leader key to space
+  g.mapleader = " "
+  g.maplocalleader = " "
   g.autoformat = false
   g.scriptencoding = 'utf-8'
   g.maplocalleader = ","                             -- Set default local leader key.
@@ -41,11 +42,11 @@ function M.setup()
   opt.encoding = 'utf-8'
 
   -- UI
+  opt.termguicolors = true
   opt.number = true
   opt.relativenumber = true
   opt.preserveindent = true
   opt.pumheight = 10 -- Height of pop up menu.
-  opt.termguicolors = true
   opt.fillchars = {
     eob = " ", -- Character to display at the end of the buffer
     fold = "", -- Character to indicate a folded line
