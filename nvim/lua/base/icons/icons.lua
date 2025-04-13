@@ -1,27 +1,3 @@
--- ### Icons
-
--- DESCRIPTION:
--- Here you can change the icons displayed in NormalNvim.
---
--- If you can't see the default icons:
--- Install nerd fonts and set it as your term font: https://www.nerdfonts.com/
-
---    Sections:
---      -> which-key
---      -> heirline-components (tabline)
---      -> heirline-components (winbar)
---      -> heirline-components (statuscolumn)
---      -> heirline-components (statusline)
---      -> heirline-components (misc)
---      -> Neotree
---      -> Git
---      -> DAP
---      -> Telescope
---      -> Nvim-lightbulb
---      -> Alpha
---      -> Mason
---      -> Render-markdown
-
 return {
   -- Which-key
   Debugger = "",
