@@ -6,4 +6,6 @@ collapse_simple_statement = "Always"
 
 indent_type = "Spaces"
 indent_width = 2
-column_width = 60
+column_width = 120
+[sort_requires]
+enabled = true
