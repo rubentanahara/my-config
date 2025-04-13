@@ -1,22 +1,7 @@
---- ### LSP utils.
-
---  DESCRIPTION:
---  Functions we use to configure the plugin `mason-lspconfig.nvim`.
---  You can specify your own lsp settings inside `M.apply_user_lsp_settings()`.
---
---  Most options we use in `M.apply_default_lsp_settings()`
---  can be tweaked on the file `../1-options.lua`.
---  Take this into consideration to minimize the risk of breaking stuff.
-
---    Functions:
---      -> M.apply_default_lsp_settings  → Apply our default lsp settings.
---      -> M.apply_user_lsp_mappings     → Apply the user lsp keymappings.
---      -> M.apply_user_lsp_settings     → Apply the user lsp settings.
---      -> M.setup                       → It passes the user lsp settings to lspconfig.
-
 local M = {}
 local utils = require "base.utils"
 local stored_handlers = {}
+local vim = vim
 
 --- Apply default settings for diagnostics, formatting, and lsp capabilities.
 --- It only need to be executed once, normally on mason-lspconfig.

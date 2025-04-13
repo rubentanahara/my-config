@@ -1,27 +1,5 @@
---- ### General utils.
-
---  DESCRIPTION:
---  General utility functions to use within Nvim.
-
---    Functions:
---      -> run_cmd                  → Run a shell command and return true/false.
---      -> add_autocmds_to_buffer   → Add autocmds to a bufnr.
---      -> del_autocmds_from_buffer → Delete autocmds from a bufnr.
---      -> get_icon                 → Return an icon from the icons directory.
---      -> get_mappings_template    → Return a empty mappings table.
---      -> is_available             → Return true if the plugin exist.
---      -> is_big_file              → Return true if the file is too big.
---      -> notify                   → Send a notification with a default title.
---      -> os_path                  → Converts a path to the current OS.
---      -> get_plugin_opts          → Return a plugin opts table.
---      -> set_mappings             → Set a list of mappings in a clean way.
---      -> set_url_effect           → Show an effect for urls.
---      -> open_with_program        → Open the file or URL under the cursor.
---      -> trigger_event            → Manually trigger an event.
---      -> which_key_register       → When setting a mapping, add it to whichkey.
-
-
 local M = {}
+local _vim = vim
 
 --- Run a shell command and capture the output and whether the command
 --- succeeded or failed.
@@ -31,25 +9,23 @@ local M = {}
 function M.run_cmd(cmd, show_error)
   -- Split cmd string into a list, if needed.
   if type(cmd) == "string" then
-    cmd = vim.split(cmd, " ")
+    cmd = _vim.split(cmd, " ")
   end
 
   -- If windows, and prepend cmd.exe
-  if vim.fn.has("win32") == 1 then
-    cmd = vim.list_extend({ "cmd.exe", "/C" }, cmd)
+  if _vim.fn.has("win32") == 1 then
+    cmd = _vim.list_extend({ "cmd.exe", "/C" }, cmd)
   end
 
   -- Execute cmd and store result (output or error message)
-  local result = vim.fn.system(cmd)
-  local success = vim.api.nvim_get_vvar("shell_error") == 0
+  local result = _vim.fn.system(cmd)
+  local success = _vim.api.nvim_get_vvar("shell_error") == 0
 
   -- If the command failed and show_error is true or not provided, print error.
   if not success and (show_error == nil or show_error) then
-    vim.api.nvim_echo({{
-      ("Error running command %s\nError message:\n%s"):format(
-        table.concat(cmd, " "), -- Convert the cmd back to string.
-        result                  -- Show the error result
-      )}}, true, { err = true }
+    M.notify(
+      "Error running command: " .. _vim.fn.join(cmd, " ") .. "\n" .. result,
+      _vim.log.levels.ERROR
     )
   end
 
@@ -67,15 +43,15 @@ end
 --- @param autocmds table|any  A table or a single autocmd definition containing the autocmds to add.
 function M.add_autocmds_to_buffer(augroup, bufnr, autocmds)
   -- Check if autocmds is a list, if not convert it to a list
-  if not vim.islist(autocmds) then autocmds = { autocmds } end
+  if not _vim.islist(autocmds) then autocmds = { autocmds } end
 
   -- Attempt to retrieve existing autocmds associated with the specified augroup and bufnr
-  local cmds_found, cmds = pcall(vim.api.nvim_get_autocmds, { group = augroup, buffer = bufnr })
+  local cmds_found, cmds = pcall(_vim.api.nvim_get_autocmds, { group = augroup, buffer = bufnr })
 
   -- If no existing autocmds are found or the cmds_found call fails
-  if not cmds_found or vim.tbl_isempty(cmds) then
+  if not cmds_found or _vim.tbl_isempty(cmds) then
     -- Create a new augroup if it doesn't already exist
-    vim.api.nvim_create_augroup(augroup, { clear = false })
+    _vim.api.nvim_create_augroup(augroup, { clear = false })
 
     -- Iterate over each autocmd provided
     for _, autocmd in ipairs(autocmds) do
@@ -88,7 +64,7 @@ function M.add_autocmds_to_buffer(augroup, bufnr, autocmds)
       autocmd.buffer = bufnr
 
       -- Create the autocmd
-      vim.api.nvim_create_autocmd(events, autocmd)
+      _vim.api.nvim_create_autocmd(events, autocmd)
     end
   end
 end
@@ -99,12 +75,12 @@ end
 --- @param bufnr number The buffer number from which the autocmds should be removed.
 function M.del_autocmds_from_buffer(augroup, bufnr)
   -- Attempt to retrieve existing autocmds associated with the specified augroup and bufnr
-  local cmds_found, cmds = pcall(vim.api.nvim_get_autocmds, { group = augroup, buffer = bufnr })
+  local cmds_found, cmds = pcall(_vim.api.nvim_get_autocmds, { group = augroup, buffer = bufnr })
 
   -- If retrieval was successful
   if cmds_found then
     -- Map over each retrieved autocmd and delete it
-    vim.tbl_map(function(cmd) vim.api.nvim_del_autocmd(cmd.id) end, cmds)
+    _vim.tbl_map(function(cmd) _vim.api.nvim_del_autocmd(cmd.id) end, cmds)
   end
 end
 
@@ -116,12 +92,12 @@ end
 --- @return string icon.
 function M.get_icon(icon_name, fallback_to_empty_string)
   -- guard clause
-  if fallback_to_empty_string and vim.g.fallback_icons_enabled then return "" end
+  if fallback_to_empty_string and _vim.g.fallback_icons_enabled then return "" end
 
   -- get icon_pack
-  local icon_pack = (vim.g.fallback_icons_enabled and "fallback_icons") or "icons"
+  local icon_pack = (_vim.g.fallback_icons_enabled and "fallback_icons") or "icons"
 
-  -- cache icon_pack into M
+    -- cache icon_pack into M
   if not M[icon_pack] then -- only if not cached already.
     if icon_pack == "icons" then
       M.icons = require("base.icons.icons")
@@ -160,10 +136,10 @@ end
 --- @return boolean is_big_file true or false.
 function M.is_big_file(bufnr)
   if bufnr == nil then bufnr = 0 end
-  local filesize = vim.fn.getfsize(vim.api.nvim_buf_get_name(bufnr))
-  local nlines = vim.api.nvim_buf_line_count(bufnr)
-  local is_big_file = (filesize > vim.g.big_file.size)
-      or (nlines > vim.g.big_file.lines)
+  local filesize = _vim.fn.getfsize(_vim.api.nvim_buf_get_name(bufnr))
+  local nlines = _vim.api.nvim_buf_line_count(bufnr)
+  local is_big_file = (filesize > _vim.g.big_file.size)
+      or (nlines > _vim.g.big_file.lines)
   return is_big_file
 end
 
@@ -173,9 +149,20 @@ end
 --- @param type number|nil The type of the notification (:help vim.log.levels).
 --- @param opts? table The nvim-notify options to use (:help notify-options).
 function M.notify(msg, type, opts)
-  vim.schedule(function()
-    vim.notify(
-      msg, type, vim.tbl_deep_extend("force", { title = "Neovim" }, opts or {}))
+  -- Define titles based on log levels
+  local titles = {
+    [_vim.log.levels.ERROR] = "Error",
+    [_vim.log.levels.WARN] = "Warning",
+    [_vim.log.levels.INFO] = "Info",
+    [_vim.log.levels.DEBUG] = "Debug",
+    [_vim.log.levels.TRACE] = "Trace",
+  }
+
+  -- Determine the title, defaulting to "Info" if type is nil or not found
+  local title = titles[type] or "Info"
+
+  _vim.schedule(function()
+    _vim.notify(msg, type, _vim.tbl_deep_extend("force", { title = title }, opts or {}))
   end)
 end
 
@@ -223,7 +210,7 @@ function M.set_mappings(map_table, base)
           cmd = options
         else
           cmd = options[1]
-          keymap_opts = vim.tbl_deep_extend("force", keymap_opts, options)
+          keymap_opts = _vim.tbl_deep_extend("force", keymap_opts, options)
           keymap_opts[1] = nil
         end
         if not cmd then -- if which-key mapping, queue it
@@ -232,7 +219,7 @@ function M.set_mappings(map_table, base)
           if not M.which_key_queue then M.which_key_queue = {} end
           table.insert(M.which_key_queue, keymap_opts)
         else -- if not which-key mapping, set it
-          vim.keymap.set(mode, keymap, cmd, keymap_opts)
+          _vim.keymap.set(mode, keymap, cmd, keymap_opts)
         end
       end
     end
@@ -240,7 +227,6 @@ function M.set_mappings(map_table, base)
   -- if which-key is loaded already, register
   if package.loaded["which-key"] then M.which_key_register() end
 end
-
 
 --- Add syntax matching rules for highlighting URLs/URIs.
 function M.set_url_effect()
@@ -254,15 +240,15 @@ function M.set_url_effect()
       "|\\{[&:#*@~%_\\-=?!+;/.0-9a-z]*})\\})+"
 
   M.delete_url_effect()
-  if vim.g.url_effect_enabled then
-    vim.fn.matchadd("HighlightURL", url_matcher, 15)
+  if _vim.g.url_effect_enabled then
+    _vim.fn.matchadd("HighlightURL", url_matcher, 15)
   end
 end
 
 --- Delete the syntax matching rules for URLs/URIs if set.
 function M.delete_url_effect()
-  for _, match in ipairs(vim.fn.getmatches()) do
-    if match.group == "HighlightURL" then vim.fn.matchdelete(match.id) end
+  for _, match in ipairs(_vim.fn.getmatches()) do
+    if match.group == "HighlightURL" then _vim.fn.matchdelete(match.id) end
   end
 end
 
@@ -270,38 +256,38 @@ end
 --- @param path string The path of the file to open with the system opener.
 function M.open_with_program(path)
   -- guard clause: If a opener already exists, use it.
-  if vim.ui.open then return vim.ui.open(path) end
+  if _vim.ui.open then return _vim.ui.open(path) end
 
   -- command to run
   local cmd
 
   -- cmd is different depending the OS
-  if vim.fn.has("mac") == 1 then
+  if _vim.fn.has("mac") == 1 then
     cmd = { "open" }
-  elseif vim.fn.has("win32") == 1 then
-    if vim.fn.executable "rundll32" then
+  elseif _vim.fn.has("win32") == 1 then
+    if _vim.fn.executable "rundll32" then
       cmd = { "rundll32", "url.dll,FileProtocolHandler" }
     else
       cmd = { "cmd.exe", "/K", "explorer" }
     end
-  elseif vim.fn.has("unix") == 1 then
-    if vim.fn.executable("explorer.exe") == 1 then -- available in WSL
+  elseif _vim.fn.has("unix") == 1 then
+    if _vim.fn.executable("explorer.exe") == 1 then -- available in WSL
       cmd = { "explorer.exe" }
-    elseif vim.fn.executable("xdg-open") == 1 then
+    elseif _vim.fn.executable("xdg-open") == 1 then
       cmd = { "xdg-open" }
     end
   end
-  if not cmd then M.notify("Available system opening tool not found!", vim.log.levels.ERROR) end
+  if not cmd then M.notify("Available system opening tool not found!", _vim.log.levels.ERROR) end
 
   -- No path provided? use the file under the cursor; else, expand the path.
   if not path then
-    path = vim.fn.expand("<cfile>")
+    path = _vim.fn.expand("<cfile>")
   elseif not path:match "%w+:" then
-    path = vim.fn.expand(path)
+    path = _vim.fn.expand(path)
   end
 
   -- start job (detached)
-  vim.fn.jobstart(vim.list_extend(cmd, { path }), { detach = true })
+  _vim.fn.jobstart(_vim.list_extend(cmd, { path }), { detach = true })
 end
 
 --- Convenient wapper to save code when we Trigger events.
@@ -316,9 +302,9 @@ function M.trigger_event(event, is_urgent)
     local is_user_event = string.match(event, "^User ") ~= nil
     if is_user_event then
       event = event:gsub("^User ", "")
-      vim.api.nvim_exec_autocmds("User", { pattern = event, modeline = false })
+      _vim.api.nvim_exec_autocmds("User", { pattern = event, modeline = false })
     else
-      vim.api.nvim_exec_autocmds(event, { modeline = false })
+      _vim.api.nvim_exec_autocmds(event, { modeline = false })
     end
   end
 
@@ -326,7 +312,7 @@ function M.trigger_event(event, is_urgent)
   if is_urgent then
     trigger()
   else
-    vim.schedule(trigger)
+    _vim.schedule(trigger)
   end
 end
 
@@ -339,6 +325,12 @@ function M.which_key_register()
       M.which_key_queue = nil
     end
   end
+end
+
+function M.map(mode, lhs, rhs, opts)
+  opts = opts or {}
+  opts.silent = opts.silent ~= false
+  _vim.keymap.set(mode, lhs, rhs, opts)
 end
 
 return M
