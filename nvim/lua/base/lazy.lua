@@ -1,14 +1,13 @@
 local M = {}
+local _vim = vim
+local utils = require("base.utils")
+local opt = _vim.opt
+local fn = _vim.fn
+local api = _vim.api
+local uv = _vim.uv
+local cmd = _vim.cmd
 
 function M.setup()
-  local _vim = vim
-  local utils = require("base.utils")
-  local opt = _vim.opt
-  local fn = _vim.fn
-  local api = _vim.api
-  local uv = _vim.uv
-  local cmd = _vim.cmd
-
   -- Lazy updater options
   -- Use the same values you have in the plugin `distroupdate.nvim`
   local updates_config = {
