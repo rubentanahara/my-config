@@ -27,7 +27,7 @@ return {
   CompilerStop = "",
   CompilerRedo = "",
   NeoTree = "",
-  Aerial = "" ,
+  Aerial = "",
   ZenMode = "󰰶",
   BufWrite = "",
   BufWriteAll = "",
@@ -43,10 +43,10 @@ return {
   ActiveLSP = "",
   ActiveTS = "",
   Environment = "",
-  DiagnosticError = "",
+  DiagnosticError = " ",
   DiagnosticHint = "󰌵",
-  DiagnosticInfo = "󰋼",
-  DiagnosticWarn = "",
+  DiagnosticInfo = " ",
+  DiagnosticWarn = " ",
   LSPLoading1 = "",
   LSPLoading2 = "󰀚",
   LSPLoading3 = "",
@@ -60,7 +60,7 @@ return {
 
   -- Neotree
   FolderClosed = "",
-  FolderEmpty = "",
+  FolderEmpty = "",
   FolderOpen = "",
   Diagnostic = "󰒡",
   DefaultFile = "󰈙",
@@ -79,7 +79,7 @@ return {
   GitUntracked = "★",
 
   -- DAP
-  DapBreakpoint = "",
+  DapBreakpoint = "",
   DapBreakpointCondition = "",
   DapBreakpointRejected = "",
   DapLogPoint = ".>",
@@ -105,5 +105,8 @@ return {
   MasonPending = "⟳",
 
   -- Render-markdown
-  RenderMarkdown = { ' ', ' ', '󰲥 ', '󰲧 ', '󰲩 ', '󰲫 ' }
+  RenderMarkdown = { ' ', ' ', '󰲥 ', '󰲧 ', '󰲩 ', '󰲫 ' },
+
+  -- Others
+  Vim = " "
 }

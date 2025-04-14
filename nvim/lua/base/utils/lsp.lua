@@ -2,6 +2,8 @@ local M = {}
 local utils = require "base.utils"
 local stored_handlers = {}
 local vim = vim
+local get_icon = utils.get_icon
+
 
 --- Apply default settings for diagnostics, formatting, and lsp capabilities.
 --- It only need to be executed once, normally on mason-lspconfig.
@@ -9,7 +11,6 @@ local vim = vim
 M.apply_default_lsp_settings = function()
   -- Icons
   -- Apply the icons defined in ../icons/icons.lua
-  local get_icon = utils.get_icon
   local signs = {
     { name = "DiagnosticSignError",    text = get_icon("DiagnosticError"),        texthl = "DiagnosticSignError" },
     { name = "DiagnosticSignWarn",     text = get_icon("DiagnosticWarn"),         texthl = "DiagnosticSignWarn" },
@@ -34,10 +35,10 @@ M.apply_default_lsp_settings = function()
     virtual_text = true,
     signs = {
       text = {
-        [vim.diagnostic.severity.ERROR] = utils.get_icon("DiagnosticError"),
-        [vim.diagnostic.severity.HINT] = utils.get_icon("DiagnosticHint"),
-        [vim.diagnostic.severity.WARN] = utils.get_icon("DiagnosticWarn"),
-        [vim.diagnostic.severity.INFO] = utils.get_icon("DiagnosticInfo"),
+        [vim.diagnostic.severity.ERROR] = get_icon("DiagnosticError"),
+        [vim.diagnostic.severity.HINT] = get_icon("DiagnosticHint"),
+        [vim.diagnostic.severity.WARN] = get_icon("DiagnosticWarn"),
+        [vim.diagnostic.severity.INFO] = get_icon("DiagnosticInfo"),
       },
       active = signs,
     },
