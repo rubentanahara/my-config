@@ -1,58 +1,4 @@
 return {
-  -- {
-  --   "Mofiqul/vscode.nvim",
-  --   lazy = false,
-  --   priority = 1000,
-  --   config = function()
-  --     -- local c = require('vscode.colors').get_colors()
-  --     require('vscode').setup({
-  --       -- Alternatively set style in setup
-  --       -- style = 'light'
-  --       commentStyle = {
-  --         italic = true
-  --       },
-  --       functionStyle = {
-  --         italic = true
-  --       },
-  --       keywordStyle = {
-  --         italic = true
-  --       },
-  --       statementStyle = {
-  --         bold = true
-  --       },
-  --
-  --       -- Enable transparent background
-  --       transparent = true,    -- do not set background color
-  --       dimInactive = false,   -- dim inactive window `:h hl-NormalNC`
-  --       terminalColors = true, -- define vim.g.terminal_color_{0,17}
-  --
-  --       -- Enable italic comment
-  --       italic_comments = true,
-  --
-  --       -- Underline `@markup.link.*` variants
-  --       underline_links = true,
-  --
-  --       -- Disable nvim-tree background color
-  --       disable_nvimtree_bg = true,
-  --
-  --       -- Apply theme colors to terminal
-  --       terminal_colors = true,
-  --
-  --       -- Override colors (see ./lua/vscode/colors.lua)
-  --       -- color_overrides = {
-  --       --   vscLineNumber = '#FFFFFF',
-  --       -- },
-  --
-  --       -- Override highlight groups (see ./lua/vscode/theme.lua)
-  --       -- group_overrides = {
-  --       --   -- this supports the same val table as vim.api.nvim_set_hl
-  --       --   -- use colors from this colorscheme by requiring vscode.colors!
-  --       --   Cursor = { fg = c.vscDarkBlue, bg = c.vscLightGreen, bold = true },
-  --       -- }
-  --     })
-  --     vim.cmd("colorscheme vscode")
-  --   end
-  -- },
   {
     -- Color scheme
     "rebelot/kanagawa.nvim",
@@ -130,7 +76,8 @@ return {
     }
   },
   {
-    'folke/zen-mode.nvim',
+    "folke/zen-mode.nvim",
+    cmd = "ZenMode",
   },
   {
     "utilyre/barbecue.nvim",
@@ -233,17 +180,9 @@ return {
       popup_border_style = "rounded",
       enable_git_status = true,
       enable_diagnostics = true,
-      -- enable_normal_mode_for_inputs = false,                             -- Enable normal mode for input dialogs.
       open_files_do_not_replace_types = { "terminal", "trouble", "qf" }, -- when opening files, do not use windows containing these filetypes or buftypes
       sort_case_insensitive = false,                                     -- used when sorting files and directories in the tree
       sort_function = nil,                                               -- use a custom function for sorting files and directories in the tree
-      -- sort_function = function(a, b)
-      --   if a.type == b.type then
-      --     return a.path > b.path
-      --   else
-      --     return a.type > b.type
-      --   end
-      -- end, -- this sorts files and directories descendantly
       default_component_configs = {
         container = {
           enable_character_fade = true
@@ -301,7 +240,7 @@ return {
         -- If you don't want to use these columns, you can set `enabled = false` for each of them individually
         file_size = {
           enabled = true,
-          required_width = 64 -- min width of window required to show this column
+          required_width = 60 -- min width of window required to show this column
         },
         type = {
           enabled = true,
@@ -309,7 +248,7 @@ return {
         },
         last_modified = {
           enabled = true,
-          required_width = 88 -- min width of window required to show this column
+          required_width = 80 -- min width of window required to show this column
         },
         created = {
           enabled = true,

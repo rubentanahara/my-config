@@ -56,21 +56,9 @@ function M.setup()
     })
   end
 
-  --- load `<config_dir>/lua/lazy_snapshot.lua` and return it as table.
   --- @return table spec A table you can pass to the `spec` option of lazy.
   local function get_lazy_spec()
-    local snapshot_filename = fn.fnamemodify(updates_config.snapshot_file, ":t:r")
-    local pin_plugins = updates_config.channel == "stable"
-    local snapshot_file_exists = uv.fs_stat(
-      fn.stdpath("config")
-      .. "/lua/"
-      .. snapshot_filename
-      .. ".lua"
-    )
-    local spec = pin_plugins
-        and snapshot_file_exists
-        and { { import = snapshot_filename } }
-        or {}
+    local spec = {}
     _vim.list_extend(spec, { { import = "plugins" } })
 
     return spec

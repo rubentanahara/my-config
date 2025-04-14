@@ -1,157 +1,382 @@
 local M = {}
 local utils = require("base.utils")
-local get_icon = utils.get_icon
-local is_available = utils.is_available
-local ui = require("base.utils.ui")
 local maps = require("base.utils").get_mappings_template()
 
--- icons displayed on which-key.nvim ---------------------------------------
-local icons = {
-  f = { desc = get_icon("Find", true) .. " Find" },
-  p = { desc = get_icon("Packages", true) .. " Packages" },
-  l = { desc = get_icon("LSP", true) .. " LSP" },
-  u = { desc = get_icon("UI", true) .. " UI" },
-  b = { desc = get_icon("Buffer", true) .. " Buffers" },
-  bs = { desc = get_icon("Sort", true) .. " Sort Buffers" },
-  c = { desc = get_icon("Run", true) .. " Compiler" },
-  d = { desc = get_icon("Debugger", true) .. " Debugger" },
-  tt = { desc = get_icon("Test", true) .. " Test" },
-  dc = { desc = get_icon("Docs", true) .. " Docs" },
-  g = { desc = get_icon("Git", true) .. " Git" },
-  S = { desc = get_icon("Session", true) .. " Session" },
-  t = { desc = get_icon("Terminal", true) .. " Terminal" },
-}
-
 function M.setup()
+  -- standard Operations -----------------------------------------------------
+  maps.n["j"] =
+  { "v:count == 0 ? 'gj' : 'j'", expr = true, desc = "Move cursor down" }
+  maps.n["k"] =
+  { "v:count == 0 ? 'gk' : 'k'", expr = true, desc = "Move cursor up" }
+  maps.n["<leader>w"] = { "<cmd>w<cr>", desc = "Save" }
+  maps.n["<leader>n"] = { "<cmd>enew<cr>", desc = "New file" }
+  maps.n["gx"] =
+  { utils.open_with_program, desc = "Open the file under cursor with a program" }
+  maps.n["<C-s>"] = { "<cmd>w!<cr>", desc = "Force write" }
+  maps.i["<C-BS>"] = { "<C-W>", desc = "Enable CTRL+backsace to delete." }
+  maps.n["0"] =
+  { "^", desc = "Go to the fist character of the line (aliases 0 to ^)" }
+  maps.n["<leader>q"] = { "<cmd>confirm q<cr>", desc = "Quit" }
+  maps.n["<leader>q"] = {
+    function()
+      -- Ask user for confirmation
+      local choice = vim.fn.confirm("Do you really want to exit nvim?", "&Yes\n&No", 2)
+      if choice == 1 then
+        -- If user confirms, but there are still files to be saved: Ask
+        vim.cmd('confirm quit')
+      end
+    end,
+    desc = "Quit",
+  }
   local map = vim.keymap.set
-
-  map("n", "<leader>l", ":Lazy<CR>", {
+  -- Lazy 
+  maps.n["<leader>l"] =  {
+    ":Lazy<CR>",
     noremap = true,
     silent = true,
     desc = "Open Lazy (Lazy.nvim)",
-  })
+  }
 
-  map("n", "<leader>lc", ":LazyConfig<CR>", {
+  maps.n["<leader>lc"] = {
+    ":LazyConfig<CR>",
     noremap = true,
     silent = true,
     desc = "Open Lazy Config (Lazy.nvim)",
-  })
+  }
 
-  map("n", "<leader>li", ":LazyInstall<CR>", {
+  maps.n["<leader>li"] = {
+    ":LazyInstall<CR>",
     noremap = true,
     silent = true,
     desc = "Install Lazy Plugins (Lazy.nvim)",
-  })
+  }
 
-  map("n", "<leader>lu", ":LazyUpdate<CR>", {
+  maps.n["<leader>lu"] = {
+    ":LazyUpdate<CR>",
     noremap = true,
     silent = true,
     desc = "Update Lazy Plugins (Lazy.nvim)",
-  })
+  }
 
-  map("n", "<leader>ld", ":LazyDebug<CR>", {
+  maps.n["<leader>ld"] = {
+    ":LazyDebug<CR>",
     noremap = true,
     silent = true,
     desc = "Debug Lazy Plugins (Lazy.nvim)",
-  })
 
-  -- Toggle line numbers
-  map("n", "<leader>ln", ":set nu!<CR>", { noremap = true, silent = true, desc = "Toggle Line Numbers" })
+  }
 
   -- Exit insert mode
-  map("i", "jk", "<ESC>", { noremap = true, silent = true, desc = "Exit insert mode" })
-
-  -- Save and close
-  map("n", "<C-s>", ":w<CR>", { noremap = true, silent = true, desc = "Save File" })
-  map("n", "<C-q>", ":wqa<CR>", { noremap = true, silent = true, desc = "Save and quit" })
-
-  -- quit
-  map("n", "<leader>qq", "<cmd>qa!<cr>", { desc = "Quit All Force" })
+  maps.i["jk"] = {
+    "<ESC>", 
+    noremap = true, 
+    silent = true,
+    desc = "Exit insert mode"
+  }
 
   -- Navigate within insert mode
-  map("i", "<C-b>", "<ESC>^i", { noremap = true, silent = true, desc = "Go to beginning of line" })
-  map("i", "<C-e>", "<ESC>$a", { noremap = true, silent = true, desc = "Go to end of line" })
+  maps.i["<C-b>"] = {
+    "<ESC>^i",
+    noremap = true,
+    silent = true,
+    desc = "Go to beginning of line"
+  }
 
-  -- better up/down
-  map({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { desc = "Down", expr = true, silent = true })
-  map({ "n", "x" }, "<Down>", "v:count == 0 ? 'gj' : 'j'", { desc = "Down", expr = true, silent = true })
-  map({ "n", "x" }, "k", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = true, silent = true })
-  map({ "n", "x" }, "<Up>", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = true, silent = true })
+  maps.i["<C-e>"] = {
+    "<ESC>$a",
+    noremap = true,
+    silent = true,
+    desc = "Go to end of line"
+  }
 
   -- Move Lines
-  map("n", "<A-j>", "<cmd>execute 'move .+' . v:count1<cr>==", { desc = "Move Down" })
-  map("n", "<A-k>", "<cmd>execute 'move .-' . (v:count1 + 1)<cr>==", { desc = "Move Up" })
-  map("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move Down" })
-  map("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move Up" })
-  map("v", "<A-j>", ":<C-u>execute \"'<,'>move '>+\" . v:count1<cr>gv=gv", { desc = "Move Down" })
-  map("v", "<A-k>", ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv", { desc = "Move Up" })
+  maps.n["<A-j>"] = {
+    "<cmd>execute 'move .+' . v:count1<cr>==",
+    noremap = true,
+    silent = true,
+    desc = "Move Down"
+  }
 
-  -- Clipboard operations
-  map({ "n", "v" }, "<leader>y", [["+y]], { noremap = true, silent = true, desc = "Yank to system clipboard" })
-  map({ "n", "v" }, "<leader>Y", [["+Y]], { noremap = true, silent = true, desc = "Yank line to system clipboard" })
+  maps.n["<A-k>"] = {
+    "<cmd>execute 'move .-' . (v:count1 + 1)<cr>==",
+    noremap = true,
+    silent = true,
+    desc = "Move Up"
+  }
 
-  -- Delete to void register
-  map({ "n", "v" }, "<leader>d", [["_d]], { noremap = true, silent = true, desc = "Delete to void register" })
+  maps.i["<A-j>"] = {
+    "<esc><cmd>m .+1<cr>==gi",
+    noremap = true,
+    silent = true,
+    desc = "Move Down"
+  }
 
-  -- Resize window using <ctrl> arrow keys
-  map("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase Window Height" })
-  map("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease Window Height" })
-  map("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease Window Width" })
-  map("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase Window Width" })
+  maps.i["<A-k>"] = {
+    "<esc><cmd>m .-2<cr>==gi",
+    noremap = true,
+    silent = true,
+    desc = "Move Up"
+  }
+
+  maps.v["<A-j>"] = {
+    ":<C-u>execute \"'<,'>move '>+\" . v:count1<cr>gv=gv",
+    noremap = true,
+    silent = true,
+    desc = "Move Down"
+  }
+
+  maps.v["<A-k>"] = {
+    ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv",
+    noremap = true,
+    silent = true,
+    desc = "Move Up"
+  }
+
 
   -- Better indenting
-  -- map("v", "<", "<gv", { noremap = true, silent = true, desc = "Indent left" })
-  -- map("v", ">", ">gv", { noremap = true, silent = true, desc = "Indent right" })
-
-  -- Move selected line / block of text in visual mode
-  -- map("v", "J", ":m '>+1<CR>gv=gv", { noremap = true, silent = true, desc = "Move line down" })
-  -- map("v", "K", ":m '<-2<CR>gv=gv", { noremap = true, silent = true, desc = "Move line up" })
-
-  -- Better paste
-  map("v", "p", '"_dP', { noremap = true, silent = true, desc = "Better paste" })
-
-  -- Clear search with <esc>
-  map({ "i", "n" }, "<esc>", "<cmd>noh<cr><esc>", { noremap = true, silent = true, desc = "Clear hlsearch and escape" })
-
-  -- save file
-  map({ "i", "x", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
-
-  --keywordprg
-  map("n", "<leader>K", "<cmd>norm! K<cr>", { desc = "Keywordprg" })
-
-  -- Clear search, diff update and redraw
-  -- taken from runtime/lua/_editor.lua
-  map(
-    "n",
-    "<leader>ur",
-    "<Cmd>nohlsearch<Bar>diffupdate<Bar>normal! <C-L><CR>",
-    { desc = "Redraw / Clear hlsearch / Diff Update" }
-  )
+  maps.v["<"] = {
+    "<gv",
+    noremap = true,
+    silent = true,
+    desc = "Indent left"
+  }
+  maps.v[">"] = {
+    ">gv",
+    noremap = true,
+    silent = true,
+    desc = "Indent right"
+  }
 
   -- Diagnostic keymaps
-  map("n", "[d", vim.diagnostic.goto_prev, { noremap = true, silent = true, desc = "Previous diagnostic" })
-  map("n", "]d", vim.diagnostic.goto_next, { noremap = true, silent = true, desc = "Next diagnostic" })
-  map("n", "gl", vim.diagnostic.open_float, { noremap = true, silent = true, desc = "Show diagnostic" })
+  maps.n["[d"] = {
+    vim.diagnostic.goto_prev,
+    noremap = true,
+    silent = true,
+    desc = "Previous diagnostic"
+  }
+  maps.n["]d"] = {
+    vim.diagnostic.goto_next,
+    noremap = true,
+    silent = true,
+    desc = "Next diagnostic"
+  }
+  maps.n["gl"] = {
+    vim.diagnostic.open_float,
+    noremap = true,
+    silent = true,
+    desc = "Show diagnostic"
+  }
 
   -- Windows
-  map("n", "ss", ":split<CR>", { noremap = true, silent = true, desc = "Horizontal Window Split" })
-  map("n", "sv", ":vsplit<CR>", { noremap = true, silent = true, desc = "Vertical Window Split" })
+  maps.n["ss"] = {
+    ":split<CR>",
+    noremap = true,
+    silent = true,
+    desc = "Horizontal Window Split"
+  }
+  maps.n["sv"] = {
+    ":vsplit<CR>",
+    noremap = true,
+    silent = true,
+    desc = "Vertical Window Split"
+  }
 
   -- Window resizing
-  map("n", "<C-w><up>", ":resize +3<CR>", { noremap = true, silent = true, desc = "Resize Horizontal Up" })
-  map("n", "<C-w><down>", ":resize -3<CR>", { noremap = true, silent = true, desc = "Resize Horizontal Down" })
-  map("n", "<C-w><left>", ":vertical resize +3<CR>", { noremap = true, silent = true, desc = "Resize Vertical Left" })
-  map("n", "<C-w><right>", ":vertical resize -3<CR>", { noremap = true, silent = true, desc = "Resize Vertical Right" })
+  maps.n["<C-w><up>"] = {
+    ":resize +3<CR>",
+    noremap = true,
+    silent = true,
+    desc = "Resize Horizontal Up"
+  }
+  maps.n["<C-w><down>"] = {
+    ":resize -3<CR>",
+    noremap = true,
+    silent = true,
+    desc = "Resize Horizontal Down"
+  }
+  maps.n["<C-w><left>"] = {
+    ":vertical resize +3<CR>",
+    noremap = true,
+    silent = true,
+    desc = "Resize Vertical Left"
+  }
+  maps.n["<C-w><right>"] = {
+    ":vertical resize -3<CR>",
+    noremap = true,
+    silent = true,
+    desc = "Resize Vertical Right"
+  }
+
+  -- Resize window using <ctrl> arrow keys
+  maps.n["<C-Up>"] = {
+    "<cmd>resize +3<cr>",
+    noremap = true,
+    silent = true,
+    desc = "Increase Window Height"
+  }
+  maps.n["<C-Down>"] = {
+    "<cmd>resize -3<cr>",
+    noremap = true,
+    silent = true,
+    desc = "Decrease Window Height"
+  }
+  maps.n["<C-Left>"] = {
+    "<cmd>vertical resize -3<cr>",
+    noremap = true,
+    silent = true,
+    desc = "Decrease Window Width"
+  }
+  maps.n["<C-Right>"] = {
+    "<cmd>vertical resize +3<cr>",
+    noremap = true,
+    silent = true,
+    desc = "Increase Window Width"
+  }
 
   -- Useful keymaps
-  map("n", "x", '"_x', { noremap = true, silent = true, desc = "Delete single character without copying into register" })
-  map("n", "+", "<C-a>", { noremap = true, silent = true, desc = "Increment" })
-  map("n", "-", "<C-x>", { noremap = true, silent = true, desc = "Decrement" })
+  maps.n["+"] = {
+    "<C-a>",
+    noremap = true,
+    silent = true,
+    desc = "Increment"
+  }
+  maps.n["-"] = {
+    "<C-x>",
+    noremap = true,
+    silent = true,
+    desc = "Decrement"
+  }
 
-  -- commenting
-  map("n", "gcb", "o<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Below" })
-  map("n", "gca", "O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Above" })
+  -- Commenting
+  maps.n["gcb"] = {
+    "o<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>",
+    noremap = true,
+    silent = true,
+    desc = "Add Comment Below"
+  }
+  maps.n["gca"] = {
+    "O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>",
+    noremap = true,
+    silent = true,
+    desc = "Add Comment Above"
+  }
+
+  -- clipboard ---------------------------------------------------------------
+  -- Make 'c' key not copy to clipboard when changing a character.
+  maps.n["c"] = { '"_c', desc = "Change without yanking" }
+  maps.n["C"] = { '"_C', desc = "Change without yanking" }
+  maps.x["c"] = { '"_c', desc = "Change without yanking" }
+  maps.x["C"] = { '"_C', desc = "Change without yanking" }
+
+  -- Make 'x' key not copy to clipboard when deleting a character.
+  maps.n["x"] = {
+    -- Also let's allow 'x' key to delete blank lines in normal mode.
+    function()
+      if vim.fn.col "." == 1 then
+        local line = vim.fn.getline "."
+        if line:match "^%s*$" then
+          vim.api.nvim_feedkeys('"_dd', "n", false)
+          vim.api.nvim_feedkeys("$", "n", false)
+        else
+          vim.api.nvim_feedkeys('"_x', "n", false)
+        end
+      else
+        vim.api.nvim_feedkeys('"_x', "n", false)
+      end
+    end,
+    noremap = true,
+    silent = true,
+    desc = "Delete character without yanking it",
+  }
+  maps.x["x"] = { '"_x', desc = "Delete all characters in line" }
+
+  -- Same for shifted X
+  maps.n["X"] = {
+    -- Also let's allow 'x' key to delete blank lines in normal mode.
+    function()
+      if vim.fn.col "." == 1 then
+        local line = vim.fn.getline "."
+        if line:match "^%s*$" then
+          vim.api.nvim_feedkeys('"_dd', "n", false)
+          vim.api.nvim_feedkeys("$", "n", false)
+        else
+          vim.api.nvim_feedkeys('"_X', "n", false)
+        end
+      else
+        vim.api.nvim_feedkeys('"_X', "n", false)
+      end
+    end,
+    desc = "Delete before character without yanking it",
+  }
+  maps.x["X"] = { '"_X', desc = "Delete all characters in line" }
+
+  -- Override nvim default behavior so it doesn't auto-yank when pasting on visual mode.
+  maps.x["p"] = { "P", desc = "Paste content you've previourly yanked" }
+  maps.x["P"] = { "p", desc = "Yank what you are going to override, then paste" }
+
+  -- search highlighting ------------------------------------------------------
+  maps.n["<leader><ENTER>"] = {
+    function()
+      if vim.fn.hlexists("Search") then
+        vim.cmd("nohlsearch")
+      else
+        vim.api.nvim_feedkeys(
+          vim.api.nvim_replace_termcodes("<ESC>", true, true, true),
+          "n",
+          true
+        )
+      end
+    end,
+  }
+
+  -- Improved tabulation ------------------------------------------------------
+  maps.x["<S-Tab>"] = { "<gv", desc = "unindent line" }
+  maps.x["<Tab>"] = { ">gv", desc = "indent line" }
+  maps.x["<"] = { "<gv", desc = "unindent line" }
+  maps.x[">"] = { ">gv", desc = "indent line" }
+
+  -- improved gg --------------------------------------------------------------
+  maps.n["gg"] = {
+    function()
+      vim.g.minianimate_disable = true
+      if vim.v.count > 0 then
+        vim.cmd("normal! " .. vim.v.count .. "gg")
+      else
+        vim.cmd("normal! gg0")
+      end
+      vim.g.minianimate_disable = false
+    end,
+    desc = "gg and go to the first position",
+  }
+  maps.n["G"] = {
+    function()
+      vim.g.minianimate_disable = true
+      vim.cmd("normal! G$")
+      vim.g.minianimate_disable = false
+    end,
+    desc = "G and go to the last position",
+  }
+  maps.x["gg"] = {
+    function()
+      vim.g.minianimate_disable = true
+      if vim.v.count > 0 then
+        vim.cmd("normal! " .. vim.v.count .. "gg")
+      else
+        vim.cmd("normal! gg0")
+      end
+      vim.g.minianimate_disable = false
+    end,
+    desc = "gg and go to the first position (visual)",
+  }
+  maps.x["G"] = {
+    function()
+      vim.g.minianimate_disable = true
+      vim.cmd("normal! G$")
+      vim.g.minianimate_disable = false
+    end,
+    desc = "G and go to the last position (visual)",
+  }
+
+  utils.set_mappings(maps)
 end
-
-utils.set_mappings(maps)
 return M

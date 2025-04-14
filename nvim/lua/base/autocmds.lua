@@ -119,7 +119,8 @@ function M.setup()
   autocmd("BufWritePre", {
     desc = "Close all notifications on BufWritePre",
     callback = function()
-      require("notify").dismiss({ pending = true, silent = true })
+      -- TODO: this throw an error
+      -- require("notify").dismiss({ pending = true, silent = true })
     end,
   })
 
