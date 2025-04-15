@@ -9,62 +9,16 @@ function M.setup()
   maps.n["k"] =
   { "v:count == 0 ? 'gk' : 'k'", expr = true, desc = "Move cursor up" }
   maps.n["<leader>w"] = { "<cmd>w<cr>", desc = "Save" }
+  maps.n["<leader>W"] = { "<cmd>w<cr>", desc = "Save all" }
+  maps.n["<leader>Q"] = { "<cmd>wa|q<cr>", desc = "Save All and Quit" }
+  maps.n["<leader>q"] = { "<cmd>q<cr>", desc = "Quit" }
   maps.n["<leader>n"] = { "<cmd>enew<cr>", desc = "New file" }
   maps.n["gx"] =
   { utils.open_with_program, desc = "Open the file under cursor with a program" }
   maps.n["<C-s>"] = { "<cmd>w!<cr>", desc = "Force write" }
-  maps.i["<C-BS>"] = { "<C-W>", desc = "Enable CTRL+backsace to delete." }
   maps.n["0"] =
   { "^", desc = "Go to the fist character of the line (aliases 0 to ^)" }
-  maps.n["<leader>q"] = { "<cmd>confirm q<cr>", desc = "Quit" }
-  maps.n["<leader>q"] = {
-    function()
-      -- Ask user for confirmation
-      local choice = vim.fn.confirm("Do you really want to exit nvim?", "&Yes\n&No", 2)
-      if choice == 1 then
-        -- If user confirms, but there are still files to be saved: Ask
-        vim.cmd('confirm quit')
-      end
-    end,
-    desc = "Quit",
-  }
-  local map = vim.keymap.set
-  -- Lazy 
-  maps.n["<leader>l"] =  {
-    ":Lazy<CR>",
-    noremap = true,
-    silent = true,
-    desc = "Open Lazy (Lazy.nvim)",
-  }
 
-  maps.n["<leader>lc"] = {
-    ":LazyConfig<CR>",
-    noremap = true,
-    silent = true,
-    desc = "Open Lazy Config (Lazy.nvim)",
-  }
-
-  maps.n["<leader>li"] = {
-    ":LazyInstall<CR>",
-    noremap = true,
-    silent = true,
-    desc = "Install Lazy Plugins (Lazy.nvim)",
-  }
-
-  maps.n["<leader>lu"] = {
-    ":LazyUpdate<CR>",
-    noremap = true,
-    silent = true,
-    desc = "Update Lazy Plugins (Lazy.nvim)",
-  }
-
-  maps.n["<leader>ld"] = {
-    ":LazyDebug<CR>",
-    noremap = true,
-    silent = true,
-    desc = "Debug Lazy Plugins (Lazy.nvim)",
-
-  }
 
   -- Exit insert mode
   maps.i["jk"] = {
@@ -376,6 +330,15 @@ function M.setup()
     end,
     desc = "G and go to the last position (visual)",
   }
+
+  -- Lazy
+  maps.n["<leader>l"] =  {
+    ":Lazy<CR>",
+    noremap = true,
+    silent = true,
+    desc = "Open Lazy (Lazy.nvim)",
+  }
+
 
   utils.set_mappings(maps)
 end
