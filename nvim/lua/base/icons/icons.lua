@@ -55,9 +55,6 @@ return {
   MacroRecording = "",
   ToggleResults = "󰑮",
 
-  -- TODO
-  
-
   -- Heirline-components - misc
   Paste = "󰅌",
   PathSeparator = "",
@@ -71,14 +68,14 @@ return {
   Diagnostic = "󰒡",
   DefaultFile = "󰈙",
 
-  -- Languages icons 
+  -- Languages icons
   Java = "",
   Python = "",
   Rust = "",
   Go = "",
   Lua = "",
   Help = "󰋖",
-  
+
   -- Git
   GitBranch = "",
   GitAdd = "",
