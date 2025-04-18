@@ -1,4 +1,4 @@
----@diagnostic disable: missing-fields
+--@diagnostic disable: missing-fields
 local M = {}
 local _vim = vim
 local opt = _vim.opt
@@ -12,18 +12,18 @@ function M.setup()
 
   g.mapleader = " "                                  -- Leader key.
   g.maplocalleader = " "                             -- Leader key.
-  g.autoformat = false                               -- Disable autoformatting for all filetypes.
+  g.autoformat = true                               -- Disable autoformatting for all filetypes.
   g.scriptencoding = 'utf-8'
   g.big_file = { size = 1024 * 5000, lines = 50000 } -- For files bigger than this, disable 'treesitter' (+5Mb).
-  g.disable_autoformat = true                        -- Disable autoformatting for all filetypes.
+  g.disable_autoformat = false                        -- Disable autoformatting for all filetypes
   g.autoformat_enabled = false                       -- Enable auto formatting at start.
   g.autopairs_enabled = false                        -- Enable autopairs at start.
   g.cmp_enabled = true                               -- Enable completion at start.
   g.codeactions_enabled = true                       -- Enable displaying 💡 where code actions can be used.
   g.codelens_enabled = true                          -- Enable automatic codelens refreshing for lsp that support it.
   g.diagnostics_mode = 3                             -- Set code linting (0=off, 1=only show in status line, 2=virtual text off, 3=all on).
-  g.fallback_icons_enabled = true                    -- Enable it if you need to use Neovim in a machine without nerd fonts.
-  g.inlay_hints_enabled = false                      -- Enable always show function parameter names.
+  g.fallback_icons_enabled = false                    -- Enable it if you need to use Neovim in a machine without nerd fonts.
+  g.inlay_hints_enabled = true                      -- Enable always show function parameter names.
   g.lsp_round_borders_enabled = true                 -- Enable round borders for lsp hover and signatureHelp.
   g.lsp_signature_enabled = true                     -- Enable automatically showing lsp help as you write function parameters.
   g.notifications_enabled = true                     -- Enable notifications.
@@ -54,16 +54,16 @@ function M.setup()
   opt.foldenable = true -- Enable fold for nvim-ufo.
   opt.foldlevel = 99 -- set highest foldlevel for nvim-ufo.
   opt.foldcolumn = "1" -- Show foldcolumn in nvim 0.9+.
-  opt.cursorline = true -- Highlight the line with the cursor.
+  -- opt.cursorline = true -- Highlight the line with the cursor.
   opt.guicursor = "n:blinkon200,i-ci-ve:ver25" -- Enable cursor blink.
   opt.signcolumn = 'yes' -- Always show sign column.
   opt.colorcolumn = '' -- Disable color column.
   opt.showmode = true -- Show mode in the last line of the screen.
-  opt.showcmd = false -- Show command in the last line of the screen.
+  opt.showcmd = true -- Show command in the last line of the screen.
   opt.showtabline = 2 -- Always show tabs.
   opt.conceallevel = 2 -- Conceal level for markdown.
   opt.laststatus = 3 -- Global status line.
-  opt.cmdheight = 1 -- Height of command line.
+  opt.cmdheight = 0 -- Height of command line.
 
   -- Editing
   opt.expandtab = true               -- Use spaces instead of tabs.

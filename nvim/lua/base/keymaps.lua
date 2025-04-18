@@ -8,14 +8,11 @@ function M.setup()
   { "v:count == 0 ? 'gj' : 'j'", expr = true, desc = "Move cursor down" }
   maps.n["k"] =
   { "v:count == 0 ? 'gk' : 'k'", expr = true, desc = "Move cursor up" }
-  maps.n["<leader>w"] = { "<cmd>w<cr>", desc = "Save" }
-  maps.n["<leader>W"] = { "<cmd>w<cr>", desc = "Save all" }
-  maps.n["<leader>Q"] = { "<cmd>wa|q<cr>", desc = "Save All and Quit" }
-  maps.n["<leader>q"] = { "<cmd>q<cr>", desc = "Quit" }
+  maps.n["<C-s>"] = { "<cmd>w<cr>", desc = "Save" }
+  maps.n["<C-q>"] = { "<cmd>q<cr>", desc = "Quit" }
   maps.n["<leader>n"] = { "<cmd>enew<cr>", desc = "New file" }
   maps.n["gx"] =
   { utils.open_with_program, desc = "Open the file under cursor with a program" }
-  maps.n["<C-s>"] = { "<cmd>w!<cr>", desc = "Force write" }
   maps.n["0"] =
   { "^", desc = "Go to the fist character of the line (aliases 0 to ^)" }
 
@@ -208,19 +205,13 @@ function M.setup()
     silent = true,
     desc = "Add Comment Below"
   }
+  
   maps.n["gca"] = {
     "O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>",
     noremap = true,
     silent = true,
     desc = "Add Comment Above"
   }
-
-  -- clipboard ---------------------------------------------------------------
-  -- Make 'c' key not copy to clipboard when changing a character.
-  maps.n["c"] = { '"_c', desc = "Change without yanking" }
-  maps.n["C"] = { '"_C', desc = "Change without yanking" }
-  maps.x["c"] = { '"_c', desc = "Change without yanking" }
-  maps.x["C"] = { '"_C', desc = "Change without yanking" }
 
   -- Make 'x' key not copy to clipboard when deleting a character.
   maps.n["x"] = {
@@ -242,6 +233,7 @@ function M.setup()
     silent = true,
     desc = "Delete character without yanking it",
   }
+
   maps.x["x"] = { '"_x', desc = "Delete all characters in line" }
 
   -- Same for shifted X
@@ -338,7 +330,6 @@ function M.setup()
     silent = true,
     desc = "Open Lazy (Lazy.nvim)",
   }
-
 
   utils.set_mappings(maps)
 end

@@ -82,28 +82,28 @@ return {
           buffers = { theme = "dropdown" },
         },
         extensions = {
-          ["ui-select"] = {
-            theme.get_dropdown(),
-          },
+        ["ui-select"] = {
+          theme.get_dropdown(),
         },
-      }
-    end,
-    config = function(_, opts)
-      local telescope = require("telescope")
-      telescope.setup(opts)
-      telescope.load_extension("fzf")
-      telescope.load_extension("ui-select")
-    end,
-  },
+      },
+    }
+  end,
+  config = function(_, opts)
+    local telescope = require("telescope")
+    telescope.setup(opts)
+    telescope.load_extension("fzf")
+    telescope.load_extension("ui-select")
+  end,
+},
 
-  -- Better buffer closing
-  {
-    "famiu/bufdelete.nvim",
-    keys = {
-      { "<leader>bd", "<cmd>Bdelete<cr>",  desc = "Delete Buffer" },
-      { "<leader>bD", "<cmd>Bdelete!<cr>", desc = "Delete Buffer (Force)" },
-    },
+-- Better buffer closing
+{
+  "famiu/bufdelete.nvim",
+  keys = {
+    { "<leader>bd", "<cmd>Bdelete<cr>",  desc = "Delete Buffer" },
+    { "<leader>bD", "<cmd>Bdelete!<cr>", desc = "Delete Buffer (Force)" },
   },
+},
 
   -- Git signs
   {
