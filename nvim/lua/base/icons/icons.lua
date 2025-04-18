@@ -15,6 +15,7 @@ return {
   LSP = "",
 
   -- Heirline-components - tabline
+  BufferLineIndicator = "▎",
   BufferClose = "󰅖",
   FileModified = "",
   FileReadOnly = "",
@@ -54,9 +55,14 @@ return {
   MacroRecording = "",
   ToggleResults = "󰑮",
 
+  -- TODO
+  
+
   -- Heirline-components - misc
   Paste = "󰅌",
   PathSeparator = "",
+  Indent = "│",
+  LastIndent = "└",
 
   -- Neotree
   FolderClosed = "",
@@ -65,6 +71,14 @@ return {
   Diagnostic = "󰒡",
   DefaultFile = "󰈙",
 
+  -- Languages icons 
+  Java = "",
+  Python = "",
+  Rust = "",
+  Go = "",
+  Lua = "",
+  Help = "󰋖",
+  
   -- Git
   GitBranch = "",
   GitAdd = "",
@@ -108,5 +122,6 @@ return {
   RenderMarkdown = { ' ', ' ', '󰲥 ', '󰲧 ', '󰲩 ', '󰲫 ' },
 
   -- Others
-  Vim = " "
+  Vim = " ",
+  Lazy = "󰒲  ",
 }

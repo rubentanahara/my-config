@@ -1,18 +1,61 @@
+local utils = require "base.utils"
+local get_icon = utils.get_icon
+
 return {
+  -- Seamless navigation between tmux panes and vim splits
+  {
+    "christoomey/vim-tmux-navigator",
+    event = "VeryLazy",
+    cmd = {
+      "TmuxNavigateLeft",
+      "TmuxNavigateDown",
+      "TmuxNavigateUp",
+      "TmuxNavigateRight",
+      "TmuxNavigatePrevious",
+    },
+    keys = {
+      { "<c-h>",  "<cmd>TmuxNavigateLeft<cr>",     desc = "Navigate Left" },
+      { "<c-j>",  "<cmd>TmuxNavigateDown<cr>",     desc = "Navigate Down" },
+      { "<c-k>",  "<cmd>TmuxNavigateUp<cr>",       desc = "Navigate Up" },
+      { "<c-l>",  "<cmd>TmuxNavigateRight<cr>",    desc = "Navigate Right" },
+      { "<c-\\>", "<cmd>TmuxNavigatePrevious<cr>", desc = "Navigate Previous" },
+    },
+  },
+  -- search/replace in multiple files
+  {
+    "MagicDuck/grug-far.nvim",
+    opts = { headerMaxWidth = 80 },
+    cmd = "GrugFar",
+    keys = {
+      {
+        "<leader>sr",
+        function()
+          local grug = require("grug-far")
+          local ext = vim.bo.buftype == "" and vim.fn.expand("%:e")
+          grug.open({
+            transient = true,
+            prefills = {
+              filesFilter = ext and ext ~= "" and "*." .. ext or nil,
+            },
+          })
+        end,
+        mode = { "n", "v" },
+        desc = "Search and Replace",
+      },
+    }, 
+  },
   -- Fuzzy finder
   {
     "nvim-telescope/telescope.nvim",
     cmd = "Telescope",
     version = false,
     dependencies = {
-      "nvim-lua/plenary.nvim",
       {
         "nvim-telescope/telescope-fzf-native.nvim",
         build = "make",
         enabled = vim.fn.executable("make") == 1,
       },
       { "nvim-telescope/telescope-ui-select.nvim" },
-      { "nvim-tree/nvim-web-devicons" },
     },
     keys = {
       { "<leader>fh",       "<cmd>Telescope help_tags<cr>",   desc = "Find Help" },
@@ -29,8 +72,8 @@ return {
         "<leader>/",
         function()
           require("telescope.builtin").current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
-            winblend = 10,
-            previewer = false,
+            winblend = 0,
+            previewer = true,
           }))
         end,
         desc = "Fuzzily search in current buffer",
@@ -82,29 +125,74 @@ return {
           buffers = { theme = "dropdown" },
         },
         extensions = {
-        ["ui-select"] = {
-          theme.get_dropdown(),
+          ["ui-select"] = {
+            theme.get_dropdown(),
+          },
+        },
+      }
+    end,
+    config = function(_, opts)
+      local telescope = require("telescope")
+      telescope.setup(opts)
+      telescope.load_extension("fzf")
+      telescope.load_extension("ui-select")
+    end,
+  },
+  -- Which-key
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    opts = {
+      plugins = {
+        spelling = true,
+      },
+      spec = {
+        {
+          mode = { "n", "v" },
+          {
+            "<leader>b",
+            group = "buffer",
+            icon = { icon = get_icon("ArrowRight"), color = "blue" },
+            expand = function()
+              return require("which-key.extras").expand.buf()
+            end,
+          },
+          { "<leader>c", group = "code" },
+          { "<leader>d", group = "debug" },
+          { "<leader>dp", group = "profiler" },
+          { "<leader>f", group = "file/find" },
+          { "<leader>h", group = "harpoon" },
+          { "<leader>g", group = "git" },
+          { "<leader>r", group = "replace", icon = { icon = "", color = "yellow" } },
+          {
+            "<leader>l",
+            group = "lazy",
+            icon = {
+              icon = get_icon("Lazy"),
+            }
+          },
+          { "<leader>p", group = "toggle_preview", icon = { icon = "", color = "purple" } },
+          { "<leader>m", group = "markdown", icon = { icon = " ", color = "yellow" } },
+          { "<leader>n", group = "dotnet_actions", icon = { icon = "", color = "purple" } },
+          { "<leader>q", group = "quit" },
+          { "<leader>s", group = "session", icon = { icon = " ", color = "blue" } },
+          { "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
+          { "<leader>x", group = "diagnostics/quickfix", icon = { icon = "󱖫 ", color = "green" } },
+          { "[", group = "prev" },
+          { "]", group = "next" },
+          { "g", group = "goto" },
+          {
+            "<leader>w",
+            group = "windows",
+            proxy = "<c-w>",
+            expand = function()
+              return require("which-key.extras").expand.win()
+            end,
+          },
         },
       },
     }
-  end,
-  config = function(_, opts)
-    local telescope = require("telescope")
-    telescope.setup(opts)
-    telescope.load_extension("fzf")
-    telescope.load_extension("ui-select")
-  end,
-},
-
--- Better buffer closing
-{
-  "famiu/bufdelete.nvim",
-  keys = {
-    { "<leader>bd", "<cmd>Bdelete<cr>",  desc = "Delete Buffer" },
-    { "<leader>bD", "<cmd>Bdelete!<cr>", desc = "Delete Buffer (Force)" },
   },
-},
-
   -- Git signs
   {
     "lewis6991/gitsigns.nvim",
@@ -139,7 +227,6 @@ return {
       end,
     },
   },
-
   -- Better diagnostics list and others
   {
     "folke/trouble.nvim",
@@ -147,7 +234,7 @@ return {
     lazy = "VeryLazy",
     opts = {
       modes = {
-        lsp = {
+       lsp = {
           win = { position = "right" },
         },
       },
@@ -207,7 +294,7 @@ return {
     event = { "BufReadPost", "BufNewFile" },
     config = true,
     keys = {
-      { "<leader>xt", "<cmd>TodoTrouble<cr>",                              desc = "Todo (Trouble)" },
+     { "<leader>xt", "<cmd>TodoTrouble<cr>",                              desc = "Todo (Trouble)" },
       { "<leader>xT", "<cmd>TodoTelescope<cr>",                            desc = "Todo" },
       { "]t",         function() require("todo-comments").jump_next() end, desc = "Next todo comment" },
       { "[t",         function() require("todo-comments").jump_prev() end, desc = "Previous todo comment" },
