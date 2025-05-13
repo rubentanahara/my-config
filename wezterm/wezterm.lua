@@ -41,7 +41,7 @@ config.font = wezterm.font("FiraCode Nerd Font Mono", { weight = "Regular" })
 config.automatically_reload_config = true
 
 -- Font size and line height
-config.font_size = 15
+config.font_size = 16
 config.line_height = 1.2
 
 -- Window decorations and tab bar settings
