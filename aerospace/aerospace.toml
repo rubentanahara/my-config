@@ -46,6 +46,7 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-3" = "workspace 3"
     "alt-4" = "workspace 4"
     "alt-5" = "workspace 5"
+    "alt-6" = "workspace 6"  # Workspace para música
     
     # Mover ventanas a workspaces
     "alt-shift-1" = "move-node-to-workspace 1"
@@ -53,6 +54,7 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-shift-3" = "move-node-to-workspace 3"
     "alt-shift-4" = "move-node-to-workspace 4"
     "alt-shift-5" = "move-node-to-workspace 5"
+    "alt-shift-6" = "move-node-to-workspace 6"  # Mover ventanas al workspace de música
     
     # Cambiar layouts
     "alt-t" = "layout tiles"
@@ -67,6 +69,8 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-d" = "exec-and-forget open -a DataGrip"
     "alt-n" = "exec-and-forget open -a Notion"
     "alt-w" = "exec-and-forget open -a 'Windows App'"
+    "alt-s" = "exec-and-forget open -a Spotify"
+    "alt-e" = "exec-and-forget open -a Cursor"
     
     # Modo de pantalla completa
     "alt-m" = "fullscreen"
@@ -101,10 +105,21 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     if.app-id = 'notion.id'
     run = 'move-node-to-workspace 5'
 
+# Asignar Spotify al workspace 6
+[[on-window-detected]]
+    if.app-id = 'com.spotify.client'
+    run = 'move-node-to-workspace 6'
+
+# Asignar Cursor al workspace 3 (junto con Android Studio)
+[[on-window-detected]]
+    if.app-id = 'com.cursor.Cursor'
+    run = 'move-node-to-workspace 3'
+
 # Asignación de workspaces a monitores
 [workspace-to-monitor-force-assignment]
     1 = 'main'
     2 = 'main'
     3 = 'main'
     4 = 'main'
-    5 = 'main' 
+    5 = 'main'
+    6 = 'main' 
