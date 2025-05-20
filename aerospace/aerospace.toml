@@ -15,12 +15,12 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
 # Espacios entre ventanas
 [gaps]
-    inner.horizontal = 10
-    inner.vertical = 10
-    outer.left = 10
-    outer.bottom = 10
-    outer.top = 10
-    outer.right = 10
+    inner.horizontal = 5
+    inner.vertical = 5
+    outer.left = 5
+    outer.bottom = 5
+    outer.top = 5
+    outer.right = 5
 
 # Asignación de teclas
 [key-mapping]
@@ -61,6 +61,15 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-c" = "layout accordion"
     "alt-f" = "layout floating"
     
+    # Redimensionar ventanas
+    "alt-minus" = "resize smart -50"       # Reducir tamaño según orientación
+    "alt-equal" = "resize smart +50"       # Aumentar tamaño según orientación
+    "alt-shift-minus" = "resize width -50" # Reducir anchura
+    "alt-shift-equal" = "resize width +50" # Aumentar anchura
+    "alt-ctrl-minus" = "resize height -50" # Reducir altura
+    "alt-ctrl-equal" = "resize height +50" # Aumentar altura
+    "alt-0" = "balance-sizes"              # Equilibrar tamaños de todas las ventanas
+    
     # Lanzar aplicaciones con exec-and-forget
     "alt-g" = "exec-and-forget open -a Ghostty"
     "alt-b" = "exec-and-forget open -a 'Brave Browser'"
@@ -71,6 +80,7 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-w" = "exec-and-forget open -a 'Windows App'"
     "alt-s" = "exec-and-forget open -a Spotify"
     "alt-e" = "exec-and-forget open -a Cursor"
+    "alt-o" = "exec-and-forget open -a Notes"
     
     # Modo de pantalla completa
     "alt-m" = "fullscreen"
@@ -89,31 +99,37 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     if.app-id = 'com.brave.Browser'
     run = 'move-node-to-workspace 1'
 
+# Asignar aplicaciones de notas al workspace 2
 [[on-window-detected]]
-    if.app-id = 'com.postmanlabs.mac'
+    if.app-id = 'notion.id'
     run = 'move-node-to-workspace 2'
 
 [[on-window-detected]]
+    if.app-id = 'com.apple.Notes'
+    run = 'move-node-to-workspace 2'
+
+# Asignar Postman al workspace 3 (aplicaciones de desarrollo)
+[[on-window-detected]]
+    if.app-id = 'com.postmanlabs.mac'
+    run = 'move-node-to-workspace 3'
+
+[[on-window-detected]]
     if.app-id = 'com.google.android.studio'
+    run = 'move-node-to-workspace 3'
+
+# Asignar Cursor al workspace 3 (junto con Android Studio y Postman)
+[[on-window-detected]]
+    if.app-id = 'com.cursor.Cursor'
     run = 'move-node-to-workspace 3'
 
 [[on-window-detected]]
     if.app-id = 'com.jetbrains.datagrip'
     run = 'move-node-to-workspace 4'
 
-[[on-window-detected]]
-    if.app-id = 'notion.id'
-    run = 'move-node-to-workspace 5'
-
 # Asignar Spotify al workspace 6
 [[on-window-detected]]
     if.app-id = 'com.spotify.client'
     run = 'move-node-to-workspace 6'
-
-# Asignar Cursor al workspace 3 (junto con Android Studio)
-[[on-window-detected]]
-    if.app-id = 'com.cursor.Cursor'
-    run = 'move-node-to-workspace 3'
 
 # Asignación de workspaces a monitores
 [workspace-to-monitor-force-assignment]
