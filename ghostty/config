@@ -2,14 +2,27 @@ cursor-style = block
 shell-integration-features = cursor,sudo,no-title
 mouse-hide-while-typing = true
 window-decoration = auto
-# background-opacity = 0.8
-# background-blur-radius = 10
+#background-opacity = 0.65
+#background-blur-radius = 20
 font-family = FiraCode Nerd Font Mono
 # font-family = JetBrains Mono
 font-size = 16
-theme = Hacktober
 background = 171616
 foreground = ffffff
+
+cursor-style = block
+cursor-style-blink = false
+cursor-invert-fg-bg = true
+
+macos-titlebar-style = hidden
+macos-option-as-alt = true
+mouse-hide-while-typing = true
+
+confirm-close-surface = false
+window-decoration = true
+window-padding-x = 10
+window-padding-y = 10
+window-padding-balance = true
 
 # keybindings
 keybind = cmd+s>r=reload_config
@@ -22,4 +35,3 @@ window-decoration = false
 
 confirm-close-surface = false
 shell-integration = zsh
-

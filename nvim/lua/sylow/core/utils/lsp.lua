@@ -105,6 +105,7 @@ end
 -- LSP Server Configuration
 ------------------------------------------
 function M.apply_user_lsp_settings(server_name)
+  print(tostring(M.apply_user_lsp_settings(server_name)))
   local server = require('lspconfig')[server_name]
 
   M.capabilities = vim.lsp.protocol.make_client_capabilities()

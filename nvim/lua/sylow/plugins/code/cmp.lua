@@ -1,5 +1,4 @@
 local utils = require('sylow.core.utils')
-local get_icon = utils.get_icon
 local icons = require('sylow.core.icons.icons')
 
 return {
@@ -10,8 +9,10 @@ return {
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-buffer',
       'hrsh7th/cmp-path',
+      'hrsh7th/cmp-emoji',
       'hrsh7th/cmp-cmdline',
       'saadparwaiz1/cmp_luasnip',
+      'L3MON4D3/LuaSnip',
     },
     opts = function()
       vim.api.nvim_set_hl(0, 'CmpGhostText', {
@@ -46,12 +47,14 @@ return {
           { name = 'nvim_lsp', priority = 1000 },
           { name = 'luasnip', priority = 750 },
           { name = 'buffer', priority = 500 },
+          { name = 'nvim_lua', priority = 400 },
           { name = 'path', priority = 250 },
+          { name = 'emoji' },
         }),
         formatting = {
           format = function(entry, item)
             local kind = item.kind
-            local kind_icon = icons.LSP_KINDS[kind] or ''
+            local kind_icon = icons.LSP_KINDS[kind] or 'X'
 
             item.kind = string.format('%s', kind_icon)
             item.menu = string.format('(%s)', kind)

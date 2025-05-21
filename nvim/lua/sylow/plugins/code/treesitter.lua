@@ -32,6 +32,7 @@ return {
       },
       highlight = {
         enable = true,
+        use_languagetree = true,
         disable = function(_, bufnr)
           return utils.is_big_file(bufnr)
         end,
@@ -48,6 +49,13 @@ return {
       ensure_installed = {
         'lua',
         'luadoc',
+        'vim',
+        'vimdoc',
+      },
+      query_linter = {
+        enable = true,
+        use_virtual_text = true,
+        lint_events = { 'BufWrite', 'CursorHold' },
       },
       textobjects = {
         select = {

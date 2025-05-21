@@ -214,16 +214,6 @@ local function setup_ui_autocmds()
     end,
   })
 
-  -- Cursor line highlighting in active window only
-  -- create_autocmd({ 'InsertLeave', 'WinEnter' }, {
-  --   desc = 'Enable cursor line in active window',
-  --   callback = function()
-  --     if vim.bo.buftype == '' then
-  --       opt_local.cursorline = true
-  --     end
-  --   end,
-  -- })
-
   create_autocmd({ 'InsertEnter', 'WinLeave' }, {
     desc = 'Disable cursor line in inactive windows',
     callback = function()

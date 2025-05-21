@@ -5,7 +5,7 @@ return {
   'folke/noice.nvim',
   event = 'VeryLazy',
   opts = {
-    presets = { inc_rename = true },
+    presets = { inc_rename = true, lsp_doc_border = true },
     lsp = {
       override = {
         ['vim.lsp.util.convert_input_to_markdown_lines'] = true,
