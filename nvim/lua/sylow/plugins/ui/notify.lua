@@ -1,3 +1,5 @@
+local utils = require('sylow.core.utils')
+
 return {
   'rcarriga/nvim-notify',
   event = 'User BaseDefered',
@@ -5,6 +7,16 @@ return {
     return {
       timeout = 2500,
       fps = 144,
+      render = 'wrapped-compact',
+      stages = 'slide',
+      top_down = false,
+      icons = {
+        DEBUG = utils.get_icon('Debugger'),
+        ERROR = utils.get_icon('DiagnosticError'),
+        INFO = utils.get_icon('DiagnosticInfo'),
+        TRACE = utils.get_icon('DiagnosticHint'),
+        WARN = utils.get_icon('DiagnosticWarn'),
+      },
       max_height = function()
         return math.floor(vim.o.lines * 0.5)
       end,
@@ -12,7 +24,6 @@ return {
         return math.floor(vim.o.columns * 0.5)
       end,
       on_open = function(win)
-        -- enable markdown support on notifications
         vim.api.nvim_win_set_config(win, { zindex = 175 })
         if not vim.g.notifications_enabled then
           vim.api.nvim_win_close(win, true)

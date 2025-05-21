@@ -91,6 +91,7 @@ local function get_plugin_spec()
     'sylow.plugins.lsp',
     'sylow.plugins.dap',
     'sylow.plugins.ai',
+    'sylow.plugins.testing',
   }
 
   for _, category in ipairs(plugin_categories) do

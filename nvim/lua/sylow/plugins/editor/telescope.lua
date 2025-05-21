@@ -1,18 +1,11 @@
 local utils = require('sylow.core.utils')
 local get_icon = utils.get_icon
 
-local build_cmd ---@type string?
-for _, cmd in ipairs({ 'make', 'cmake', 'gmake' }) do
-  if vim.fn.executable(cmd) == 1 then
-    build_cmd = cmd
-    break
-  end
-end
-
 return {
   {
     'nvim-telescope/telescope.nvim',
     cmd = 'Telescope',
+    priority = 1000,
     version = false,
     dependencies = {
       {
@@ -21,9 +14,7 @@ return {
       },
       {
         'nvim-telescope/telescope-fzf-native.nvim',
-        build = (build_cmd ~= 'cmake') and 'make'
-          or 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build',
-        enabled = build_cmd ~= nil,
+        build = 'make',
       },
       { 'nvim-telescope/telescope-ui-select.nvim' },
     },
@@ -31,65 +22,77 @@ return {
       {
         '<leader>fh',
         function()
-          require('telescope.builtin').help_tags()
+          local builtin = require('telescope.builtin')
+          builtin.help_tags()
         end,
         desc = 'Find Help',
       },
       {
         '<leader>fk',
         function()
-          require('telescope.builtin').keymaps()
+          local builtin = require('telescope.builtin')
+          builtin.keymaps()
         end,
         desc = 'Find Keymaps',
       },
       {
         '<leader>ff',
-        '<cmd>Telescope find_files<cr>',
+        function()
+          local builtin = require('telescope.builtin')
+          builtin.find_files({
+            no_ignore = false,
+            hidden = true,
+          })
+        end,
         desc = 'Find Files',
       },
       {
-        '<leader>fs',
-        '<cmd>Telescope builtin<cr>',
-        desc = 'Find Select Telescope',
-      },
-      {
-        '<leader>fw',
-        '<cmd>Telescope grep_string<cr>',
-        desc = 'Find current Word',
-      },
-      {
         '<leader>fg',
-        '<cmd>Telescope live_grep<cr>',
+        function()
+          local builtin = require('telescope.builtin')
+          builtin.live_grep()
+        end,
         desc = 'Find by Grep',
       },
       {
         '<leader>fd',
-        '<cmd>Telescope diagnostics<cr>',
+        function()
+          local builtin = require('telescope.builtin')
+          builtin.diagnostics()
+        end,
         desc = 'Find Diagnostics',
       },
       {
         '<leader>fr',
         function()
-          require('telescope.builtin').resume()
+          local builtin = require('telescope.builtin')
+          builtin.resume()
         end,
         desc = 'Find Resume',
       },
       {
         '<leader>f.',
-        '<cmd>Telescope oldfiles<cr>',
+        function()
+          local builtin = require('telescope.builtin')
+          builtin.oldfiles()
+        end,
         desc = 'Find Recent Files',
       },
       {
-        '<leader><leader>',
-        '<cmd>Telescope buffers<cr>',
+        '<leader>fb',
+        function()
+          local builtin = require('telescope.builtin')
+          builtin.buffers()
+        end,
         desc = 'Find existing buffers',
       },
       {
-        '<leader>/',
+        '<leader>f,',
         function()
           require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown({
             winblend = 0,
             previewer = true,
+            prompt_title = 'Live Grep in Curent Buffer',
           }))
         end,
         desc = 'Fuzzily search in current buffer',
@@ -103,6 +106,14 @@ return {
           })
         end,
         desc = 'Find in Open Files',
+      },
+      {
+        '<leader>f;',
+        function()
+          local builtin = require('telescope.builtin')
+          builtin.treesitter()
+        end,
+        desc = 'Lists Function names, variables, from Treesitter',
       },
     },
     opts = function()
@@ -144,6 +155,7 @@ return {
           selection_caret = get_icon('PromptPrefix') .. ' ',
           multi_icon = get_icon('PromptPrefix') .. ' ',
           path_display = { 'truncate' },
+          entry_prefix = ' ',
           sorting_strategy = 'ascending',
           -- open files in the first window that is an actual file.
           -- use the current window if no other window is available.
@@ -161,10 +173,7 @@ return {
           layout_config = {
             horizontal = {
               prompt_position = 'top',
-              preview_width = 0.50,
-            },
-            vertical = {
-              mirror = false,
+              preview_width = 0.55,
             },
             width = 0.87,
             height = 0.80,

@@ -216,20 +216,6 @@ local function setup_mappings()
     }
   end
 
-  if vim.fn.executable 'lazygit' == 1 then -- if lazygit exists, show it
-    maps.n['<leader>gg'] = {
-      function()
-        local git_dir = vim.fn.finddir('.git', vim.fn.getcwd() .. ';')
-        if git_dir ~= '' then
-          vim.cmd("TermExec cmd='lazygit && exit'")
-        else
-          utils.notify('Not a git repository', vim.log.levels.WARN)
-        end
-      end,
-      desc = 'ToggleTerm lazygit',
-    }
-  end
-
   if is_available('aerial.nvim') then
     maps.n['<leader>i'] = {
       function()
@@ -276,14 +262,6 @@ local function setup_mappings()
   maps.n['<leader>th'] = { ui.toggle_foldcolumn, desc = 'Toggle foldcolumn' }
   maps.n['<leader>tN'] = { ui.toggle_ui_notifications, desc = 'UI notifications' }
 
-  if is_available('mini.autopairs') then
-    maps.n['<leader>ta'] = { ui.toggle_autopairs, desc = 'Toggle autopairs' }
-  end
-
-  if is_available('lsp_signature.nvim') then
-    maps.n['<leader>tp'] = { ui.toggle_lsp_signature, desc = 'Togle LSP signature' }
-  end
-
   if is_available('nvim-cmp') then
     maps.n['<leader>uC'] = { ui.toggle_cmp, desc = 'Toggle autocompletion' }
   end
@@ -298,6 +276,7 @@ local function setup_mappings()
 end
 
 function M.lsp_mappings(client, bufnr)
+  print(tostring(M.lsp_mappings))
   local has_declaration = has_capability(client, 'declaration')
   local has_definition = has_capability(client, 'definition')
   local has_hover = has_capability(client, 'hover')

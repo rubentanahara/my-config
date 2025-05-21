@@ -1,93 +1,6 @@
 local M = {}
 
 ------------------------------------------
--- System Operations
-------------------------------------------
-
-function M.run_cmd(cmd, show_error)
-  -- Split cmd string into a list, if needed.
-  if type(cmd) == 'string' then
-    cmd = vim.split(cmd, ' ')
-  end
-
-  -- If windows, and prepend cmd.exe
-  if vim.fn.has('win32') == 1 then
-    cmd = vim.list_extend({ 'cmd.exe', '/C' }, cmd)
-  end
-
-  -- Execute cmd and store result (output or error message)
-  local result = vim.fn.system(cmd)
-  local success = vim.api.nvim_get_vvar('shell_error') == 0
-
-  -- If the command failed and show_error is true or not provided, print error.
-  if not success and (show_error == nil or show_error) then
-    vim.api.nvim_echo({
-      {
-        ('Error running command %s\nError message:\n%s'):format(
-          table.concat(cmd, ' '), -- Convert the cmd back to string.
-          result -- Show the error result
-        ),
-      },
-    }, true, { err = true })
-  end
-
-  -- strip out terminal escape sequences and control characters.
-  local cleaned_result = result:gsub('[\27\155][][()#;?%d]*[A-PRZcf-ntqry=><~]', '')
-
-  -- Return cleaned result on success, nil on failure
-  return success and cleaned_result or nil
-end
-
-function M.os_path(path)
-  if path == nil then
-    return nil
-  end
-
-  local separator = string.sub(package.config, 1, 1)
-  return string.gsub(path, '[/\\]', separator)
-end
-
-function M.open_with_program(path)
-  -- Use vim.ui.open if available
-  if vim.ui.open then
-    return vim.ui.open(path)
-  end
-
-  -- Determine appropriate command based on OS
-  local cmd
-  if vim.fn.has('mac') == 1 then
-    cmd = { 'open' }
-  elseif vim.fn.has('win32') == 1 then
-    if vim.fn.executable('rundll32') then
-      cmd = { 'rundll32', 'url.dll,FileProtocolHandler' }
-    else
-      cmd = { 'cmd.exe', '/K', 'explorer' }
-    end
-  elseif vim.fn.has('unix') == 1 then
-    if vim.fn.executable('explorer.exe') == 1 then -- WSL
-      cmd = { 'explorer.exe' }
-    elseif vim.fn.executable('xdg-open') == 1 then
-      cmd = { 'xdg-open' }
-    end
-  end
-
-  if not cmd then
-    M.notify('Available system opening tool not found!', vim.log.levels.ERROR)
-    return
-  end
-
-  -- Resolve path
-  if not path then
-    path = vim.fn.expand('<cfile>')
-  elseif not path:match('%w+:') then
-    path = vim.fn.expand(path)
-  end
-
-  -- Launch process detached
-  vim.fn.jobstart(vim.list_extend(cmd, { path }), { detach = true })
-end
-
-------------------------------------------
 -- Autocommand Utilities
 ------------------------------------------
 
@@ -148,17 +61,15 @@ end
 -- Icons and UI Utilities
 ------------------------------------------
 
-function M.get_icon(icon_name, fallback_to_empty)
+function M.get_icon(icon_name)
   local icon_pack = 'icons'
 
-  -- Load icon pack if not cached
   if not M[icon_pack] then
     if icon_pack == 'icons' then
       M.icons = require('sylow.core.icons.icons')
     end
   end
 
-  -- Return the icon
   local icon = M[icon_pack] and M[icon_pack][icon_name] or ''
   return icon
 end
@@ -167,8 +78,6 @@ end
 -- Keymapping Utilities
 ------------------------------------------
 
---- Create an empty mappings template for all modes
---- @return table<string,table> mappings Empty mappings table
 function M.get_mappings_template()
   local maps = {}
   for _, mode in ipairs {
@@ -229,6 +138,17 @@ function M.set_mappings(map_table, base)
   end
 end
 
+--- Register queued which-key mappings.
+function M.which_key_register()
+  if M.which_key_queue then
+    local wk_avail, wk = pcall(require, 'which-key')
+    if wk_avail then
+      wk.add(M.which_key_queue)
+      M.which_key_queue = nil
+    end
+  end
+end
+
 --- Add syntax highlighting for URLs/URIs
 function M.set_url_effect()
   -- URL matching regex pattern
@@ -263,7 +183,7 @@ end
 
 function M.notify(msg, level, opts)
   vim.schedule(function()
-    vim.notify(msg, level, vim.tbl_deep_extend('force', { title = 'Neovim' }, opts or {}))
+    vim.notify(msg, level, vim.tbl_deep_extend('force', { title = 'Notify' }, opts or {}))
   end)
 end
 
@@ -302,17 +222,6 @@ function M.is_big_file(bufnr)
   local nlines = vim.api.nvim_buf_line_count(bufnr)
 
   return (filesize > vim.g.big_file.size) or (nlines > vim.g.big_file.lines)
-end
-
---- Register queued which-key mappings.
-function M.which_key_register()
-  if M.which_key_queue then
-    local wk_avail, wk = pcall(require, 'which-key')
-    if wk_avail then
-      wk.add(M.which_key_queue)
-      M.which_key_queue = nil
-    end
-  end
 end
 
 return M

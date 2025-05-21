@@ -1,6 +1,5 @@
 local M = {}
 
--- Import dependencies
 local utils = require('sylow.core.utils')
 
 local function bool2str(bool)
@@ -65,25 +64,6 @@ end
 function M.toggle_autoformat()
   vim.g.autoformat_enabled = not vim.g.autoformat_enabled
   utils.notify(string.format('Global autoformatting %s', bool2str(vim.g.autoformat_enabled)))
-end
-
-function M.toggle_autopairs()
-  local ok, autopairs = pcall(require, 'mini.pairs')
-
-  if ok then
-    -- Toggle the plugin state
-    if autopairs.state.disabled then
-      autopairs.enable()
-    else
-      autopairs.disable()
-    end
-
-    -- Update global state and notify
-    vim.g.autopairs_enabled = autopairs.state.disabled
-    utils.notify(string.format('autopairs %s', bool2str(not autopairs.state.disabled)))
-  else
-    utils.notify('autopairs not available', vim.log.levels.WARN)
-  end
 end
 
 function M.toggle_background()
