@@ -91,15 +91,12 @@ return {
   GitUnstaged = '✗',
   GitUntracked = '★',
 
-  DAP = {
-    -- DAP
-    Stopped = { '󰁕 ', 'DiagnosticWarn', 'DapStoppedLine' },
-    DapBreakpoint = ' ',
-    DapBreakpointCondition = ' ',
-    DapBreakpointRejected = { ' ', 'DiagnosticError' },
-    DapLogPoint = '.>',
-    DapStopped = { '󰁕 ', 'DiagnosticWarn', 'DapStoppedLine' },
-  },
+  -- DAP
+  DapBreakpoint = '',
+  DapBreakpointCondition = '',
+  DapBreakpointRejected = '',
+  DapLogPoint = '.>',
+  DapStopped = '󰁕',
 
   -- Telescope
   PromptPrefix = '❯',

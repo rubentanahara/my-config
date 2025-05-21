@@ -8,10 +8,6 @@ local function create_mapping_table()
   return utils.get_mappings_template()
 end
 
-local function has_capability(client, feature)
-  return client and client.server_capabilities[feature .. 'Provider'] or false
-end
-
 local function without_animation(func)
   vim.g.minianimate_disable = true
   local result = func()
@@ -276,81 +272,399 @@ local function setup_mappings()
 end
 
 function M.lsp_mappings(client, bufnr)
-  print(tostring(M.lsp_mappings))
-  local has_declaration = has_capability(client, 'declaration')
-  local has_definition = has_capability(client, 'definition')
-  local has_hover = has_capability(client, 'hover')
-  local has_implementation = has_capability(client, 'implementation')
-  local has_references = has_capability(client, 'references')
-  local has_rename = has_capability(client, 'rename')
-  local has_typeDefinition = has_capability(client, 'typeDefinition')
-  local has_workspace_symbol = has_capability(client, 'workspaceSymbol')
-  local has_formatting = has_capability(client, 'documentFormatting')
-  local has_codeAction = has_capability(client, 'codeAction')
-  local has_signatureHelp = has_capability(client, 'signatureHelp')
-
-  local mappings = utils.get_mappings_template()
-
-  -- Basic LSP mappings
-  if has_declaration then
-    mappings.n['gD'] = { vim.lsp.buf.declaration, desc = 'Go to declaration' }
+  -- Helper function to check if any active LSP clients
+  -- given a filter provide a specific capability.
+  -- @param capability string The server capability to check for (example: "documentFormattingProvider").
+  -- @param filter vim.lsp.get_clients.filter|nil A valid get_clients filter (see function docs).
+  -- @return boolean # `true` if any of the clients provide the capability.
+  local function has_capability(capability, filter)
+    for _, lsp_client in ipairs(vim.lsp.get_clients(filter)) do
+      if lsp_client.supports_method(capability) then
+        return true
+      end
+    end
+    return false
   end
 
-  if has_definition then
-    mappings.n['gd'] = { vim.lsp.buf.definition, desc = 'Go to definition' }
-  end
-
-  if has_hover then
-    mappings.n['K'] = { vim.lsp.buf.hover, desc = 'Hover information' }
-  end
-
-  if has_implementation then
-    mappings.n['gI'] = { vim.lsp.buf.implementation, desc = 'Go to implementation' }
-  end
-
-  if has_references then
-    mappings.n['gr'] = { vim.lsp.buf.references, desc = 'Go to references' }
-  end
-
-  if has_rename then
-    mappings.n['<leader>cr'] = { vim.lsp.buf.rename, desc = 'Rename symbol' }
-  end
-
-  if has_typeDefinition then
-    mappings.n['gT'] = { vim.lsp.buf.type_definition, desc = 'Go to type definition' }
-  end
-
-  if has_workspace_symbol then
-    mappings.n['<leader>ls'] = { vim.lsp.buf.workspace_symbol, desc = 'Workspace symbols' }
-  end
-
-  if has_formatting then
-    mappings.n['<leader>lf'] = { vim.lsp.buf.format, desc = 'Format document' }
-    mappings.v['<leader>lf'] = { vim.lsp.buf.format, desc = 'Format selection' }
-  end
-
-  if has_codeAction then
-    mappings.n['<leader>la'] = { vim.lsp.buf.code_action, desc = 'Code actions' }
-    mappings.v['<leader>la'] = { vim.lsp.buf.code_action, desc = 'Code actions' }
-  end
-
-  if has_signatureHelp then
-    mappings.n['<leader>lh'] = { vim.lsp.buf.signature_help, desc = 'Signature help' }
-    mappings.i['<C-k>'] = { vim.lsp.buf.signature_help, desc = 'Signature help' }
-  end
-
-  -- Label for LSP section in visual mode
-  if not vim.tbl_isempty(mappings.v) then
-    mappings.v['<leader>l'] = { name = '+lsp' }
-  end
+  local lsp_mappings = require('sylow.core.utils').get_mappings_template()
 
   -- Diagnostics
-  mappings.n['<leader>ld'] = { vim.diagnostic.open_float, desc = 'Line diagnostics' }
-  mappings.n['[d'] = { vim.diagnostic.goto_prev, desc = 'Previous diagnostic' }
-  mappings.n[']d'] = { vim.diagnostic.goto_next, desc = 'Next diagnostic' }
-  mappings.n['<leader>lq'] = { vim.diagnostic.setloclist, desc = 'Diagnostics list' }
+  lsp_mappings.n['<leader>ld'] = {
+    function()
+      vim.diagnostic.open_float()
+    end,
+    desc = 'Hover diagnostics',
+  }
+  lsp_mappings.n['[d'] = {
+    function()
+      vim.diagnostic.jump({ count = -1 })
+    end,
+    desc = 'Previous diagnostic',
+  }
+  lsp_mappings.n[']d'] = {
+    function()
+      vim.diagnostic.jump({ count = 1 })
+    end,
+    desc = 'Next diagnostic',
+  }
 
-  return mappings
+  -- Diagnostics
+  lsp_mappings.n['gl'] = {
+    function()
+      vim.diagnostic.open_float()
+    end,
+    desc = 'Hover diagnostics',
+  }
+  if is_available('telescope.nvim') then
+    lsp_mappings.n['<leader>lD'] = {
+      function()
+        require('telescope.builtin').diagnostics()
+      end,
+      desc = 'Diagnostics',
+    }
+  end
+
+  -- LSP info
+  if is_available('mason-lspconfig.nvim') then
+    lsp_mappings.n['<leader>li'] = { '<cmd>LspInfo<cr>', desc = 'LSP information' }
+  end
+
+  if is_available('none-ls.nvim') then
+    lsp_mappings.n['<leader>lI'] = { '<cmd>NullLsInfo<cr>', desc = 'Null-ls information' }
+  end
+
+  -- Code actions
+  lsp_mappings.n['<leader>la'] = {
+    function()
+      vim.lsp.buf.code_action()
+    end,
+    desc = 'LSP code action',
+  }
+  lsp_mappings.v['<leader>la'] = lsp_mappings.n['<leader>la']
+
+  -- Codelens
+  utils.add_autocmds_to_buffer('lsp_codelens_refresh', bufnr, {
+    events = { 'InsertLeave' },
+    desc = 'Refresh codelens',
+    callback = function(args)
+      if client.supports_method('textDocument/codeLens') then
+        if vim.g.codelens_enabled then
+          vim.lsp.codelens.refresh({ bufnr = args.buf })
+        end
+      end
+    end,
+  })
+  if client.supports_method('textDocument/codeLens') then -- on LspAttach
+    if vim.g.codelens_enabled then
+      vim.lsp.codelens.refresh({ bufnr = 0 })
+    end
+  end
+
+  lsp_mappings.n['<leader>ll'] = {
+    function()
+      vim.lsp.codelens.run()
+      vim.lsp.codelens.refresh({ bufnr = 0 })
+    end,
+    desc = 'LSP CodeLens run',
+  }
+  lsp_mappings.n['<leader>uL'] = {
+    function()
+      ui.toggle_codelens()
+    end,
+    desc = 'CodeLens',
+  }
+
+  -- Formatting (keymapping)
+  local formatting = require('base.utils.lsp').formatting
+  local format_opts = require('base.utils.lsp').format_opts
+  lsp_mappings.n['<leader>lf'] = {
+    function()
+      vim.lsp.buf.format(format_opts)
+      vim.cmd('checktime') -- Sync buffer with changes
+    end,
+    desc = 'Format buffer',
+  }
+  lsp_mappings.v['<leader>lf'] = lsp_mappings.n['<leader>lf']
+
+  -- Formatting (command)
+  vim.api.nvim_buf_create_user_command(bufnr, 'Format', function()
+    vim.lsp.buf.format(format_opts)
+  end, { desc = 'Format file with LSP' })
+
+  -- Autoformatting (autocmd)
+  local autoformat = formatting.format_on_save
+  local filetype = vim.api.nvim_get_option_value('filetype', { buf = bufnr })
+
+  -- guard clauses
+  local is_autoformat_enabled = autoformat.enabled
+  local is_filetype_allowed = vim.tbl_isempty(autoformat.allow_filetypes or {})
+    or vim.tbl_contains(autoformat.allow_filetypes, filetype)
+  local is_filetype_ignored = vim.tbl_isempty(autoformat.ignore_filetypes or {})
+    or not vim.tbl_contains(autoformat.ignore_filetypes, filetype)
+
+  if is_autoformat_enabled and is_filetype_allowed and is_filetype_ignored then
+    utils.add_autocmds_to_buffer('lsp_auto_format', bufnr, {
+      events = 'BufWritePre', -- Trigger before save
+      desc = 'Autoformat on save',
+      callback = function()
+        -- guard clause: has_capability
+        if not has_capability('textDocument/formatting', { bufnr = bufnr }) then
+          utils.del_autocmds_from_buffer('lsp_auto_format', bufnr)
+          return
+        end
+
+        -- Get autoformat setting (buffer or global)
+        local autoformat_enabled = vim.b.autoformat_enabled or vim.g.autoformat_enabled
+        local has_no_filter = not autoformat.filter
+        local passes_filter = autoformat.filter and autoformat.filter(bufnr)
+
+        -- Use these variables in the if condition
+        if autoformat_enabled and (has_no_filter or passes_filter) then
+          vim.lsp.buf.format(vim.tbl_deep_extend('force', format_opts, { bufnr = bufnr }))
+        end
+      end,
+    })
+
+    -- Key mappings for toggling autoformat (buffer/global)
+    lsp_mappings.n['<leader>uf'] = {
+      function()
+        require('sylow.core.utils.ui').toggle_buffer_autoformat()
+      end,
+      desc = 'Toggle buffer autoformat',
+    }
+    lsp_mappings.n['<leader>uF'] = {
+      function()
+        require('base.utils.ui').toggle_autoformat()
+      end,
+      desc = 'Toggle global autoformat',
+    }
+  end
+
+  -- Highlight references when cursor holds
+  utils.add_autocmds_to_buffer('lsp_document_highlight', bufnr, {
+    {
+      events = { 'CursorHold', 'CursorHoldI' },
+      desc = 'highlight references when cursor holds',
+      callback = function()
+        if has_capability('textDocument/documentHighlight', { bufnr = bufnr }) then
+          vim.lsp.buf.document_highlight()
+        end
+      end,
+    },
+    {
+      events = { 'CursorMoved', 'CursorMovedI', 'BufLeave' },
+      desc = 'clear references when cursor moves',
+      callback = function()
+        vim.lsp.buf.clear_references()
+      end,
+    },
+  })
+
+  -- Other LSP mappings
+  lsp_mappings.n['<leader>lL'] = {
+    function()
+      vim.api.nvim_command(':LspRestart')
+    end,
+    desc = 'LSP refresh',
+  }
+
+  -- Goto definition / declaration
+  lsp_mappings.n['gd'] = {
+    function()
+      vim.lsp.buf.definition()
+    end,
+    desc = 'Goto definition of current symbol',
+  }
+  lsp_mappings.n['gD'] = {
+    function()
+      vim.lsp.buf.declaration()
+    end,
+    desc = 'Goto declaration of current symbol',
+  }
+
+  -- Goto implementation
+  lsp_mappings.n['gI'] = {
+    function()
+      vim.lsp.buf.implementation()
+    end,
+    desc = 'Goto implementation of current symbol',
+  }
+
+  -- Goto type definition
+  lsp_mappings.n['gT'] = {
+    function()
+      vim.lsp.buf.type_definition()
+    end,
+    desc = 'Goto definition of current type',
+  }
+
+  -- Goto references
+  lsp_mappings.n['<leader>lR'] = {
+    function()
+      vim.lsp.buf.references()
+    end,
+    desc = 'Hover references',
+  }
+  lsp_mappings.n['gr'] = {
+    function()
+      vim.lsp.buf.references()
+    end,
+    desc = 'References of current symbol',
+  }
+
+  -- Goto help
+  local lsp_hover_config = require('sylow.core.utils.lsp').lsp_hover_config
+  lsp_mappings.n['gh'] = {
+    function()
+      vim.lsp.buf.hover(lsp_hover_config)
+    end,
+    desc = 'Hover help',
+  }
+  lsp_mappings.n['gH'] = {
+    function()
+      vim.lsp.buf.signature_help(lsp_hover_config)
+    end,
+    desc = 'Signature help',
+  }
+
+  lsp_mappings.n['<leader>lh'] = {
+    function()
+      vim.lsp.buf.hover(lsp_hover_config)
+    end,
+    desc = 'Hover help',
+  }
+  lsp_mappings.n['<leader>lH'] = {
+    function()
+      vim.lsp.buf.signature_help(lsp_hover_config)
+    end,
+    desc = 'Signature help',
+  }
+
+  -- Goto man
+  lsp_mappings.n['gm'] = {
+    function()
+      vim.api.nvim_feedkeys('K', 'n', false)
+    end,
+    desc = 'Hover man',
+  }
+  lsp_mappings.n['<leader>lm'] = {
+    function()
+      vim.api.nvim_feedkeys('K', 'n', false)
+    end,
+    desc = 'Hover man',
+  }
+
+  -- Rename symbol
+  lsp_mappings.n['<leader>lr'] = {
+    function()
+      vim.lsp.buf.rename()
+    end,
+    desc = 'Rename current symbol',
+  }
+
+  -- Toggle inlay hints
+  if vim.b.inlay_hints_enabled == nil then
+    vim.b.inlay_hints_enabled = vim.g.inlay_hints_enabled
+  end
+  if vim.b.inlay_hints_enabled then
+    vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+  end
+  lsp_mappings.n['<leader>uH'] = {
+    function()
+      require('sylow.core.utils.ui').toggle_buffer_inlay_hints(bufnr)
+    end,
+    desc = 'LSP inlay hints (buffer)',
+  }
+
+  -- Toggle semantic tokens
+  if vim.g.semantic_tokens_enabled then
+    vim.b[bufnr].semantic_tokens_enabled = true
+    lsp_mappings.n['<leader>uY'] = {
+      function()
+        require('sylow.core.utils.ui').toggle_buffer_semantic_tokens(bufnr)
+      end,
+      desc = 'LSP semantic highlight (buffer)',
+    }
+  else
+    client.server_capabilities.semanticTokensProvider = nil
+  end
+
+  -- LSP based search
+  lsp_mappings.n['<leader>lS'] = {
+    function()
+      vim.lsp.buf.workspace_symbol()
+    end,
+    desc = 'Search symbol in workspace',
+  }
+  lsp_mappings.n['gS'] = {
+    function()
+      vim.lsp.buf.workspace_symbol()
+    end,
+    desc = 'Search symbol in workspace',
+  }
+
+  -- LSP telescope
+  if is_available('telescope.nvim') then -- setup telescope mappings if available
+    if lsp_mappings.n.gd then
+      lsp_mappings.n.gd[1] = function()
+        require('telescope.builtin').lsp_definitions()
+      end
+    end
+    if lsp_mappings.n.gI then
+      lsp_mappings.n.gI[1] = function()
+        require('telescope.builtin').lsp_implementations()
+      end
+    end
+    if lsp_mappings.n.gr then
+      lsp_mappings.n.gr[1] = function()
+        require('telescope.builtin').lsp_references()
+      end
+    end
+    if lsp_mappings.n['<leader>lR'] then
+      lsp_mappings.n['<leader>lR'][1] = function()
+        require('telescope.builtin').lsp_references()
+      end
+    end
+    if lsp_mappings.n.gy then
+      lsp_mappings.n.gy[1] = function()
+        require('telescope.builtin').lsp_type_definitions()
+      end
+    end
+    if lsp_mappings.n['<leader>lS'] then
+      lsp_mappings.n['<leader>lS'][1] = function()
+        vim.ui.input({ prompt = 'Symbol Query: (leave empty for word under cursor)' }, function(query)
+          if query then
+            -- word under cursor if given query is empty
+            if query == '' then
+              query = vim.fn.expand('<cword>')
+            end
+            require('telescope.builtin').lsp_workspace_symbols({
+              query = query,
+              prompt_title = ('Find word (%s)'):format(query),
+            })
+          end
+        end)
+      end
+    end
+    if lsp_mappings.n['gS'] then
+      lsp_mappings.n['gS'][1] = function()
+        vim.ui.input({ prompt = 'Symbol Query: (leave empty for word under cursor)' }, function(query)
+          if query then
+            -- word under cursor if given query is empty
+            if query == '' then
+              query = vim.fn.expand('<cword>')
+            end
+            require('telescope.builtin').lsp_workspace_symbols({
+              query = query,
+              prompt_title = ('Find word (%s)'):format(query),
+            })
+          end
+        end)
+      end
+    end
+  end
+
+  return lsp_mappings
 end
 
 function M.setup()
