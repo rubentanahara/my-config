@@ -28,7 +28,7 @@ local function setup_module(source, module)
 end
 
 local function load_source(source)
-  local module, err = require_module(source)
+  local module = require_module(source)
   if not module then
     return false
   end

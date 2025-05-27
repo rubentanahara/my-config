@@ -39,24 +39,6 @@ function M.del_autocmds_from_buffer(augroup, bufnr)
   end
 end
 
-function M.trigger_event(event, is_urgent)
-  local function trigger()
-    local is_user_event = string.match(event, '^User ') ~= nil
-    if is_user_event then
-      event = event:gsub('^User ', '')
-      vim.api.nvim_exec_autocmds('User', { pattern = event, modeline = false })
-    else
-      vim.api.nvim_exec_autocmds(event, { modeline = false })
-    end
-  end
-
-  if is_urgent then
-    trigger()
-  else
-    vim.schedule(trigger)
-  end
-end
-
 ------------------------------------------
 -- Icons and UI Utilities
 ------------------------------------------

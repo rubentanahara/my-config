@@ -19,7 +19,7 @@ local function set_options()
   g.codelens_enabled = true -- Enable automatic codelens refreshing for lsp that support it.
   g.diagnostics_mode = 3 -- Set code linting (0=off, 1=only show in status line, 2=virtual text off, 3=all on).
   g.fallback_icons_enabled = false -- Enable it if you need to use Neovim in a machine without nerd fonts.
-  g.inlay_hints_enabled = true -- Enable always show function parameter names.
+  g.inlay_hints_enabled = false -- Enable always show function parameter names.
   g.lsp_round_borders_enabled = true -- Enable round borders for lsp hover and signatureHelp.
   g.lsp_signature_enabled = true -- Enable automatically showing lsp help as you write function parameters.
   g.notifications_enabled = true -- Enable notifications.

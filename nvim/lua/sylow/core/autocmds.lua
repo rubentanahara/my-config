@@ -15,10 +15,6 @@ local function create_autocmd(event, opts)
   return api.nvim_create_autocmd(event, opts)
 end
 
-local function create_user_command(name, fn, opts)
-  return api.nvim_create_user_command(name, fn, opts)
-end
-
 local options = {
   -- Filetypes to enable spell checking and wrapping
   text_filetypes = { 'text', 'plaintex', 'typst', 'gitcommit', 'markdown' },
@@ -226,20 +222,6 @@ local function setup_ui_autocmds()
   return true
 end
 
--- local function setup_lsp_autocmds()
---   create_autocmd('LspAttach', {
---     desc = 'On lsp attach',
---     callback = function(e)
---       local opts = { buffer = e.buf }
---       vim.keymap.set('n', 'gd', function()
---         vim.lsp.buf.definition()
---       end, opts)
---     end,
---   })
---
---   return true
--- end
-
 local function setup_diagnostic_autocmds()
   -- Update diagnostics in insert mode (disabled by default)
   create_autocmd('DiagnosticChanged', {
@@ -272,11 +254,6 @@ function M.setup()
   if not isOkUIAutocmds then
     vim.notify('Failed to setup_buffer_autocmds', vim.log.levels.ERROR)
   end
-
-  -- local isOkLspAutocmds = setup_lsp_autocmds()
-  -- if not isOkLspAutocmds then
-  --   vim.notify('Failed to setup_lsp_autocmds', vim.log.levels.ERROR)
-  -- end
 
   local isOkDiagnosticAutocmds = setup_diagnostic_autocmds()
   if not isOkDiagnosticAutocmds then
