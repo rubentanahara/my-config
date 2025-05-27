@@ -1,5 +1,4 @@
-print("Hello, world")
+list = [1, 2, 3]
 
-items = [1, 2, 3]
-for w in items:
-    print(w)
+for x in list:
+    print(x)

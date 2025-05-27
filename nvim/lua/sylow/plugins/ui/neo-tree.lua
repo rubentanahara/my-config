@@ -59,7 +59,7 @@ return {
     window = {
       windblend = 100,
       position = 'left',
-      width = 30,
+      width = 40,
       mappings = {
         ['<space>'] = 'none',
         ['l'] = 'open',
@@ -103,7 +103,7 @@ return {
       sort_case_insensitive = false, -- used when sorting files and directories in the tree
       sort_function = nil, -- use a custom function for sorting files and directories in the tree
       window = {
-        width = 30,
+        width = 40,
         mapping_options = {
           noremap = true,
           nowait = true,
