@@ -9,10 +9,10 @@ local function set_options()
 
   g.mapleader = ' ' -- Set space as the leader key for custom mappings
   g.maplocalleader = '\\' -- Set backslash as the local leader key
-  g.autoformat = true -- Disable autoformatting for all filetypes.
+  g.autoformat = false -- Disable autoformatting for all filetypes.
   g.scriptencoding = 'utf-8'
   g.big_file = { size = 1024 * 5000, lines = 50000 } -- For files bigger than this, disable 'treesitter' (+5Mb).
-  g.autoformat_enabled = true -- Enable auto formatting at start.
+  g.autoformat_enabled = false -- Enable auto formatting at start.
   g.autopairs_enabled = true -- Enable autopairs at start.
   g.cmp_enabled = true -- Enable completion at start.
   g.codeactions_enabled = true -- Enable displaying 💡 where code actions can be used.

@@ -1,20 +1,14 @@
---- Buffer-related plugins and configuration
---- Includes bufferline.nvim and bufdelete.nvim
---- @module plugins.ui.buffers
-
 local utils = require('sylow.core.utils')
 local get_icon = utils.get_icon
 
 -- Buffer-related mappings
 local buffer_mappings = {
   n = {
-    -- Buffer navigation
     ['<S-h>'] = { '<cmd>BufferLineCyclePrev<cr>', desc = 'Previous buffer' },
     ['<S-l>'] = { '<cmd>BufferLineCycleNext<cr>', desc = 'Next buffer' },
     ['[B'] = { '<cmd>BufferLineMovePrev<cr>', desc = 'Move buffer prev' },
     [']B'] = { '<cmd>BufferLineMoveNext<cr>', desc = 'Move buffer next' },
 
-    -- Buffer management
     ['<leader>bp'] = { '<cmd>BufferLineTogglePin<cr>', desc = 'Toggle pin' },
     ['<leader>bP'] = { '<cmd>BufferLineGroupClose ungrouped<cr>', desc = 'Delete non-pinned buffers' },
     ['<leader>bo'] = { '<cmd>BufferLineCloseOthers<cr>', desc = 'Delete other buffers' },
@@ -25,10 +19,8 @@ local buffer_mappings = {
   },
 }
 
--- Register mappings
 utils.set_mappings(buffer_mappings, { noremap = true, silent = true })
 
--- Bufferline configuration
 local function setup_bufferline()
   local bufferline = require('bufferline')
   bufferline.setup({
@@ -36,7 +28,14 @@ local function setup_bufferline()
       mode = 'buffers',
       diagnostics = 'nvim_lsp',
       diagnostics_indicator = function(count, level)
-        local icon = level:match('error') and ' ' or ' '
+        local icon_map = {
+          error = 'DiagnosticError',
+          warning = 'DiagnosticWarn',
+          info = 'DiagnosticInfo',
+          hint = 'DiagnosticHint',
+        }
+        local icon_name = icon_map[(level or ''):lower()] or ''
+        local icon = get_icon(icon_name)
         return ' ' .. icon .. count
       end,
 
@@ -73,13 +72,11 @@ local function setup_bufferline()
       right_trunc_marker = get_icon('ArrowRight'),
       show_tab_indicators = false,
 
-      -- Indicator configuration
       indicator = {
         style = 'icon',
         icon = get_icon('BufferLineIndicator'),
       },
 
-      -- Custom formatters and filters
       name_formatter = function(buf)
         return buf.name
       end,
@@ -87,7 +84,6 @@ local function setup_bufferline()
         return string.format('%s', opts.ordinal)
       end,
       custom_filter = function(buf_number, _)
-        -- Filter out neo-tree buffers from the buffer list
         local ft = vim.bo[buf_number].filetype
         if ft == 'neo-tree' then
           return false
@@ -96,11 +92,10 @@ local function setup_bufferline()
       end,
     },
 
-    -- Highlight configuration
     highlights = {
       fill = {
         fg = { attribute = 'fg', highlight = 'Normal' },
-        bg = { attribute = 'bg', highlight = 'StatusLineNC' },
+        bg = { attribute = 'bg', highlight = 'Normal' },
       },
       buffer_visible = {
         fg = { attribute = 'fg', highlight = 'Normal' },
@@ -130,14 +125,12 @@ local function setup_bufferline()
   })
 end
 
--- Plugin specifications
 return {
   {
     'akinsho/bufferline.nvim',
     lazy = false,
     version = '*',
     dependencies = {
-      'nvim-tree/nvim-web-devicons', -- If you want icons
       'famiu/bufdelete.nvim', -- Move bufdelete as a dependency
     },
     config = function()
