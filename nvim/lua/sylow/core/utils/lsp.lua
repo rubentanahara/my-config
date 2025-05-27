@@ -90,12 +90,11 @@ function M.apply_default_lsp_settings()
 end
 
 function M.apply_user_lsp_mappings(client, bufnr)
-  print('apply yser lsp_mappings')
   local lsp_mappings = require('sylow.core.mappings').lsp_mappings(client, bufnr)
 
   -- Add LSP label to visual mode if mappings exist
   if not vim.tbl_isempty(lsp_mappings.v) then
-    lsp_mappings.v['<leader>l'] = { desc = utils.get_icon('ActiveLSP', true) .. 'LSP' }
+    lsp_mappings.v['<leader>l'] = { desc = utils.get_icon('ActiveLSP') .. 'LSP' }
   end
 
   -- Apply the mappings to the buffer
@@ -138,7 +137,6 @@ function M.apply_user_lsp_settings(server_name)
 
   -- Server-specific configurations
   if server_name == 'jsonls' then
-    -- Add JSON schema support
     local schema_loaded, schemastore = pcall(require, 'schemastore')
     if schema_loaded then
       opts.settings = {
@@ -148,8 +146,24 @@ function M.apply_user_lsp_settings(server_name)
         },
       }
     end
+  elseif server_name == 'omnisharp' then
+    opts.settings = {
+      omnisharp = {
+        FormattingOptions = {
+          EnableEditorConfigSupport = true,
+          OrganizeImports = true,
+        },
+        RoslynExtensionsOptions = {
+          DocumentAnalysisTimeoutMs = 30000,
+          EnableAnalyzersSupport = true,
+          EnableImportCompletion = true,
+        },
+        Sdk = {
+          IncludePrereleases = true,
+        },
+      },
+    }
   elseif server_name == 'yamlls' then
-    -- Add YAML schema support
     local schema_loaded, schemastore = pcall(require, 'schemastore')
     if schema_loaded then
       opts.settings = {
@@ -158,17 +172,6 @@ function M.apply_user_lsp_settings(server_name)
         },
       }
     end
-  end
-
-  -- Preserve original on_attach and extend with our mappings
-  local old_on_attach = server.on_attach
-  opts.on_attach = function(client, bufnr)
-    if type(old_on_attach) == 'function' then
-      old_on_attach(client, bufnr)
-    end
-
-    -- Apply our custom mappings
-    M.apply_user_lsp_mappings(client, bufnr)
   end
 
   return opts

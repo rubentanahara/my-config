@@ -110,7 +110,7 @@ function M.toggle_buffer_syntax(bufnr)
     end
     vim.bo[bufnr].syntax = 'on'
     if not vim.b.semantic_tokens_enabled then
-      M.toggle_buffer_semantic_tokens(bufnr, true)
+      M.toggle_buffer_semantic_tokens(bufnr)
     end
   else
     if ts_avail and parsers.has_parser() then
@@ -118,7 +118,7 @@ function M.toggle_buffer_syntax(bufnr)
     end
     vim.bo[bufnr].syntax = 'off'
     if vim.b.semantic_tokens_enabled then
-      M.toggle_buffer_semantic_tokens(bufnr, true)
+      M.toggle_buffer_semantic_tokens(bufnr)
     end
   end
   utils.notify(string.format('syntax %s', bool2str(vim.bo[bufnr].syntax)))
