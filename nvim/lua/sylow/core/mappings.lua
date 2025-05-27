@@ -375,8 +375,8 @@ function M.lsp_mappings(client, bufnr)
   }
 
   -- Formatting (keymapping)
-  local formatting = require('base.utils.lsp').formatting
-  local format_opts = require('base.utils.lsp').format_opts
+  local formatting = require('sylow.core.utils.lsp').formatting
+  local format_opts = require('sylow.core.utils.lsp').format_opts
   lsp_mappings.n['<leader>lf'] = {
     function()
       vim.lsp.buf.format(format_opts)
