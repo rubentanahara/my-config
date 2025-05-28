@@ -62,13 +62,13 @@ return {
 
       vim.api.nvim_set_hl(0, 'DapStoppedLine', { default = true, link = 'Visual' })
 
-      for name, sign in pairs(utils.icons.DAP) do
-        sign = type(sign) == 'table' and sign or { sign }
-        vim.fn.sign_define(
-          'Dap' .. name,
-          { text = sign[1], texthl = sign[2] or 'DiagnosticInfo', linehl = sign[3], numhl = sign[3] }
-        )
-      end
+      -- for name, sign in pairs(utils.icons.DAP) do
+      --   sign = type(sign) == 'table' and sign or { sign }
+      --   vim.fn.sign_define(
+      --     'Dap' .. name,
+      --     { text = sign[1], texthl = sign[2] or 'DiagnosticInfo', linehl = sign[3], numhl = sign[3] }
+      --   )
+      -- end
 
       -- setup dap config by VsCode launch.json file
       local vscode = require('dap.ext.vscode')
@@ -122,7 +122,7 @@ return {
       -- You'll need to check that you have the required things installed
       -- online, please don't ask me how to install them :)
       ensure_installed = {
-        -- Update this to ensure that you have the debuggers for the langs you want
+        'netcoredbg',
       },
     },
     -- mason-nvim-dap is loaded when nvim-dap loads

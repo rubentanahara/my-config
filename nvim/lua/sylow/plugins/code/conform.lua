@@ -7,12 +7,14 @@ return {
     conform.setup({
       formatters_by_ft = {
         lua = { 'stylua' },
+        cs = { 'csharpier' },
       },
-      -- format_on_save = {
-      --   lsp_fallback = true,
-      --   async = false,
-      --   timeout_ms = 1000,
-      -- },
+      formatters = {
+        csharpier = {
+          command = 'dotnet-csharpier',
+          args = { '--write-stdout' },
+        },
+      },
     })
 
     vim.keymap.set({ 'n', 'v' }, '<leader>cf', function()
