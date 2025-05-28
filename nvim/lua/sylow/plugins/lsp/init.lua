@@ -34,14 +34,6 @@ return {
             package_pending = get_icon('MasonPending'),
           },
         },
-      })
-    end,
-  },
-  {
-    'williamboman/mason-lspconfig.nvim',
-    lazy = false,
-    config = function()
-      require('mason-lspconfig').setup({
         ensure_installed = {
           'pylsp',
           'lua_ls',
@@ -49,8 +41,16 @@ return {
           'jsonls',
           'rust_analyzer',
           'csharp_ls',
+          'csharpier',
         },
       })
+    end,
+  },
+  {
+    'williamboman/mason-lspconfig.nvim',
+    lazy = false,
+    config = function()
+      require('mason-lspconfig').setup({})
     end,
   },
   {

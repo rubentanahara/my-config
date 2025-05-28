@@ -51,6 +51,7 @@ return {
         'luadoc',
         'vim',
         'vimdoc',
+        'c_sharp',
       },
       query_linter = {
         enable = true,
