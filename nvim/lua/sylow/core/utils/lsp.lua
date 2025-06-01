@@ -33,16 +33,8 @@ function M.apply_default_lsp_settings()
   M.lsp_hover_config = vim.g.lsp_round_borders_enabled and { border = 'rounded', silent = true } or {}
 
   local default_diagnostics = {
+    -- virtual_lines = true,
     virtual_text = true,
-    signs = {
-      text = {
-        [vim.diagnostic.severity.ERROR] = get_icon('DiagnosticError'),
-        [vim.diagnostic.severity.HINT] = get_icon('DiagnosticHint'),
-        [vim.diagnostic.severity.WARN] = get_icon('DiagnosticWarn'),
-        [vim.diagnostic.severity.INFO] = get_icon('DiagnosticInfo'),
-      },
-      active = signs,
-    },
     update_in_insert = true,
     underline = true,
     severity_sort = true,
@@ -50,9 +42,22 @@ function M.apply_default_lsp_settings()
       focused = false,
       style = 'minimal',
       border = 'rounded',
-      source = 'always',
+      source = true,
       header = '',
       prefix = '',
+    },
+    signs = {
+      text = {
+        [vim.diagnostic.severity.ERROR] = get_icon('DiagnosticError'),
+        [vim.diagnostic.severity.HINT] = get_icon('DiagnosticHint'),
+        [vim.diagnostic.severity.WARN] = get_icon('DiagnosticWarn'),
+        [vim.diagnostic.severity.INFO] = get_icon('DiagnosticInfo'),
+      },
+      numhl = {
+        [vim.diagnostic.severity.ERROR] = 'ErrorMsg',
+        [vim.diagnostic.severity.WARN] = 'WarningMsg',
+      },
+      active = signs,
     },
   }
 
@@ -74,7 +79,7 @@ function M.apply_default_lsp_settings()
   }
   vim.diagnostic.config(M.diagnostics[vim.g.diagnostics_mode])
 
-  M.formatting = { format_on_save = { enabled = true }, disabled = {} }
+  M.formatting = { format_on_save = { enabled = false }, disabled = {} }
   if type(M.formatting.format_on_save) == 'boolean' then
     M.formatting.format_on_save = { enabled = M.formatting.format_on_save }
   end
