@@ -1,29 +1,21 @@
 return {
-	'stevearc/conform.nvim',
-	event = { 'BufReadPre', 'BufNewFile' },
-	config = function()
-		local conform = require('conform')
+  'stevearc/conform.nvim',
+  event = { 'BufReadPre', 'BufNewFile' },
+  config = function()
+    local conform = require('conform')
 
-		conform.setup({
-			formatters_by_ft = {
-				lua = { 'stylua' },
-				cs = { 'csharpier' },
-				kotlin = { 'ktlint' }
-			},
-			formatters = {
-				csharpier = {
-					command = 'dotnet-csharpier',
-					args = { '--write-stdout' },
-				},
-			},
-		})
+    conform.setup({
+      formatters_by_ft = {
+        lua = { 'stylua' },
+      },
+    })
 
-		vim.keymap.set({ 'n', 'v' }, '<leader>cf', function()
-			conform.format({
-				lsp_fallback = true,
-				async = true,
-				timeout_ms = 1000,
-			})
-		end, { desc = 'Format file or range (in visual mode)' })
-	end,
+    vim.keymap.set({ 'n', 'v' }, '<leader>cf', function()
+      conform.format({
+        lsp_fallback = true,
+        async = true,
+        timeout_ms = 1000,
+      })
+    end, { desc = 'Format file or range (in visual mode)' })
+  end,
 }
