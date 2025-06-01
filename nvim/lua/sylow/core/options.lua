@@ -6,7 +6,7 @@ local g = vim.g
 local function set_options()
   -- Globals
   vim.o.background = 'dark' -- Set the overall color theme to dark mode
-
+  vim.opt.updatetime = 200
   g.mapleader = ' ' -- Set space as the leader key for custom mappings
   g.maplocalleader = '\\' -- Set backslash as the local leader key
   g.autoformat = false -- Disable autoformatting for all filetypes.

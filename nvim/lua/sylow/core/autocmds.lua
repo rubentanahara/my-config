@@ -1,4 +1,5 @@
 local M = {}
+local utils = require('sylow.core.utils')
 
 --- Local reference to vim API functions for performance
 local api = vim.api
@@ -129,6 +130,39 @@ local function setup_buffer_autocmds()
           vim.b[args.buf].view_activated = true
           vim.cmd.loadview { mods = { emsg_silent = true } }
         end
+      end
+    end,
+  })
+
+  create_autocmd({
+    'WinScrolled',
+    'BufWinEnter',
+    'CursorHold',
+    'InsertLeave',
+    'BufModifiedSet',
+  }, {
+    desc = 'Barbecue show modified',
+    callback = function()
+      if utils.is_available('barbecue.ui') then
+        require('barbecue.ui').update()
+      end
+    end,
+  })
+
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'dashboard',
+    callback = function()
+      vim.opt.cursorline = false
+      vim.opt.cursorcolumn = false
+      vim.opt.fillchars:append('eob: ')
+    end,
+  })
+
+  vim.api.nvim_create_autocmd('VimResized', {
+    pattern = '*',
+    callback = function()
+      if vim.bo.filetype == 'dashboard' then
+        vim.cmd('doautocmd FileType dashboard')
       end
     end,
   })

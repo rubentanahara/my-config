@@ -2,17 +2,8 @@ local M = {}
 
 local utils = require('sylow.core.utils')
 local get_icon = utils.get_icon
-local stored_handlers = {}
 
-------------------------------------------
--- LSP Configuration
-------------------------------------------
-
---- Apply default settings for diagnostics, formatting, and lsp capabilities
---- @return nil
 function M.apply_default_lsp_settings()
-  -- Icons
-  -- Apply the icons defined in ../icons/icons.lua
   local signs = {
     { name = 'DiagnosticSignError', text = get_icon('DiagnosticError'), texthl = 'DiagnosticSignError' },
     { name = 'DiagnosticSignWarn', text = get_icon('DiagnosticWarn'), texthl = 'DiagnosticSignWarn' },
@@ -28,12 +19,10 @@ function M.apply_default_lsp_settings()
     vim.fn.sign_define(sign.name, sign)
   end
 
-  -- Apply default lsp hover borders
-  -- Applies the option lsp_round_borders_enabled from ../options.lua
   M.lsp_hover_config = vim.g.lsp_round_borders_enabled and { border = 'rounded', silent = true } or {}
 
   local default_diagnostics = {
-    virtual_lines = true,
+    -- virtual_lines = true,
     virtual_text = true,
     update_in_insert = true,
     underline = true,
@@ -61,8 +50,6 @@ function M.apply_default_lsp_settings()
     },
   }
 
-  -- Apply default diagnostics
-  -- Applies the option diagnostics_mode from ../1-options.lua
   M.diagnostics = {
     -- diagnostics off
     [0] = vim.tbl_deep_extend(
@@ -80,9 +67,11 @@ function M.apply_default_lsp_settings()
   vim.diagnostic.config(M.diagnostics[vim.g.diagnostics_mode])
 
   M.formatting = { format_on_save = { enabled = false }, disabled = {} }
+
   if type(M.formatting.format_on_save) == 'boolean' then
     M.formatting.format_on_save = { enabled = M.formatting.format_on_save }
   end
+
   M.format_opts = vim.deepcopy(M.formatting)
   M.format_opts.disabled = nil
   M.format_opts.format_on_save = nil
@@ -97,24 +86,18 @@ end
 function M.apply_user_lsp_mappings(client, bufnr)
   local lsp_mappings = require('sylow.core.mappings').lsp_mappings(client, bufnr)
 
-  -- Add LSP label to visual mode if mappings exist
   if not vim.tbl_isempty(lsp_mappings.v) then
     lsp_mappings.v['<leader>l'] = { desc = utils.get_icon('ActiveLSP') .. 'LSP' }
   end
 
-  -- Apply the mappings to the buffer
   utils.set_mappings(lsp_mappings, { buffer = bufnr, silent = true })
 end
 
-------------------------------------------
--- LSP Server Configuration
-------------------------------------------
 function M.apply_user_lsp_settings(server_name)
   local server = require('lspconfig')[server_name]
 
   M.capabilities = vim.lsp.protocol.make_client_capabilities()
 
-  -- Enhanced completion capabilities
   M.capabilities.textDocument.completion.completionItem.documentationFormat = { 'markdown', 'plaintext' }
   M.capabilities.textDocument.completion.completionItem.snippetSupport = true
   M.capabilities.textDocument.completion.completionItem.preselectSupport = true
@@ -126,21 +109,39 @@ function M.apply_user_lsp_settings(server_name)
   M.capabilities.textDocument.completion.completionItem.resolveSupport = {
     properties = { 'documentation', 'detail', 'additionalTextEdits' },
   }
-
-  -- Folding capabilities
   M.capabilities.textDocument.foldingRange = {
     dynamicRegistration = false,
     lineFoldingOnly = true,
   }
 
-  -- Setup flags and merge with server options
   M.flags = {}
   local opts = vim.tbl_deep_extend('force', server, {
     capabilities = M.capabilities,
     flags = M.flags,
   })
 
-  -- Server-specific configurations
+  if server_name == 'ts_ls' then
+    local function organize_imports()
+      local params = {
+        command = '_typescript.organizeImports',
+        arguments = { vim.api.nvim_buf_get_name(0) },
+      }
+      vim.lsp.buf.execute_command(params)
+    end
+
+    opts.init_options = {
+      preferences = {
+        disableSuggestions = true,
+      },
+    }
+
+    opts.commands = {
+      OrganizeImports = {
+        organize_imports,
+        description = 'Organize Imports',
+      },
+    }
+  end
   if server_name == 'jsonls' then
     local schema_loaded, schemastore = pcall(require, 'schemastore')
     if schema_loaded then
@@ -151,23 +152,6 @@ function M.apply_user_lsp_settings(server_name)
         },
       }
     end
-  elseif server_name == 'omnisharp' then
-    opts.settings = {
-      omnisharp = {
-        FormattingOptions = {
-          EnableEditorConfigSupport = true,
-          OrganizeImports = true,
-        },
-        RoslynExtensionsOptions = {
-          DocumentAnalysisTimeoutMs = 30000,
-          EnableAnalyzersSupport = true,
-          EnableImportCompletion = true,
-        },
-        Sdk = {
-          IncludePrereleases = true,
-        },
-      },
-    }
   elseif server_name == 'yamlls' then
     local schema_loaded, schemastore = pcall(require, 'schemastore')
     if schema_loaded then
@@ -183,13 +167,10 @@ function M.apply_user_lsp_settings(server_name)
 end
 
 function M.setup(server)
-  -- Get custom settings for the server
   local opts = M.apply_user_lsp_settings(server)
 
-  -- Get the setup handler
-  local setup_handler = stored_handlers[server] or require('lspconfig')[server].setup(opts)
+  local setup_handler = require('lspconfig')[server].setup(opts)
 
-  -- Apply settings using the handler if available
   if setup_handler then
     setup_handler(server, opts)
   end

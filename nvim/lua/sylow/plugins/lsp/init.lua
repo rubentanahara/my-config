@@ -59,9 +59,24 @@ return {
         ensure_installed = {
           'prettier',
           'stylua',
+          'luacheck',
+          'eslint_d'
         },
       })
     end,
+  },
+  {
+    'jay-babu/mason-nvim-dap.nvim',
+    dependencies = 'mason.nvim',
+    cmd = { 'DapInstall', 'DapUninstall' },
+    opts = {
+      automatic_installation = true,
+      ensure_installed = {
+        'netcoredbg',
+        'pwa-node',
+      },
+    },
+    config = function() end,
   },
   {
     'neovim/nvim-lspconfig',
