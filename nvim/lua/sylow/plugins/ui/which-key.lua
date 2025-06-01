@@ -99,7 +99,7 @@ return { -- Which-key: Display available keybindings in popup
           },
           {
             '<leader>t',
-            group = 'Terminal',
+            group = 'Toggle UI options',
           },
           {
             '<leader>s',

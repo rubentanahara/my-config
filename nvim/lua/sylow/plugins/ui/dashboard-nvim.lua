@@ -13,14 +13,14 @@ return {
     },
     config = {
       header = {
-        '                                                     ',
-        '  ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗ ',
-        '  ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║ ',
-        '  ██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║ ',
-        '  ██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║ ',
-        '  ██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║ ',
-        '  ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝ ',
-        '                                                     ',
+        '																																									 ',
+        '  ███╗███████╗██╗   ██╗██╗      ██████╗ ██╗    ██╗   ██████╗ ███████╗██╗   ██╗███╗',
+        '  ██╔╝██╔════╝╚██╗ ██╔╝██║     ██╔═══██╗██║    ██║   ██╔══██╗██╔════╝██║   ██║╚██║',
+        '  ██║ ███████╗ ╚████╔╝ ██║     ██║   ██║██║ █╗ ██║   ██║  ██║█████╗  ██║   ██║ ██║',
+        '  ██║ ╚════██║  ╚██╔╝  ██║     ██║   ██║██║███╗██║   ██║  ██║██╔══╝  ╚██╗ ██╔╝ ██║',
+        '  ███╗███████║   ██║   ███████╗╚██████╔╝╚███╔███╔╝██╗██████╔╝███████╗ ╚████╔╝ ███║',
+        '  ╚══╝╚══════╝   ╚═╝   ╚══════╝ ╚═════╝  ╚══╝╚══╝ ╚═╝╚═════╝ ╚══════╝  ╚═══╝  ╚══╝',
+        '                                                                                  ',
       },
       center = {
         {
@@ -28,24 +28,6 @@ return {
           desc = ' Find file',
           icon = ' ',
           key = 'f',
-        },
-        {
-          action = 'ene | startinsert',
-          desc = ' New file',
-          icon = get_icon('GreeterNew'),
-          key = 'n',
-        },
-        {
-          action = 'Telescope oldfiles',
-          desc = ' Recent files',
-          icon = get_icon('GreeterRecent'),
-          key = 'r',
-        },
-        {
-          action = 'Telescope live_grep',
-          desc = ' Find text',
-          icon = ' ',
-          key = 'g',
         },
         {
           action = 'e $MYVIMRC',
@@ -70,21 +52,16 @@ return {
         local stats = require('lazy').stats()
         local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
 
-        -- Calcular líneas en blanco dinámicamente
         local lines = {}
         local win_height = vim.api.nvim_win_get_height(0)
 
-        -- Calcular cuántas líneas necesitamos
-        -- Estimación: header (8) + espacio (1) + center (7×2) + espacio para footer (1)
         local used_lines = 8 + 1 + (7 * 2) + 1
         local padding_lines = math.max(1, win_height - used_lines)
 
-        -- Añadir líneas en blanco
         for _ = 1, padding_lines do
           table.insert(lines, '')
         end
 
-        -- Añadir línea de stats
         table.insert(
           lines,
           '⚡️  Neovim loaded ' .. stats.loaded .. '/' .. stats.count .. ' plugins in ' .. ms .. 'ms'
@@ -95,7 +72,6 @@ return {
     },
   },
   init = function()
-    -- Ocultar cursor en el dashboard
     vim.api.nvim_create_autocmd('FileType', {
       pattern = 'dashboard',
       callback = function()
