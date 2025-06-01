@@ -7,6 +7,11 @@ return {
     'nvim-lua/plenary.nvim',
     lazy = true,
   },
+
+  {
+    'stevearc/dressing.nvim',
+    event = 'VeryLazy'
+  },
   {
     'nvim-tree/nvim-web-devicons',
     lazy = true,
