@@ -33,7 +33,7 @@ function M.apply_default_lsp_settings()
   M.lsp_hover_config = vim.g.lsp_round_borders_enabled and { border = 'rounded', silent = true } or {}
 
   local default_diagnostics = {
-    -- virtual_lines = true,
+    virtual_lines = true,
     virtual_text = true,
     update_in_insert = true,
     underline = true,
@@ -103,7 +103,7 @@ function M.apply_user_lsp_mappings(client, bufnr)
   end
 
   -- Apply the mappings to the buffer
-  utils.set_mappings(lsp_mappings, { buffer = bufnr })
+  utils.set_mappings(lsp_mappings, { buffer = bufnr, silent = true })
 end
 
 ------------------------------------------
