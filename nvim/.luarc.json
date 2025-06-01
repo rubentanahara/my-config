@@ -9,14 +9,8 @@
             "assert"
         ],
         "disable": [
-            "param-type-mismatch",
-            "missing-fields",
-            "undefined-field",
-            "need-check-nil"
+      			"undefined-variable"
         ]
-    },
-    "telemetry": {
-        "enable": false
     },
     "completion": {
         "autoRequire": true,

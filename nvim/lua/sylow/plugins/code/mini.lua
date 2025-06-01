@@ -1,5 +1,72 @@
 return {
   {
+    'echasnovski/mini.icons',
+    lazy = true,
+    opts = {
+      file = {
+        ['.keep'] = { glyph = '󰊢', hl = 'MiniIconsGrey' },
+        ['devcontainer.json'] = { glyph = '', hl = 'MiniIconsAzure' },
+        ['.eslintrc.js'] = { glyph = '󰱺', hl = 'MiniIconsYellow' },
+        ['.node-version'] = { glyph = '', hl = 'MiniIconsGreen' },
+        ['.prettierrc'] = { glyph = '', hl = 'MiniIconsPurple' },
+        ['.yarnrc.yml'] = { glyph = '', hl = 'MiniIconsBlue' },
+        ['eslint.config.js'] = { glyph = '󰱺', hl = 'MiniIconsYellow' },
+        ['package.json'] = { glyph = '', hl = 'MiniIconsGreen' },
+        ['tsconfig.json'] = { glyph = '', hl = 'MiniIconsAzure' },
+        ['tsconfig.build.json'] = { glyph = '', hl = 'MiniIconsAzure' },
+        ['yarn.lock'] = { glyph = '', hl = 'MiniIconsBlue' },
+      },
+      filetype = {
+        dotenv = { glyph = '', hl = 'MiniIconsYellow' },
+      },
+    },
+    init = function()
+      package.preload['nvim-web-devicons'] = function()
+        require('mini.icons').mock_nvim_web_devicons()
+        return package.loaded['nvim-web-devicons']
+      end
+    end,
+  },
+  {
+    'echasnovski/mini.indentscope',
+    event = { 'BufReadPre', 'BufNewFile' },
+    opts = {
+      -- draw = { delay = 0, animation = function() return 0 end },
+      options = { border = 'top', try_as_border = true },
+      symbol = '▏',
+    },
+    config = function(_, opts)
+      require('mini.indentscope').setup(opts)
+
+      -- Disable for certain filetypes
+      vim.api.nvim_create_autocmd({ 'FileType' }, {
+        desc = 'Disable indentscope for certain filetypes',
+        callback = function()
+          local ignored_filetypes = {
+            'aerial',
+            'dashboard',
+            'help',
+            'lazy',
+            'leetcode.nvim',
+            'mason',
+            'neo-tree',
+            'NvimTree',
+            'neogitstatus',
+            'notify',
+            'startify',
+            'toggleterm',
+            'Trouble',
+            'calltree',
+            'coverage',
+          }
+          if vim.tbl_contains(ignored_filetypes, vim.bo.filetype) then
+            vim.b.miniindentscope_disable = true
+          end
+        end,
+      })
+    end,
+  },
+  {
     'echasnovski/mini.pairs',
     event = 'VeryLazy',
     opts = {

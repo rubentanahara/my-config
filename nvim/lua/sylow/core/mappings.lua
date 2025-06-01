@@ -212,15 +212,6 @@ local function setup_mappings()
     }
   end
 
-  if is_available('aerial.nvim') then
-    maps.n['<leader>i'] = {
-      function()
-        require('aerial').toggle()
-      end,
-      desc = 'Aerial',
-    }
-  end
-
   -- Toggle folds
   maps.n['<leader>zc'] = { 'zc', desc = 'Close fold' }
   maps.n['<leader>zo'] = { 'zo', desc = 'Open fold' }
@@ -257,10 +248,6 @@ local function setup_mappings()
   maps.n['<leader>ty'] = { ui.toggle_buffer_syntax, desc = 'Toggle syntax highlight (buffer)' }
   maps.n['<leader>th'] = { ui.toggle_foldcolumn, desc = 'Toggle foldcolumn' }
   maps.n['<leader>tN'] = { ui.toggle_ui_notifications, desc = 'UI notifications' }
-
-  if is_available('nvim-cmp') then
-    maps.n['<leader>uC'] = { ui.toggle_cmp, desc = 'Toggle autocompletion' }
-  end
 
   if is_available('zen-mode.nvim') then
     maps.n['<leader>tz'] = { ui.toggle_zen_mode, desc = 'Zen mode' }
@@ -424,20 +411,6 @@ function M.lsp_mappings(client, bufnr)
         end
       end,
     })
-
-    -- Key mappings for toggling autoformat (buffer/global)
-    lsp_mappings.n['<leader>uf'] = {
-      function()
-        require('sylow.core.utils.ui').toggle_buffer_autoformat()
-      end,
-      desc = 'Toggle buffer autoformat',
-    }
-    lsp_mappings.n['<leader>uF'] = {
-      function()
-        require('base.utils.ui').toggle_autoformat()
-      end,
-      desc = 'Toggle global autoformat',
-    }
   end
 
   -- Highlight references when cursor holds

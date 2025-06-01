@@ -39,10 +39,7 @@ return {
         '<leader>ff',
         function()
           local builtin = require('telescope.builtin')
-          builtin.find_files({
-            no_ignore = false,
-            hidden = true,
-          })
+          builtin.find_files()
         end,
         desc = 'Find Files',
       },
@@ -205,7 +202,6 @@ return {
 
       telescope.setup(opts)
       telescope.load_extension('luasnip')
-      telescope.load_extension('aerial')
       telescope.load_extension('notify')
       telescope.load_extension('fzf')
       telescope.load_extension('ui-select')
