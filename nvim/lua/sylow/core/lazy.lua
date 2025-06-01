@@ -112,7 +112,7 @@ local function initialize_lazy(lazy_path)
 
   local lazy_config = {
     spec = get_plugin_spec(),
-    defaults = { lazy = true, version = false },
+    defaults = { lazy = false, version = false },
     performance = {
       rtp = {
         disabled_plugins = DISABLED_PLUGINS,
