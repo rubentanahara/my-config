@@ -25,7 +25,6 @@ local ICONS = {
 local DISABLED_PLUGINS = {
   'gzip',
   'tarPlugin',
-  'tohtml',
   'tutor',
   'zipPlugin',
 }
@@ -78,8 +77,6 @@ local function setup_post_install_loads(plugins)
   })
 end
 
---- Get plugin specification for Lazy
---- @return table spec Plugin specification table
 local function get_plugin_spec()
   local spec = {}
   local plugin_categories = {

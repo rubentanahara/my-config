@@ -44,6 +44,7 @@ return {
         end,
         preselect = cmp.PreselectMode.None,
         sources = cmp.config.sources({
+          { name = 'copilot', priority = 1200 },
           { name = 'nvim_lsp', priority = 1000 },
           { name = 'luasnip', priority = 750 },
           { name = 'buffer', priority = 500 },

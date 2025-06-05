@@ -51,7 +51,14 @@ return {
         'luadoc',
         'vim',
         'vimdoc',
-
+        'c_sharp',
+        'ninja',
+        'rst',
+        'rust',
+        'pydoc',
+        'ron',
+        'javascript',
+        'typescript',
       },
       query_linter = {
         enable = true,

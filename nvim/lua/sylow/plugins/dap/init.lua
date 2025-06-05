@@ -16,11 +16,12 @@ local function get_args(config)
   return config
 end
 
-local utils = require('sylow.core.utils')
-
 return {
   {
     'mfussenegger/nvim-dap',
+    recommended = true,
+    desc = 'Debugging support. Requires language specific adapters to be configured. (see lang extras)',
+
     dependencies = {
       'rcarriga/nvim-dap-ui',
       {
@@ -51,10 +52,14 @@ return {
     },
 
     config = function()
-      if utils.is_available('mason-nvim-dap.nvim') then
-        require('mason-nvim-dap').setup(utils.get_plugin_opts('mason-nvim-dap.nvim'))
-      end
+      -- load mason-nvim-dap here, after all adapters have been setup
+      -- if LazyVim.has('mason-nvim-dap.nvim') then
+      --   require('mason-nvim-dap').setup(LazyVim.opts('mason-nvim-dap.nvim'))
+      -- end
 
+      vim.api.nvim_set_hl(0, 'DapStoppedLine', { default = true, link = 'Visual' })
+
+      -- setup dap config by VsCode launch.json file
       local vscode = require('dap.ext.vscode')
       local json = require('plenary.json')
       vscode.json_decode = function(str)
@@ -62,6 +67,8 @@ return {
       end
     end,
   },
+
+  -- fancy UI for the debugger
   {
     'rcarriga/nvim-dap-ui',
     dependencies = { 'nvim-neotest/nvim-nio' },
@@ -75,15 +82,30 @@ return {
       local dap = require('dap')
       local dapui = require('dapui')
       dapui.setup(opts)
-      dap.listeners.after.event_initialized['dapui_config'] = function()
-        dapui.open({})
+      dap.listeners.before.attach.dapui_config = function()
+        dapui.open()
       end
-      dap.listeners.before.event_terminated['dapui_config'] = function()
-        dapui.close({})
+      dap.listeners.before.launch.dapui_config = function()
+        dapui.open()
       end
-      dap.listeners.before.event_exited['dapui_config'] = function()
-        dapui.close({})
+      dap.listeners.before.event_terminated.dapui_config = function()
+        dapui.close()
+      end
+      dap.listeners.before.event_exited.dapui_config = function()
+        dapui.close()
       end
     end,
+  },
+  {
+    'jay-babu/mason-nvim-dap.nvim',
+    dependencies = 'mason.nvim',
+    lazy = false,
+    cmd = { 'DapInstall', 'DapUninstall' },
+    opts = {
+      automatic_installation = true,
+      handlers = {},
+      ensure_installed = {},
+    },
+    config = function() end,
   },
 }
