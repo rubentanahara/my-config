@@ -49,34 +49,35 @@ return {
 
       mason_lspconfig.setup({
         ensure_installed = {
-          'ts_ls',
-          'lua_ls',
+          'lua_ls', -- lua
+          'ts_ls', -- js,js
+          'bacon-ls', -- rust
+          'omnisharp', -- cs
+          'pyright',
         },
         automatic_installation = true,
       })
 
       mason_tool_installer.setup({
         ensure_installed = {
-          'prettier',
-          'stylua',
-          'luacheck',
-          'eslint_d'
+          -- Formatters
+          'stylua', -- lua
+          'prettier', -- js,ts
+          'csharpier', -- cs
+          'rustfmt', -- rust
+          'ruff',
+          -- Linters
+          'luacheck', -- lua
+          'eslint_d', -- js,ts
+          'semgrep', -- cs
+          'bacon', -- rust
+          -- Daps
+          'js-debug-adapter', -- js,ts
+          'netcoredbg', -- cs
+          'codelldb', -- rust
         },
       })
     end,
-  },
-  {
-    'jay-babu/mason-nvim-dap.nvim',
-    dependencies = 'mason.nvim',
-    cmd = { 'DapInstall', 'DapUninstall' },
-    opts = {
-      automatic_installation = true,
-      ensure_installed = {
-        'netcoredbg',
-        'pwa-node',
-      },
-    },
-    config = function() end,
   },
   {
     'neovim/nvim-lspconfig',

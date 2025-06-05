@@ -1,19 +1,13 @@
-# Configuración AeroSpace
-
 start-at-login = true
 
-# Normalización de contenedores
 enable-normalization-flatten-containers = true
 enable-normalization-opposite-orientation-for-nested-containers = true
 
-# Diseño por defecto para contenedores raíz
 default-root-container-layout = 'tiles'
 default-root-container-orientation = 'auto'
 
-# El ratón sigue al foco cuando cambia el monitor enfocado
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
-# Espacios entre ventanas
 [gaps]
     inner.horizontal = 5
     inner.vertical = 5
@@ -22,25 +16,20 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     outer.top = 5
     outer.right = 5
 
-# Asignación de teclas
 [key-mapping]
     preset = 'qwerty'
 
-# Modo de vinculación principal
 [mode.main.binding]
-    # Navegación entre ventanas
     "alt-h" = "focus left"
     "alt-j" = "focus down"
     "alt-k" = "focus up"
     "alt-l" = "focus right"
     
-    # Mover ventanas
     "alt-shift-h" = "move left"
     "alt-shift-j" = "move down"
     "alt-shift-k" = "move up"
     "alt-shift-l" = "move right"
     
-    # Cambiar entre workspaces
     "alt-1" = "workspace 1"
     "alt-2" = "workspace 2"
     "alt-3" = "workspace 3"
@@ -48,7 +37,6 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-5" = "workspace 5"
     "alt-6" = "workspace 6"  # Workspace para música
     
-    # Mover ventanas a workspaces
     "alt-shift-1" = "move-node-to-workspace 1"
     "alt-shift-2" = "move-node-to-workspace 2"
     "alt-shift-3" = "move-node-to-workspace 3"
@@ -56,12 +44,10 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-shift-5" = "move-node-to-workspace 5"
     "alt-shift-6" = "move-node-to-workspace 6"  # Mover ventanas al workspace de música
     
-    # Cambiar layouts
     "alt-t" = "layout tiles"
     "alt-c" = "layout accordion"
     "alt-f" = "layout floating"
     
-    # Redimensionar ventanas
     "alt-minus" = "resize smart -50"       # Reducir tamaño según orientación
     "alt-equal" = "resize smart +50"       # Aumentar tamaño según orientación
     "alt-shift-minus" = "resize width -50" # Reducir anchura
@@ -70,7 +56,6 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-ctrl-equal" = "resize height +50" # Aumentar altura
     "alt-0" = "balance-sizes"              # Equilibrar tamaños de todas las ventanas
     
-    # Lanzar aplicaciones con exec-and-forget
     "alt-g" = "exec-and-forget open -a Ghostty"
     "alt-b" = "exec-and-forget open -a 'Brave Browser'"
     "alt-p" = "exec-and-forget open -a Postman"
@@ -81,16 +66,12 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-w" = "exec-and-forget open -a 'Windows App'"
     "alt-a" = "exec-and-forget open -a Music"
     
-    # Modo de pantalla completa
     "alt-m" = "fullscreen"
     
-    # Minimizar ventana
     "alt-y" = "macos-native-minimize"
     
-    # Cerrar ventana
     "alt-shift-q" = "close"
     
-    # Reiniciar AeroSpace
     "alt-shift-r" = "reload-config"
 
 # Asignar aplicaciones a espacios de trabajo específicos
