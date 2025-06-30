@@ -16,21 +16,21 @@ return {
 	-- 	end,
 	-- },
 	-- Copilot
-  {
-    'zbirenbaum/copilot.lua',
-    lazy = false,
-    cmd = 'Copilot',
-    event = 'InsertEnter',
-    config = function()
-      require('copilot').setup()
-    end,
-  },
-  -- Copilot completion source
-  {
-    'zbirenbaum/copilot-cmp',
-    lazy = false,
-    config = function()
-      require('copilot_cmp').setup()
-    end,
-  },
+  -- {
+  --   'zbirenbaum/copilot.lua',
+  --   lazy = false,
+  --   cmd = 'Copilot',
+  --   event = 'InsertEnter',
+  --   config = function()
+  --     require('copilot').setup()
+  --   end,
+  -- },
+  -- -- Copilot completion source
+  -- {
+  --   'zbirenbaum/copilot-cmp',
+  --   lazy = false,
+  --   config = function()
+  --     require('copilot_cmp').setup()
+  --   end,
+  -- },
 }

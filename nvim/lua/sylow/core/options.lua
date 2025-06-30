@@ -27,6 +27,9 @@ local function set_options()
   g.url_effect_enabled = true -- Highlight URLs with an underline effect.
   g.markdown_recommended_style = 0 -- Disable default markdown style to allow custom formatting
 
+  g.dotnet_errors_only = true
+  g.dotnet_show_project_file = false
+
   -- Encoding
   opt.fileencoding = 'utf-8' -- Set encoding for written files
   opt.encoding = 'utf-8' -- Set encoding for Neovim interface

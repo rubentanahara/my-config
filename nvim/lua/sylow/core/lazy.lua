@@ -86,7 +86,7 @@ local function get_plugin_spec()
     'sylow.plugins.tools',
     'sylow.plugins.code',
     'sylow.plugins.lsp',
-    'sylow.plugins.dap',
+    'sylow.plugins.debugger',
     'sylow.plugins.ai',
     'sylow.plugins.testing',
   }

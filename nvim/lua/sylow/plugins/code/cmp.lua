@@ -44,13 +44,12 @@ return {
         end,
         preselect = cmp.PreselectMode.None,
         sources = cmp.config.sources({
-          { name = 'copilot', priority = 1200 },
-          { name = 'nvim_lsp', priority = 1000 },
-          { name = 'luasnip', priority = 750 },
-          { name = 'buffer', priority = 500 },
-          { name = 'nvim_lua', priority = 400 },
-          { name = 'path', priority = 250 },
+          { name = 'nvim_lsp' },
+          { name = 'luasnip' },
+          { name = 'buffer' },
+          { name = 'nvim_lua' },
           { name = 'emoji' },
+          { name = 'path' },
         }),
         formatting = {
           format = function(entry, item)
@@ -75,7 +74,6 @@ return {
         },
         duplicates = {
           nvim_lsp = 1,
-          lazydev = 1,
           luasnip = 1,
           cmp_tabnine = 1,
           buffer = 1,
