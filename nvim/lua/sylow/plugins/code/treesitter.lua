@@ -55,10 +55,13 @@ return {
         'ninja',
         'rst',
         'rust',
-        'pydoc',
+        'python',
         'ron',
         'javascript',
         'typescript',
+        'bash',
+        'json',
+        'bicep'
       },
       query_linter = {
         enable = true,

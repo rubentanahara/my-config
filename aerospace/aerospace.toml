@@ -59,12 +59,12 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-g" = "exec-and-forget open -a Ghostty"
     "alt-b" = "exec-and-forget open -a 'Brave Browser'"
     "alt-p" = "exec-and-forget open -a Postman"
-    "alt-i" = "exec-and-forget open -a 'Android Studio'"
+    "alt-a" = "exec-and-forget open -a 'Android Studio Preview'"
     "alt-d" = "exec-and-forget open -a DataGrip"
     "alt-s" = "exec-and-forget open -a Discord"
     "alt-n" = "exec-and-forget open -a Notion"
     "alt-w" = "exec-and-forget open -a 'Windows App'"
-    "alt-a" = "exec-and-forget open -a Music"
+    "alt-o" = "exec-and-forget open -a Spotify"
     
     "alt-m" = "fullscreen"
     

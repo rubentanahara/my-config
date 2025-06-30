@@ -1,3 +1,13 @@
+local function splitstr(str)
+  local result = {}
+  for match in (str .. ' '):gmatch('(.-) ') do
+    if match ~= '' then
+      table.insert(result, match)
+    end
+  end
+  return result
+end
+
 ---@param config {type?:string, args?:string[]|fun():string[]?}
 local function get_args(config)
   local args = type(config.args) == 'function' and (config.args() or {}) or config.args or {} --[[@as string[] | string ]]
@@ -11,7 +21,7 @@ local function get_args(config)
       ---@diagnostic disable-next-line: return-type-mismatch
       return new_args
     end
-    return require('dap.utils').splitstr(new_args)
+    return splitstr(new_args) -- Use our custom function instead
   end
   return config
 end
@@ -52,11 +62,6 @@ return {
     },
 
     config = function()
-      -- load mason-nvim-dap here, after all adapters have been setup
-      -- if LazyVim.has('mason-nvim-dap.nvim') then
-      --   require('mason-nvim-dap').setup(LazyVim.opts('mason-nvim-dap.nvim'))
-      -- end
-
       vim.api.nvim_set_hl(0, 'DapStoppedLine', { default = true, link = 'Visual' })
 
       -- setup dap config by VsCode launch.json file
@@ -71,7 +76,7 @@ return {
   -- fancy UI for the debugger
   {
     'rcarriga/nvim-dap-ui',
-    dependencies = { 'nvim-neotest/nvim-nio' },
+    dependencies = { 'nvim-neotest/nvim-nio', 'mfussenegger/nvim-dap' },
     -- stylua: ignore
     keys = {
       { "<leader>du", function() require("dapui").toggle({ }) end, desc = "Dap UI" },

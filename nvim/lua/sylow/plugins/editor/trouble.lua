@@ -1,7 +1,7 @@
 return {
   'folke/trouble.nvim',
   cmd = { 'Trouble' },
-  lazy = 'VeryLazy',
+  event = 'VeryLazy',
   opts = {
     modes = {
       lsp = {

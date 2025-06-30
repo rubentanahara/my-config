@@ -8,6 +8,7 @@ return {
       lua = { 'luacheck' },
       javascript = { 'eslint_d' },
       typescript = { 'eslint_d' },
+      python = {'flake8'}
     }
 
     vim.api.nvim_create_autocmd({ 'BufWritePost' }, {

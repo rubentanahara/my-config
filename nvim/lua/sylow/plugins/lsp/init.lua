@@ -51,9 +51,9 @@ return {
         ensure_installed = {
           'lua_ls', -- lua
           'ts_ls', -- js,js
-          'bacon-ls', -- rust
-          'omnisharp', -- cs
-          'pyright',
+          'rust_analyzer', -- rust
+          'csharp_ls', -- cs
+          'pyright', -- python
         },
         automatic_installation = true,
       })
@@ -66,15 +66,19 @@ return {
           'csharpier', -- cs
           'rustfmt', -- rust
           'ruff',
+          'black', -- python
+          'xmlformatter',
           -- Linters
           'luacheck', -- lua
           'eslint_d', -- js,ts
           'semgrep', -- cs
           'bacon', -- rust
+          'flake8', -- python
           -- Daps
           'js-debug-adapter', -- js,ts
           'netcoredbg', -- cs
           'codelldb', -- rust
+          'debugpy', -- python
         },
       })
     end,
@@ -83,6 +87,7 @@ return {
     'neovim/nvim-lspconfig',
     event = { 'BufReadPre', 'BufNewFile' },
     config = function()
+      vim.lsp.enable('omnisharp')
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('sylow-lsp-attach', { clear = true }),
         callback = function(ev)
