@@ -9,12 +9,12 @@ default-root-container-orientation = 'auto'
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
 [gaps]
-    inner.horizontal = 5
-    inner.vertical = 5
-    outer.left = 5
-    outer.bottom = 5
-    outer.top = 5
-    outer.right = 5
+    inner.horizontal = 0
+    inner.vertical = 0
+    outer.left = 0
+    outer.bottom = 0
+    outer.top = 0
+    outer.right = 0
 
 [key-mapping]
     preset = 'qwerty'
@@ -67,11 +67,8 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-o" = "exec-and-forget open -a Spotify"
     
     "alt-m" = "fullscreen"
-    
     "alt-y" = "macos-native-minimize"
-    
     "alt-shift-q" = "close"
-    
     "alt-shift-r" = "reload-config"
 
 # Asignar aplicaciones a espacios de trabajo específicos

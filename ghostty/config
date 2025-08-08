@@ -1,8 +1,10 @@
 # title = ""
 font-family = FiraCode Nerd Font Mono
-font-size = 16
-background = 181414
+font-size = 16 
+background = 181616
 foreground = f3f3f3
+# background-blur-radius = 20
+# background-opacity = 0.8
 
 cursor-invert-fg-bg = true 
 cursor-style = underline
@@ -16,7 +18,7 @@ macos-icon-frame = chrome
 window-padding-balance = true
 window-padding-x = 0
 window-padding-y = 0
-window-decoration = auto
+window-decoration = true
 
 confirm-close-surface = false
 shell-integration-features = cursor,sudo,no-title

@@ -34,6 +34,11 @@ Thumbs.db
 flutter/
 karabiner/automatic_backups/
 node_modules/
+uv
+jgit/
+neofetch
+sql-studio
+azure-datalake-store
 
 # Keep configurations that should be version controlled
 !.config/starship.toml
