@@ -61,7 +61,9 @@ return {
         'typescript',
         'bash',
         'json',
-        'bicep'
+        'bicep',
+        'xml',
+        'sql'
       },
       query_linter = {
         enable = true,

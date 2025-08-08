@@ -33,9 +33,9 @@ $character"""
 
 # Core prompt symbols
 [character]
-success_symbol = "[❯](purple)"
+success_symbol = "[❯](bold green)"
+vimcmd_symbol = "[❮](yellow)"
 error_symbol = "[❯](red)"
-vimcmd_symbol = "[❮](green)"
 
 [directory]
 style = "fg:#89B4FA bg:#1E1E2E"
