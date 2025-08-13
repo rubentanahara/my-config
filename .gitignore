@@ -2,6 +2,8 @@
 .config/*
 !.config/.gitignore
 
+nvim.normalvim
+
 # Editor configs
 .vscode/
 .idea/
