@@ -57,7 +57,7 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-0" = "balance-sizes"              # Equilibrar tamaños de todas las ventanas
     
     "alt-g" = "exec-and-forget open -a Ghostty"
-    "alt-b" = "exec-and-forget open -a 'Brave Browser'"
+    "alt-b" = "exec-and-forget open -a Arc"
     "alt-p" = "exec-and-forget open -a Postman"
     "alt-a" = "exec-and-forget open -a 'Android Studio Preview'"
     "alt-d" = "exec-and-forget open -a DataGrip"
@@ -73,7 +73,7 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
 # Asignar aplicaciones a espacios de trabajo específicos
 [[on-window-detected]]
-    if.app-id = 'com.brave.Browser'
+    if.app-id = 'com.arc.Browser'
     run = 'move-node-to-workspace 1'
 
 # Asignar aplicaciones de notas al workspace 2

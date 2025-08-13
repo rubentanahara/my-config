@@ -1,24 +1,60 @@
 local M = {}
 
-------------------------------------------
--- Autocommand Utilities
-------------------------------------------
+
+function M.require_module(source)
+	local ok, module_or_err = pcall(require, source)
+	if not ok then
+		vim.notify("Failed to load module '" .. source .. "': " .. tostring(module_or_err), vim.log.levels.ERROR)
+		return nil, tostring(module_or_err)
+	end
+
+	return module_or_err, nil
+end
+
+function M.setup_module(source, module)
+	if type(module.setup) ~= 'function' then
+		vim.notify("Module '" .. source .. "' does not have a setup function", vim.log.levels.WARN)
+		return false
+	end
+
+	local ok, err = pcall(module.setup)
+	if not ok then
+		vim.notify("Failed to initialize module '" .. source .. "': " .. tostring(err), vim.log.levels.ERROR)
+		return false
+	end
+
+	return ok
+end
+
+function M.load_source(source)
+	local module, err = M.require_module(source)
+	if not module then
+		return
+	end
+	return M.setup_module(source, module)
+end
+
+function M.load_sources(sources)
+	vim.loader.enable()
+
+	local success = true
+	for _, source in ipairs(sources) do
+		success = M.load_source(source) and success
+	end
+
+	return success
+end
 
 function M.add_autocmds_to_buffer(augroup, bufnr, autocmds)
-	-- Ensure autocmds is a list
 	if not vim.islist(autocmds) then
 		autocmds = { autocmds }
 	end
 
-	-- Check if autocommands already exist
 	local cmds_found, cmds = pcall(vim.api.nvim_get_autocmds, { group = augroup, buffer = bufnr })
 
-	-- Only add if no existing autocommands were found
 	if not cmds_found or vim.tbl_isempty(cmds) then
-		-- Create augroup if it doesn't exist
 		vim.api.nvim_create_augroup(augroup, { clear = false })
 
-		-- Add each autocommand
 		for _, autocmd in ipairs(autocmds) do
 			local events = autocmd.events
 			autocmd.events = nil
@@ -39,10 +75,6 @@ function M.del_autocmds_from_buffer(augroup, bufnr)
 	end
 end
 
-------------------------------------------
--- Icons and UI Utilities
-------------------------------------------
-
 function M.get_icon(icon_name)
 	local icon_pack = 'icons'
 
@@ -55,10 +87,6 @@ function M.get_icon(icon_name)
 	local icon = M[icon_pack] and M[icon_pack][icon_name] or ''
 	return icon
 end
-
-------------------------------------------
--- Keymapping Utilities
-------------------------------------------
 
 function M.get_mappings_template()
 	local maps = {}
@@ -84,11 +112,8 @@ function M.get_mappings_template()
 end
 
 function M.set_mappings(map_table, base)
-	-- iterate over the first keys for each mode
 	for mode, maps in pairs(map_table) do
-		-- iterate over each keybinding set in the current mode
 		for keymap, options in pairs(maps) do
-			-- build the options for the command accordingly
 			if options then
 				local cmd
 				local keymap_opts = base or {}
@@ -114,13 +139,11 @@ function M.set_mappings(map_table, base)
 			end
 		end
 	end
-	-- if which-key is loaded already, register
 	if package.loaded['which-key'] then
 		M.which_key_register()
 	end
 end
 
---- Register queued which-key mappings.
 function M.which_key_register()
 	if M.which_key_queue then
 		local wk_avail, wk = pcall(require, 'which-key')
@@ -131,7 +154,6 @@ function M.which_key_register()
 	end
 end
 
---- Add syntax highlighting for URLs/URIs
 function M.set_url_effect()
 	-- URL matching regex pattern
 	local url_matcher = '\\v\\c%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)'
@@ -141,16 +163,13 @@ function M.set_url_effect()
 			.. '|\\[[&:#*@~%_\\-=?!+;/.0-9a-z]*\\]|\\{%([&:#*@~%_\\-=?!+;/.0-9a-z]*'
 			.. '|\\{[&:#*@~%_\\-=?!+;/.0-9a-z]*})\\})+'
 
-	-- Clear existing URL highlighting
 	M.delete_url_effect()
 
-	-- Apply highlighting if enabled
 	if vim.g.url_effect_enabled then
 		vim.fn.matchadd('HighlightURL', url_matcher, 15)
 	end
 end
 
---- Remove URL/URI syntax highlighting
 function M.delete_url_effect()
 	for _, match in ipairs(vim.fn.getmatches()) do
 		if match.group == 'HighlightURL' then
@@ -159,19 +178,11 @@ function M.delete_url_effect()
 	end
 end
 
-------------------------------------------
--- Notifications
-------------------------------------------
-
 function M.notify(msg, level, opts)
 	vim.schedule(function()
 		vim.notify(msg, level, vim.tbl_deep_extend('force', { title = 'Notify' }, opts or {}))
 	end)
 end
-
-------------------------------------------
--- Plugin Management
-------------------------------------------
 
 function M.is_available(plugin)
 	local lazy_config_avail, lazy_config = pcall(require, 'lazy.core.config')
@@ -192,10 +203,6 @@ function M.get_plugin_opts(plugin)
 
 	return opts
 end
-
-------------------------------------------
--- File Operations
-------------------------------------------
 
 function M.is_big_file(bufnr)
 	bufnr = bufnr or 0

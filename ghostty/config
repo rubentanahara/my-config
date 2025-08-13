@@ -1,10 +1,8 @@
-# title = ""
+title = ""
 font-family = FiraCode Nerd Font Mono
 font-size = 16 
 background = 181616
 foreground = f3f3f3
-# background-blur-radius = 20
-# background-opacity = 0.8
 
 cursor-invert-fg-bg = true 
 cursor-style = underline
