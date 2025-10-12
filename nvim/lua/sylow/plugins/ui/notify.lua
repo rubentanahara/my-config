@@ -5,7 +5,7 @@ return {
   event = 'User BaseDefered',
   opts = function()
     return {
-      timeout = 2500,
+      timeout = 3500,
       fps = 144,
       render = 'wrapped-compact',
       stages = 'slide',

@@ -1,0 +1,145 @@
+-- Local helper functions for better organization
+local function setup_lint()
+  local lint = require('lint')
+  
+  return {
+    linters_by_ft = {
+      lua = { 'selene' }, -- More modern alternative to luacheck
+      luadoc = { 'selene' },
+      vim = { 'vint' },
+      vimdoc = { 'vint' },
+      c_sharp = { 'dotnet-format' }, -- Requires dotnet format
+      ninja = { 'ninja' }, -- ninja syntax checker
+      rst = { 'rstcheck' },
+      rust = { 'clippy' }, -- clippy is usually sufficient
+      python = { 'flake8', 'mypy' }, -- Add type checking with mypy
+      ron = { 'ron' }, -- RON format linter
+      javascript = { 'eslint_d' },
+      typescript = { 'eslint_d' },
+      bash = { 'shellcheck' },
+      json = { 'jsonlint' },
+      bicep = { 'bicep' }, -- Azure Bicep linter
+      xml = { 'xmllint' },
+      sql = { 'sqlfluff' },
+      yaml = { 'yamllint' },
+      markdown = { 'markdownlint' },
+      dockerfile = { 'hadolint' },
+    },
+  }
+end
+
+-- Lint autocmd configuration
+local function setup_lint_autocmds()
+  local lint_augroup = vim.api.nvim_create_augroup('LintConfig', { clear = true })
+  
+  -- Lint on save
+  vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
+    group = lint_augroup,
+    callback = function()
+      require('lint').try_lint()
+    end,
+    desc = 'Run linter on save',
+  })
+
+  -- Lint on entering buffer (optional)
+  vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
+    group = lint_augroup,
+    callback = function()
+      -- Only lint if file has been modified
+      if vim.bo.modified then
+        vim.defer_fn(function()
+          require('lint').try_lint()
+        end, 100)
+      end
+    end,
+    desc = 'Run linter on buffer enter if modified',
+  })
+
+  -- Lint after text changes (debounced)
+  vim.api.nvim_create_autocmd({ 'TextChanged', 'TextChangedI' }, {
+    group = lint_augroup,
+    callback = function()
+      if vim.g.lint_on_change then
+        vim.defer_fn(function()
+          require('lint').try_lint()
+        end, 500)
+      end
+    end,
+    desc = 'Run linter on text change (debounced)',
+  })
+end
+
+-- Custom linter configurations (optional)
+local function setup_custom_linters()
+  local lint = require('lint')
+  
+  -- Custom eslint_d configuration
+  lint.linters.eslint_d = lint.linters.eslint_d or {}
+  lint.linters.eslint_d.cmd = 'eslint_d'
+  lint.linters.eslint_d.args = {
+    '--format', 'json',
+    '--stdin',
+    '--stdin-filename', '%filename'
+  }
+  lint.linters.eslint_d.stream = 'stdout'
+  lint.linters.eslint_d.ignore_exitcode = true
+  lint.linters.eslint_d.parser = function(output, bufnr)
+    local decoded = vim.json.decode(output)
+    if not decoded or not decoded[1] then
+      return {}
+    end
+    
+    local messages = decoded[1].messages
+    local diagnostics = {}
+    
+    for _, message in ipairs(messages) do
+      table.insert(diagnostics, {
+        lnum = (message.line or 1) - 1,
+        col = (message.column or 1) - 1,
+        end_lnum = (message.endLine or message.line or 1) - 1,
+        end_col = (message.endColumn or message.column or 1) - 1,
+        severity = message.severity == 2 and vim.diagnostic.severity.ERROR
+                 or message.severity == 1 and vim.diagnostic.severity.WARN
+                 or vim.diagnostic.severity.INFO,
+        message = message.message,
+        source = 'eslint',
+        code = message.ruleId,
+      })
+    end
+    
+    return diagnostics
+  end
+
+  -- Custom flake8 configuration
+  lint.linters.flake8 = lint.linters.flake8 or {}
+  lint.linters.flake8.args = {
+    '--format', 'default',
+    '--stdin-display-name', '%filename',
+    '-'
+  }
+end
+
+return {
+  {
+    'mfussenegger/nvim-lint',
+    event = { 'BufReadPre', 'BufNewFile', 'BufWritePost' },
+    opts = setup_lint,
+    config = function(_, opts)
+      local lint = require('lint')
+      
+      -- Apply linter configurations
+      for ft, linters in pairs(opts.linters_by_ft) do
+        lint.linters_by_ft[ft] = linters
+      end
+      
+      -- Setup custom linters
+      setup_custom_linters()
+      
+      -- Setup autocmds
+      setup_lint_autocmds()
+      
+      -- Optional: Global lint configuration
+      vim.g.lint_on_change = false -- Set to true for real-time linting
+    end,
+  },
+}
