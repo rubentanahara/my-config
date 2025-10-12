@@ -212,8 +212,8 @@ maps.n[']z'] = { ']z', desc = 'Go to end of current fold' }
 -- Window splitting
 maps.n['ss'] = { '<cmd>split<cr>', desc = 'Split horizontal' }
 maps.n['sv'] = { '<cmd>vsplit<cr>', desc = 'Split vertical' }
-maps.n['[d'] = { vim.diagnostic.goto_prev, desc = 'Previous diagnostic' }
-maps.n[']d'] = { vim.diagnostic.goto_next, desc = 'Next diagnostic' }
+maps.n['[d'] = { vim.diagnostic.get_prev, desc = 'Previous diagnostic' }
+maps.n[']d'] = { vim.diagnostic.get_next, desc = 'Next diagnostic' }
 maps.n['gl'] = { vim.diagnostic.open_float, desc = 'Show diagnostic' }
 maps.n['<leader>xd'] = { vim.diagnostic.open_float, desc = 'Line diagnostics' }
 
