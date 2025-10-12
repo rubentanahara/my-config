@@ -1,26 +1,25 @@
-title = ""
-font-family = FiraCode Nerd Font Mono
-font-size = 14 
-background = 181616
-foreground = f3f3f3
+title="You can do it"
+font-family=FiraCode Nerd Font Mono
+font-size=16
+background=181616
+foreground=f3f3f3
 
-cursor-invert-fg-bg = true 
+cursor-invert-fg-bg=true 
 cursor-style = underline
-cursor-style-blink = true
-mouse-hide-while-typing = true
+cursor-style-blink=true
+mouse-hide-while-typing=true
 
-
-macos-option-as-alt = true
-macos-icon-frame = chrome
+macos-option-as-alt=true
+macos-icon-frame=chrome
 
 window-padding-balance = true
-window-padding-x = 0
-window-padding-y = 0
-window-decoration = true
+window-padding-x=4
+window-padding-y=4
+window-decoration=true
 
-confirm-close-surface = false
-shell-integration-features = cursor,sudo,no-title
-shell-integration = zsh
+confirm-close-surface=false
+shell-integration-features=cursor,sudo,no-title
+shell-integration=zsh
 
-keybind = cmd+s>r=reload_config
-keybind = cmd+s>x=close_surface
+keybind=cmd+s>r=reload_config
+keybind=cmd+s>x=close_surface
