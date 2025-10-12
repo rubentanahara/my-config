@@ -180,16 +180,9 @@ return {
         },
         pickers = {
           find_files = {
-            theme = 'dropdown',
             file_ignore_patterns = { 'node_modules', '.git', '.venv' },
             hidden = true,
             find_command = find_command,
-          },
-          git_files = {
-            theme = 'dropdown',
-          },
-          buffers = {
-            theme = 'dropdown',
           },
         },
         extensions = {
@@ -205,6 +198,7 @@ return {
       telescope.load_extension('notify')
       telescope.load_extension('fzf')
       telescope.load_extension('ui-select')
+      telescope.load_extension('flutter')
     end,
   },
 }
