@@ -1,27 +1,13 @@
-local M = {}
 local utils = require('sylow.core.utils')
-
---- Local reference to vim API functions for performance
-local api = vim.api
+local lsp_utils = require('sylow.config.lsp')
 local fn = vim.fn
 local opt_local = vim.opt_local
 local bo = vim.bo
-
-local function create_augroup(name)
-  return api.nvim_create_augroup('sylow_' .. name, { clear = true })
-end
-
-local function create_autocmd(event, opts)
-  opts.group = opts.group or create_augroup(opts.desc:gsub('%s+', '_'):lower())
-  return api.nvim_create_autocmd(event, opts)
-end
+local cmd = vim.cmd
 
 local options = {
-  -- Filetypes to enable spell checking and wrapping
   text_filetypes = { 'text', 'plaintex', 'typst', 'gitcommit', 'markdown' },
-  -- Filetypes to exclude from view saving
   view_ignore_filetypes = { 'gitcommit', 'gitrebase', 'svg', 'hgcommit' },
-  -- Filetypes to close with q
   close_with_q_filetypes = {
     'PlenaryTestPopup',
     'checkhealth',
@@ -40,261 +26,127 @@ local options = {
     'startuptime',
     'tsplayground',
   },
-  -- Filetypes to unlist from buffer list
   unlist_filetypes = { 'man', 'help' },
+  indentscope_ignored_filetypes = {
+    'aerial',
+    'dashboard',
+    'help',
+    'lazy',
+    'leetcode.nvim',
+    'mason',
+    'neo-tree',
+    'NvimTree',
+    'neogitstatus',
+    'notify',
+    'startify',
+    'toggleterm',
+    'Trouble',
+    'calltree',
+    'coverage',
+  },
 }
 
-local function setup_filetype_autocmds()
-  -- JSON files conceallevel
-  create_autocmd('FileType', {
-    desc = 'Fix conceallevel for JSON files',
-    pattern = { 'json', 'jsonc', 'json5' },
-    callback = function()
-      opt_local.conceallevel = 0
-    end,
-  })
+utils.create_autocmd('LspAttach', {
+  desc = 'Apply default LSP mappings when an LSP server attaches to a buffer',
+  callback = function(e)
+    local client = vim.lsp.get_client_by_id(e.data.client_id)
+    if client ~= nil then
+      lsp_utils.apply_user_lsp_mappings(client, e.buf)
+    end
+  end
+})
 
-  -- Text file settings
-  create_autocmd('FileType', {
-    desc = 'Enable wrapping and spell checking in text filetypes',
-    pattern = options.text_filetypes,
-    callback = function()
-      opt_local.wrap = true
-      opt_local.spell = true
-    end,
-  })
+utils.create_autocmd({ 'FileType' }, {
+  desc = 'Disable indentscope for certain filetypes',
+  callback = function()
+    if vim.tbl_contains(options.indentscope_ignored_filetypes, bo.filetype) then
+      vim.b.miniindentscope_disable = true
+    end
+  end,
+})
 
-  -- Quickfix and help settings - close with q
-  create_autocmd('FileType', {
-    desc = 'Make certain filetypes closable with q and unlist them',
-    pattern = options.close_with_q_filetypes,
-    callback = function(event)
-      bo[event.buf].buflisted = false
-      vim.keymap.set('n', 'q', function()
-        vim.cmd('close')
-        pcall(api.nvim_buf_delete, event.buf, { force = true })
-      end, {
+utils.create_autocmd('FileType', {
+  desc = 'Make certain filetypes closable with q and unlist them',
+  pattern = options.close_with_q_filetypes,
+  callback = function(event)
+    bo[event.buf].buflisted = false  -- Corrected this line
+    vim.keymap.set('n', 'q', function()
+      vim.cmd('close')
+      pcall(vim.api.nvim_buf_delete, event.buf, { force = true })
+    end, {
         buffer = event.buf,
         silent = true,
         desc = 'Quit buffer',
       })
-    end,
-  })
+  end,
+})
 
-  -- Unlist specific buffer types
-  create_autocmd('FileType', {
-    desc = 'Unlist specific buffer types from buffer list',
-    pattern = options.unlist_filetypes,
-    callback = function(event)
-      bo[event.buf].buflisted = false
-    end,
-  })
+utils.create_autocmd('CmdlineEnter', {
+  desc = 'Hide cmd line',
+  pattern = { '/', '?' },
+  callback = function()
+    vim.opt.cmdheight = 0
+  end,
+})
 
-  return true
-end
+utils.create_autocmd('CmdlineLeave', {
+  desc = 'Use hlslens after find',
+  pattern = { '/', '?' },
+  callback = function()
+    vim.opt.cmdheight = 0
+    vim.defer_fn(utils.start_hlslens, 10)
+  end,
+})
 
-local function setup_buffer_autocmds()
-  -- File change detection
-  create_autocmd({ 'FocusGained', 'TermClose', 'TermLeave' }, {
-    desc = 'Check if files need to be reloaded when changed externally',
-    callback = function()
-      if vim.o.buftype ~= 'nofile' then
-        vim.cmd('checktime')
-      end
-    end,
-  })
+utils.create_autocmd('FileType', {
+  desc = "Hide neo-tree buffers from the buffer list",
+  pattern = 'neo-tree',
+  callback = function(opts)
+    vim.schedule(function()
+      vim.api.nvim_buf_set_option(opts.buf, 'buflisted', false)
+    end)
+  end,
+})
 
-  -- View saving
-  create_autocmd({ 'BufWinLeave', 'BufWritePost', 'WinLeave' }, {
-    desc = 'Save view with mkview for real files',
-    callback = function(args)
-      if vim.b[args.buf].view_activated then
-        vim.cmd.mkview { mods = { emsg_silent = true } }
-      end
-    end,
-  })
+utils.create_autocmd('FileType', {
+  desc = 'Fix conceallevel for JSON files',
+  pattern = { 'json', 'jsonc', 'json5' },
+  callback = function()
+    opt_local.conceallevel = 0
+  end,
+})
 
-  -- View loading
-  create_autocmd('BufWinEnter', {
-    desc = 'Load view if available and enable view saving for real files',
-    callback = function(args)
-      if not vim.b[args.buf].view_activated then
-        local filetype = api.nvim_get_option_value('filetype', { buf = args.buf })
-        local buftype = api.nvim_get_option_value('buftype', { buf = args.buf })
-        if
-          buftype == ''
-          and filetype
-          and filetype ~= ''
-          and not vim.tbl_contains(options.view_ignore_filetypes, filetype)
-        then
-          vim.b[args.buf].view_activated = true
-          vim.cmd.loadview { mods = { emsg_silent = true } }
-        end
-      end
-    end,
-  })
+utils.create_autocmd('FileType', {
+  desc = 'Enable wrapping and spell checking in text filetypes',
+  pattern = options.text_filetypes,
+  callback = function()
+    opt_local.wrap = true
+    opt_local.spell = true
+  end,
+})
 
-  create_autocmd({
-    'WinScrolled',
-    'BufWinEnter',
-    'CursorHold',
-    'InsertLeave',
-    'BufModifiedSet',
-  }, {
-    desc = 'Barbecue show modified',
-    callback = function()
-      if utils.is_available('barbecue.ui') then
-        require('barbecue.ui').update()
-      end
-    end,
-  })
+utils.create_autocmd('VimResized', {
+  desc = 'Handles window resizing events and ensures the dashboard gets properly refreshed',
+  pattern = '*',
+  callback = function()
+    if bo.filetype == 'dashboard' then
+      cmd('doautocmd FileType dashboard')
+    end
+  end,
+})
 
-  vim.api.nvim_create_autocmd('FileType', {
-    pattern = 'dashboard',
-    callback = function()
-      vim.opt.cursorline = false
-      vim.opt.cursorcolumn = false
-      vim.opt.fillchars:append('eob: ')
-    end,
-  })
+utils.create_autocmd('TextYankPost', {
+  desc = 'Highlight text on yank',
+  callback = function()
+    (vim.hl or vim.highlight).on_yank()
+  end,
+})
 
-  vim.api.nvim_create_autocmd('VimResized', {
-    pattern = '*',
-    callback = function()
-      if vim.bo.filetype == 'dashboard' then
-        vim.cmd('doautocmd FileType dashboard')
-      end
-    end,
-  })
-
-  -- Go to last location when opening a buffer
-  create_autocmd('BufReadPost', {
-    desc = 'Return to last position in file',
-    callback = function(event)
-      local buf = event.buf
-      if vim.tbl_contains(options.view_ignore_filetypes, vim.bo[buf].filetype) or vim.b[buf].last_position_jump then
-        return
-      end
-
-      vim.b[buf].last_position_jump = true
-      local mark = api.nvim_buf_get_mark(buf, '"')
-      local line_count = api.nvim_buf_line_count(buf)
-      if mark[1] > 0 and mark[1] <= line_count then
-        pcall(api.nvim_win_set_cursor, 0, mark)
-      end
-    end,
-  })
-
-  -- Create parent directories when saving a file
-  create_autocmd('BufWritePre', {
-    desc = "Create parent directories when saving a file if they don't exist",
-    callback = function(event)
-      if event.match:match('^%w%w+:[\\/][\\/]') then
-        return
-      end
-
-      local file = vim.uv.fs_realpath(event.match) or event.match
-      fn.mkdir(fn.fnamemodify(file, ':p:h'), 'p')
-    end,
-  })
-
-  return true
-end
-
-local function setup_ui_autocmds()
-  -- URL Highlighting
-  api.nvim_set_hl(0, 'HighlightURL', { underline = true })
-
-  -- Highlight on yank
-  create_autocmd('TextYankPost', {
-    desc = 'Highlight text on yank',
-    callback = function()
-      (vim.hl or vim.highlight).on_yank()
-    end,
-  })
-
-  -- Window resizing
-  create_autocmd('VimResized', {
-    desc = 'Equalize window sizes when terminal is resized',
-    callback = function()
-      local current_tab = fn.tabpagenr()
-      vim.cmd('tabdo wincmd =')
-      vim.cmd('tabnext ' .. current_tab)
-    end,
-  })
-
-  -- Terminal behavior
-  create_autocmd('TermOpen', {
-    desc = 'Set terminal buffer options',
-    callback = function()
-      opt_local.number = false
-      opt_local.relativenumber = false
-      opt_local.signcolumn = 'no'
-      opt_local.spell = false
-      vim.cmd('startinsert')
-    end,
-  })
-
-  -- Terminal exit
-  create_autocmd('BufLeave', {
-    desc = 'Close terminal buffer on process exit',
-    pattern = 'term://*',
-    callback = function()
-      vim.cmd('stopinsert')
-    end,
-  })
-
-  create_autocmd({ 'InsertEnter', 'WinLeave' }, {
-    desc = 'Disable cursor line in inactive windows',
-    callback = function()
-      if vim.bo.buftype == '' then
-        opt_local.cursorline = false
-      end
-    end,
-  })
-
-  return true
-end
-
-local function setup_diagnostic_autocmds()
-  -- Update diagnostics in insert mode (disabled by default)
-  create_autocmd('DiagnosticChanged', {
-    desc = 'Update diagnostics when changed',
-    callback = function()
-      if not vim.diagnostic.is_enabled() or vim.api.nvim_get_mode().mode:match('i') then
-        return
-      end
-      vim.diagnostic.setloclist({ open = false })
-    end,
-  })
-
-  return true
-end
-
-function M.setup()
-  local success = true
-
-  local okFileTypeAutocmds = setup_filetype_autocmds()
-  if not okFileTypeAutocmds then
-    vim.notify('Failed to setup_filetype_autocmds', vim.log.levels.ERROR)
-  end
-
-  local okBufferAutoCmds = setup_buffer_autocmds()
-  if not okBufferAutoCmds then
-    vim.notify('Failed to setup_buffer_autocmds ', vim.log.levels.ERROR)
-  end
-
-  local okUIAutocmds = setup_ui_autocmds()
-  if not okUIAutocmds then
-    vim.notify('Failed to setup_buffer_autocmds', vim.log.levels.ERROR)
-  end
-
-  local okDiagnosticAutocmds = setup_diagnostic_autocmds()
-  if not okDiagnosticAutocmds then
-    vim.notify('Failed to setup_diagnostic_autocmds', vim.log.levels.ERROR)
-  end
-
-  return success
-end
-
-return M
+utils.create_autocmd('VimResized', {
+  desc = 'Equalize window sizes when terminal is resized',
+  callback = function()
+    local current_tab = fn.tabpagenr()
+    cmd('tabdo wincmd =')
+    cmd('tabnext ' .. current_tab)
+  end,
+})
