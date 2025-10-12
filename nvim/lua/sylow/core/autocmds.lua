@@ -274,23 +274,23 @@ end
 function M.setup()
   local success = true
 
-  local isOkFileTypeAutocmds = setup_filetype_autocmds()
-  if not isOkFileTypeAutocmds then
+  local okFileTypeAutocmds = setup_filetype_autocmds()
+  if not okFileTypeAutocmds then
     vim.notify('Failed to setup_filetype_autocmds', vim.log.levels.ERROR)
   end
 
-  local isOkBufferAutoCmds = setup_buffer_autocmds()
-  if not isOkBufferAutoCmds then
+  local okBufferAutoCmds = setup_buffer_autocmds()
+  if not okBufferAutoCmds then
     vim.notify('Failed to setup_buffer_autocmds ', vim.log.levels.ERROR)
   end
 
-  local isOkUIAutocmds = setup_ui_autocmds()
-  if not isOkUIAutocmds then
+  local okUIAutocmds = setup_ui_autocmds()
+  if not okUIAutocmds then
     vim.notify('Failed to setup_buffer_autocmds', vim.log.levels.ERROR)
   end
 
-  local isOkDiagnosticAutocmds = setup_diagnostic_autocmds()
-  if not isOkDiagnosticAutocmds then
+  local okDiagnosticAutocmds = setup_diagnostic_autocmds()
+  if not okDiagnosticAutocmds then
     vim.notify('Failed to setup_diagnostic_autocmds', vim.log.levels.ERROR)
   end
 

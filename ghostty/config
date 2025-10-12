@@ -1,6 +1,6 @@
 title = ""
 font-family = FiraCode Nerd Font Mono
-font-size = 16 
+font-size = 14 
 background = 181616
 foreground = f3f3f3
 
@@ -9,7 +9,7 @@ cursor-style = underline
 cursor-style-blink = true
 mouse-hide-while-typing = true
 
-macos-titlebar-style = hidden
+
 macos-option-as-alt = true
 macos-icon-frame = chrome
 

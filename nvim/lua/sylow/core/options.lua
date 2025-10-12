@@ -4,6 +4,12 @@ local opt = vim.opt
 local g = vim.g
 
 local function set_options()
+
+	function _G.statusLine()
+		return g.flutter_tools_decorations.app_version
+	end
+
+	vim.opt.statusline = '%!v:statusLine()'
   -- Globals
   vim.o.background = 'dark' -- Set the overall color theme to dark mode
   vim.opt.updatetime = 200

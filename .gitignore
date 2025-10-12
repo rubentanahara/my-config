@@ -37,10 +37,13 @@ flutter/
 karabiner/automatic_backups/
 node_modules/
 uv
-jgit/
+jgit
 neofetch
 sql-studio
 azure-datalake-store
+opencode
+neofetch
+
 
 # Keep configurations that should be version controlled
 !.config/starship.toml
