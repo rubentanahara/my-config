@@ -1,4 +1,4 @@
-local utils = require('sylow.core.utils')
+local utils = require('sylow.utils')
 
 return {
   'rcarriga/nvim-notify',

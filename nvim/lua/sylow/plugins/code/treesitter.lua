@@ -1,4 +1,4 @@
-local utils = require('sylow.core.utils')
+local utils = require('sylow.utils')
 
 local function setup_treesitter()
   return {
@@ -32,6 +32,18 @@ local function setup_treesitter()
       'ron',
       'javascript',
       'typescript',
+      'toml',
+      'yaml',
+      'markdown',
+      'markdown_inline',
+      'css',
+      'html',
+      'scss',
+      'http',
+      'go',
+      'terraform',
+      'dockerfile',
+      'gitignore',
       'bash',
       'json',
       'bicep',

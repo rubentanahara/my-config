@@ -1,5 +1,5 @@
-local utils = require('sylow.core.utils')
-local icons = require('sylow.core.icons')
+local utils = require('sylow.utils')
+local icons = require('sylow.utils.icons')
 
 local function has_words_before()
   local line, col = unpack(vim.api.nvim_win_get_cursor(0))
