@@ -76,9 +76,8 @@ local function initialize_lazy(lazy_path)
       'sylow.plugins.code',
       'sylow.plugins.debugger',
       'sylow.plugins.lsp',
-      'sylow.plugins.langs'
-      -- 'sylow.plugins.tools',
-      -- 'sylow.plugins.testing',
+      'sylow.plugins.langs',
+      'sylow.plugins.testing',
     }
 
     for _, category in ipairs(plugin_categories) do
