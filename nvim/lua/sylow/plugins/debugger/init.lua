@@ -60,31 +60,7 @@ local function setup_language_debuggers()
   local dap = require('dap')
   local is_windows = vim.fn.has('win32') == 1
 
-  local mason_path = vim.fn.stdpath("data") .. "/mason/packages/netcoredbg/netcoredbg"
-
   require('netcoredbg-macOS-arm64').setup(dap)
-
-  -- local netcoredbg_adapter = {
-  --   type = "executable",
-  --   command = mason_path,
-  --   args = { "--interpreter=vscode" },
-  -- }
-  -- dap.adapters.netcoredbg = netcoredbg_adapter -- needed for normal debugging
-  -- dap.adapters.coreclr = netcoredbg_adapter    -- needed for unit test debugging
-  -- -- C#
-  -- dap.configurations.cs = {
-  --   {
-  --     type = "coreclr",
-  --     name = "launch - netcoredbg",
-  --     request = "launch",
-  --     program = function()
-  --       return debugger_utils.build_dll_path()
-  --     end,
-  --     cwd = "${workspaceFolder}",
-  --   },
-  -- }
-  -- dap.configurations.fsharp = dap.configurations.cs
-  -- dap.configurations.vb = dap.configurations.cs
 
   -- Python
   dap.adapters.python = {
