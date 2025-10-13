@@ -54,7 +54,7 @@ utils.create_autocmd('LspAttach', {
     if client ~= nil then
       lsp_utils.apply_user_lsp_mappings(client, e.buf)
     end
-  end
+  end,
 })
 
 utils.create_autocmd({ 'FileType' }, {
@@ -100,7 +100,7 @@ utils.create_autocmd('CmdlineLeave', {
 })
 
 utils.create_autocmd('FileType', {
-  desc = "Hide neo-tree buffers from the buffer list",
+  desc = 'Hide neo-tree buffers from the buffer list',
   pattern = 'neo-tree',
   callback = function(opts)
     vim.schedule(function()
