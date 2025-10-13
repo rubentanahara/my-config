@@ -160,9 +160,9 @@ return {
     Unit = ' ',
     Value = ' ',
     Variable = ' ',
-   },
+  },
 
-   LSP_SERVERS_ICONS = {
+  LSP_SERVERS_ICONS = {
     lua_language_server = '',
     vimls = '',
     pyright = '',
@@ -183,10 +183,10 @@ return {
     htmlcssls = '',
     cssmodules_ls = '',
     intelephense = '',
-   },
+  },
 
-   -- Others
-   Vim = ' ',
-   Lazy = '💤',
-   Copilot = ' ',
- }
+  -- Others
+  Vim = ' ',
+  Lazy = '💤',
+  Copilot = ' ',
+}

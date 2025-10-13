@@ -1,5 +1,5 @@
-local utils = require('sylow.core.utils')
-local lsp_utils = require('sylow.config.lsp')
+local utils = require('sylow.utils')
+local lsp_utils = require('sylow.utils.lsp')
 local fn = vim.fn
 local opt_local = vim.opt_local
 local bo = vim.bo
@@ -50,6 +50,7 @@ utils.create_autocmd('LspAttach', {
   desc = 'Apply default LSP mappings when an LSP server attaches to a buffer',
   callback = function(e)
     local client = vim.lsp.get_client_by_id(e.data.client_id)
+    -- print(client.name)
     if client ~= nil then
       lsp_utils.apply_user_lsp_mappings(client, e.buf)
     end
@@ -69,15 +70,15 @@ utils.create_autocmd('FileType', {
   desc = 'Make certain filetypes closable with q and unlist them',
   pattern = options.close_with_q_filetypes,
   callback = function(event)
-    bo[event.buf].buflisted = false  -- Corrected this line
+    bo[event.buf].buflisted = false -- Corrected this line
     vim.keymap.set('n', 'q', function()
       vim.cmd('close')
       pcall(vim.api.nvim_buf_delete, event.buf, { force = true })
     end, {
-        buffer = event.buf,
-        silent = true,
-        desc = 'Quit buffer',
-      })
+      buffer = event.buf,
+      silent = true,
+      desc = 'Quit buffer',
+    })
   end,
 })
 

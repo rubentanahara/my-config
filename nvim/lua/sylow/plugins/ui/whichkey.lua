@@ -1,5 +1,5 @@
-local utils = require('sylow.core.utils')
-local lsp_utils = require('sylow.config.lsp')
+local utils = require('sylow.utils')
+local lsp_utils = require('sylow.utils.lsp')
 local get_icon = utils.get_icon
 
 return { 

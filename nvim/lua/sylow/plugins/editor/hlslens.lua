@@ -1,4 +1,4 @@
-local utils = require('sylow.core.utils')
+local utils = require('sylow.utils')
 
 local function execute_normal_n(count)
   vim.cmd(('execute("normal! " . %d . "n")'):format(count or vim.v.count1))

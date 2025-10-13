@@ -1,16 +1,8 @@
-local utils = require("sylow.core.utils")
+local utils = require('sylow.utils')
 
 local LAZY_PATH = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 local LAZY_REPO = 'https://github.com/folke/lazy.nvim.git'
 local LAZY_ROCKS_ENABLED = vim.fn.executable('luarocks') == 1
-
-local vim_version = vim.version()
-if vim_version.major < 0 or (vim_version.major == 0 and vim_version.minor < 8) then
-  vim.api.nvim_err_writeln('Neovim 0.8 or higher is required for this configuration')
-  return
-end
-
--- Disabled built-in plugins
 local DISABLED_PLUGINS = {
   'gzip',
   'tarPlugin',
@@ -31,7 +23,7 @@ local function clone_lazy()
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({
       { 'Failed to clone lazy.nvim:\n', 'ErrorMsg' },
-      { output, 'WarningMsg' },
+      { output,                         'WarningMsg' },
       { '\nPress any key to exit...' },
     }, true, {})
     vim.fn.getchar()
@@ -42,7 +34,7 @@ local function clone_lazy()
 end
 
 local function setup_post_install_loads(plugins)
-  local original_cmdheight = vim.opt.cmdheight:get()
+  local original_cmdheight = vim.opt.cmdheight;
   vim.opt.cmdheight = 1
 
   vim.api.nvim_create_autocmd('User', {
@@ -84,6 +76,7 @@ local function initialize_lazy(lazy_path)
       'sylow.plugins.code',
       'sylow.plugins.debugger',
       'sylow.plugins.lsp',
+      'sylow.plugins.langs'
       -- 'sylow.plugins.tools',
       -- 'sylow.plugins.testing',
     }
@@ -105,7 +98,7 @@ local function initialize_lazy(lazy_path)
     },
     checker = {
       enabled = false, -- check for plugin updates periodically turn off
-      notify = true, -- notify on update
+      notify = false,  -- notify on update
     },
     rocks = { enabled = LAZY_ROCKS_ENABLED },
   }

@@ -1,4 +1,4 @@
-local utils = require('sylow.core.utils')
+local utils = require('sylow.utils')
 local get_icon = utils.get_icon
 
 local mode = {
@@ -100,9 +100,9 @@ return -- Status line
       lualine_z = {
         function()
           -- 12-hour format with AM/PM
-          return ' ' .. os.date('%I:%M %p')
+          -- return ' ' .. os.date('%I:%M %p')
           -- 24 format
-          -- return " " .. os.date("%R")
+          return " " .. os.date("%R")
         end,
       },
     },

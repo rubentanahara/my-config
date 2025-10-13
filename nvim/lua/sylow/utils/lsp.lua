@@ -1,39 +1,36 @@
-local utils = require('sylow.core.utils')
+local utils = require('sylow.utils')
+local ui = require('sylow.utils.ui')
 local is_available = utils.is_available
 local get_icon = utils.get_icon
 
 local M = {}
 
 local function get_lsp_mappings(client, bufnr)
-  -- Helper function to check if any active LSP clients
-  -- given a filter provide a specific capability.
-  -- @param capability string The server capability to check for (example: "documentFormattingProvider").
-  -- @param filter vim.lsp.get_clients.filter|nil A valid get_clients filter (see function docs).
-  -- @return boolean # `true` if any of the clients provide the capability.
   local function has_capability(capability, filter)
     for _, lsp_client in ipairs(vim.lsp.get_clients(filter)) do
-      if lsp_client.supports_method(capability) then
+      if lsp_client.supports_method(capability, '') then
         return true
       end
     end
     return false
   end
 
-  local lsp_mappings = require('sylow.core.utils').get_mappings_template()
+  local lsp_mappings = require('sylow.utils').get_mappings_template()
 
-  -- Diagnostics
   lsp_mappings.n['<leader>ld'] = {
     function()
       vim.diagnostic.open_float()
     end,
     desc = 'Hover diagnostics',
   }
+
   lsp_mappings.n['[d'] = {
     function()
       vim.diagnostic.jump({ count = -1 })
     end,
     desc = 'Previous diagnostic',
   }
+
   lsp_mappings.n[']d'] = {
     function()
       vim.diagnostic.jump({ count = 1 })
@@ -41,13 +38,13 @@ local function get_lsp_mappings(client, bufnr)
     desc = 'Next diagnostic',
   }
 
-  -- Diagnostics
   lsp_mappings.n['gl'] = {
     function()
       vim.diagnostic.open_float()
     end,
     desc = 'Hover diagnostics',
   }
+
   if is_available('telescope.nvim') then
     lsp_mappings.n['<leader>lD'] = {
       function()
@@ -57,21 +54,18 @@ local function get_lsp_mappings(client, bufnr)
     }
   end
 
-  -- LSP info
   if is_available('mason-lspconfig.nvim') then
     lsp_mappings.n['<leader>li'] = { '<cmd>LspInfo<cr>', desc = 'LSP information' }
   end
 
-  -- Code actions
   lsp_mappings.n['<leader>la'] = {
     function()
       vim.lsp.buf.code_action()
     end,
     desc = 'LSP code action',
   }
-  lsp_mappings.v['<leader>la'] = lsp_mappings.n['<leader>la']
 
-  -- Codelens
+  lsp_mappings.v['<leader>la'] = lsp_mappings.n['<leader>la']
   utils.add_autocmds_to_buffer('lsp_codelens_refresh', bufnr, {
     events = { 'InsertLeave' },
     desc = 'Refresh codelens',
@@ -97,9 +91,10 @@ local function get_lsp_mappings(client, bufnr)
     end,
     desc = 'LSP CodeLens run',
   }
+
   lsp_mappings.n['<leader>uL'] = {
     function()
-      -- ui.toggle_codelens()
+      ui.toggle_codelens()
     end,
     desc = 'CodeLens',
   }
@@ -111,23 +106,21 @@ local function get_lsp_mappings(client, bufnr)
     end,
     desc = 'Format buffer',
   }
+
   lsp_mappings.v['<leader>lf'] = lsp_mappings.n['<leader>lf']
 
-  -- Formatting (command)
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function()
     vim.lsp.buf.format(M.format_opts)
   end, { desc = 'Format file with LSP' })
 
-  -- Autoformatting (autocmd)
   local autoformat = M.formatting.format_on_save
   local filetype = vim.api.nvim_get_option_value('filetype', { buf = bufnr })
 
-  -- guard clauses
   local is_autoformat_enabled = autoformat.enabled
   local is_filetype_allowed = vim.tbl_isempty(autoformat.allow_filetypes or {})
-  or vim.tbl_contains(autoformat.allow_filetypes, filetype)
+      or vim.tbl_contains(autoformat.allow_filetypes, filetype)
   local is_filetype_ignored = vim.tbl_isempty(autoformat.ignore_filetypes or {})
-  or not vim.tbl_contains(autoformat.ignore_filetypes, filetype)
+      or not vim.tbl_contains(autoformat.ignore_filetypes, filetype)
 
   if is_autoformat_enabled and is_filetype_allowed and is_filetype_ignored then
     utils.add_autocmds_to_buffer('lsp_auto_format', bufnr, {
@@ -153,7 +146,6 @@ local function get_lsp_mappings(client, bufnr)
     })
   end
 
-  -- Highlight references when cursor holds
   utils.add_autocmds_to_buffer('lsp_document_highlight', bufnr, {
     {
       events = { 'CursorHold', 'CursorHoldI' },
@@ -173,7 +165,6 @@ local function get_lsp_mappings(client, bufnr)
     },
   })
 
-  -- Other LSP mappings
   lsp_mappings.n['<leader>lL'] = {
     function()
       vim.api.nvim_command(':LspRestart')
@@ -181,13 +172,13 @@ local function get_lsp_mappings(client, bufnr)
     desc = 'LSP refresh',
   }
 
-  -- Goto definition / declaration
   lsp_mappings.n['gd'] = {
     function()
       vim.lsp.buf.definition()
     end,
     desc = 'Goto definition of current symbol',
   }
+
   lsp_mappings.n['gD'] = {
     function()
       vim.lsp.buf.declaration()
@@ -195,7 +186,6 @@ local function get_lsp_mappings(client, bufnr)
     desc = 'Goto declaration of current symbol',
   }
 
-  -- Goto implementation
   lsp_mappings.n['gI'] = {
     function()
       vim.lsp.buf.implementation()
@@ -203,7 +193,6 @@ local function get_lsp_mappings(client, bufnr)
     desc = 'Goto implementation of current symbol',
   }
 
-  -- Goto type definition
   lsp_mappings.n['gT'] = {
     function()
       vim.lsp.buf.type_definition()
@@ -211,13 +200,13 @@ local function get_lsp_mappings(client, bufnr)
     desc = 'Goto definition of current type',
   }
 
-  -- Goto references
   lsp_mappings.n['<leader>lR'] = {
     function()
       vim.lsp.buf.references()
     end,
     desc = 'Hover references',
   }
+
   lsp_mappings.n['gr'] = {
     function()
       vim.lsp.buf.references()
@@ -225,7 +214,6 @@ local function get_lsp_mappings(client, bufnr)
     desc = 'References of current symbol',
   }
 
-  -- Goto help
   local lsp_hover_config = M.lsp_hover_config
   lsp_mappings.n['gh'] = {
     function()
@@ -233,6 +221,7 @@ local function get_lsp_mappings(client, bufnr)
     end,
     desc = 'Hover help',
   }
+
   lsp_mappings.n['gH'] = {
     function()
       vim.lsp.buf.signature_help(lsp_hover_config)
@@ -246,6 +235,7 @@ local function get_lsp_mappings(client, bufnr)
     end,
     desc = 'Hover help',
   }
+
   lsp_mappings.n['<leader>lH'] = {
     function()
       vim.lsp.buf.signature_help(lsp_hover_config)
@@ -253,13 +243,13 @@ local function get_lsp_mappings(client, bufnr)
     desc = 'Signature help',
   }
 
-  -- Goto man
   lsp_mappings.n['gm'] = {
     function()
       vim.api.nvim_feedkeys('K', 'n', false)
     end,
     desc = 'Hover man',
   }
+
   lsp_mappings.n['<leader>lm'] = {
     function()
       vim.api.nvim_feedkeys('K', 'n', false)
@@ -267,7 +257,6 @@ local function get_lsp_mappings(client, bufnr)
     desc = 'Hover man',
   }
 
-  -- Rename symbol
   lsp_mappings.n['<leader>lr'] = {
     function()
       vim.lsp.buf.rename()
@@ -275,26 +264,25 @@ local function get_lsp_mappings(client, bufnr)
     desc = 'Rename current symbol',
   }
 
-  -- Toggle inlay hints
   if vim.b.inlay_hints_enabled == nil then
     vim.b.inlay_hints_enabled = vim.g.inlay_hints_enabled
   end
   if vim.b.inlay_hints_enabled then
     vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
   end
+
   lsp_mappings.n['<leader>uH'] = {
     function()
-      require('sylow.core.utils.ui').toggle_buffer_inlay_hints(bufnr)
+      ui.toggle_buffer_inlay_hints(bufnr)
     end,
     desc = 'LSP inlay hints (buffer)',
   }
 
-  -- Toggle semantic tokens
   if vim.g.semantic_tokens_enabled then
     vim.b[bufnr].semantic_tokens_enabled = true
     lsp_mappings.n['<leader>uY'] = {
       function()
-        require('sylow.core.utils.ui').toggle_buffer_semantic_tokens(bufnr)
+        require('sylow.utils.ui').toggle_buffer_semantic_tokens(bufnr)
       end,
       desc = 'LSP semantic highlight (buffer)',
     }
@@ -302,13 +290,13 @@ local function get_lsp_mappings(client, bufnr)
     client.server_capabilities.semanticTokensProvider = nil
   end
 
-  -- LSP based search
   lsp_mappings.n['<leader>lS'] = {
     function()
       vim.lsp.buf.workspace_symbol()
     end,
     desc = 'Search symbol in workspace',
   }
+
   lsp_mappings.n['gS'] = {
     function()
       vim.lsp.buf.workspace_symbol()
@@ -316,7 +304,6 @@ local function get_lsp_mappings(client, bufnr)
     desc = 'Search symbol in workspace',
   }
 
-  -- LSP telescope
   if is_available('telescope.nvim') then -- setup telescope mappings if available
     if lsp_mappings.n.gd then
       lsp_mappings.n.gd[1] = function()
@@ -382,15 +369,15 @@ end
 
 function M.apply_default_lsp_settings()
   local signs = {
-    { name = 'DiagnosticSignError', text = get_icon('DiagnosticError'), texthl = 'DiagnosticSignError' },
-    { name = 'DiagnosticSignWarn', text = get_icon('DiagnosticWarn'), texthl = 'DiagnosticSignWarn' },
-    { name = 'DiagnosticSignHint', text = get_icon('DiagnosticHint'), texthl = 'DiagnosticSignHint' },
-    { name = 'DiagnosticSignInfo', text = get_icon('DiagnosticInfo'), texthl = 'DiagnosticSignInfo' },
-    { name = 'DapStopped', text = get_icon('DapStopped'), texthl = 'DiagnosticWarn' },
-    { name = 'DapBreakpoint', text = get_icon('DapBreakpoint'), texthl = 'DiagnosticInfo' },
-    { name = 'DapBreakpointRejected', text = get_icon('DapBreakpointRejected'), texthl = 'DiagnosticError' },
+    { name = 'DiagnosticSignError',    text = get_icon('DiagnosticError'),        texthl = 'DiagnosticSignError' },
+    { name = 'DiagnosticSignWarn',     text = get_icon('DiagnosticWarn'),         texthl = 'DiagnosticSignWarn' },
+    { name = 'DiagnosticSignHint',     text = get_icon('DiagnosticHint'),         texthl = 'DiagnosticSignHint' },
+    { name = 'DiagnosticSignInfo',     text = get_icon('DiagnosticInfo'),         texthl = 'DiagnosticSignInfo' },
+    { name = 'DapStopped',             text = get_icon('DapStopped'),             texthl = 'DiagnosticWarn' },
+    { name = 'DapBreakpoint',          text = get_icon('DapBreakpoint'),          texthl = 'DiagnosticInfo' },
+    { name = 'DapBreakpointRejected',  text = get_icon('DapBreakpointRejected'),  texthl = 'DiagnosticError' },
     { name = 'DapBreakpointCondition', text = get_icon('DapBreakpointCondition'), texthl = 'DiagnosticInfo' },
-    { name = 'DapLogPoint', text = get_icon('DapLogPoint'), texthl = 'DiagnosticInfo' },
+    { name = 'DapLogPoint',            text = get_icon('DapLogPoint'),            texthl = 'DiagnosticInfo' },
   }
   for _, sign in ipairs(signs) do
     vim.fn.sign_define(sign.name, sign)
@@ -478,7 +465,6 @@ function M.apply_user_lsp_settings(server_name)
 
   -- Base capabilities
   M.capabilities = vim.lsp.protocol.make_client_capabilities()
-
   M.capabilities.textDocument.completion.completionItem.documentationFormat = { 'markdown', 'plaintext' }
   M.capabilities.textDocument.completion.completionItem.snippetSupport = true
   M.capabilities.textDocument.completion.completionItem.preselectSupport = true
@@ -495,18 +481,14 @@ function M.apply_user_lsp_settings(server_name)
     lineFoldingOnly = true,
   }
 
-  -- M.capabilities.textDocument.formatting = true
-
   M.flags = {}
 
-  -- Get base server config
   local server_config = lspconfig[server_name] or {}
   local opts = vim.tbl_deep_extend('force', server_config, {
     capabilities = M.capabilities,
     flags = M.flags,
   })
 
-  -- Server-specific configurations
   if server_name == 'lua_ls' then
     opts.settings = {
       Lua = {
@@ -533,8 +515,34 @@ function M.apply_user_lsp_settings(server_name)
         },
       }
     }
+  -- elseif server_name == 'roslyn' then
+  --   opts.settings = {
+  --     roslyn = {
+  --       handlers = {
+  --         ["textDocument/definition"] = function(...)
+  --           return require("omnisharp_extended").handler(...)
+  --         end,
+  --       },
+  --       keys = {
+  --         {
+  --           "gd",
+  --           utils.is_available("telescope.nvim") and function()
+  --             require("omnisharp_extended").telescope_lsp_definitions()
+  --           end or function()
+  --             require("omnisharp_extended").lsp_definitions()
+  --           end,
+  --           desc = "Goto Definition",
+  --         },
+  --       },
+  --       enable_roslyn_analyzers = true,
+  --       organize_imports_on_format = true,
+  --       enable_import_completion = true,
+  --       filetypes = { 'cs', 'vb', 'csproj', 'sln', 'slnx', 'props', 'csx', 'targets', 'tproj', 'slngen', 'fproj' },
+  --     }
+  --   }
   end
 
   return opts
 end
+
 return M

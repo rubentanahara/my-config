@@ -1,4 +1,4 @@
-local utils = require('sylow.core.utils')
+local utils = require('sylow.utils')
 local get_icon = utils.get_icon
 
 -- Buffer-related mappings

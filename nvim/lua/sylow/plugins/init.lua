@@ -1,10 +1,10 @@
-local utils = require('sylow.core.utils')
+local utils = require('sylow.utils')
 
 return {
   {
     'JoosepAlviste/nvim-ts-context-commentstring',
     opts = {
-      enable_autocmd = false, -- Recommended to disable for efficiency
+      -- enable_autocmd = false, -- Recommended to disable for efficiency
     },
     config = function(_, opts)
       vim.g.skip_ts_context_commentstring_module = true
@@ -39,10 +39,10 @@ return {
       'TmuxNavigatePrevious',
     },
     keys = {
-      { '<c-h>', '<cmd>TmuxNavigateLeft<cr>', desc = 'Navigate Left' },
-      { '<c-j>', '<cmd>TmuxNavigateDown<cr>', desc = 'Navigate Down' },
-      { '<c-k>', '<cmd>TmuxNavigateUp<cr>', desc = 'Navigate Up' },
-      { '<c-l>', '<cmd>TmuxNavigateRight<cr>', desc = 'Navigate Right' },
+      { '<c-h>',  '<cmd>TmuxNavigateLeft<cr>',     desc = 'Navigate Left' },
+      { '<c-j>',  '<cmd>TmuxNavigateDown<cr>',     desc = 'Navigate Down' },
+      { '<c-k>',  '<cmd>TmuxNavigateUp<cr>',       desc = 'Navigate Up' },
+      { '<c-l>',  '<cmd>TmuxNavigateRight<cr>',    desc = 'Navigate Right' },
       { '<c-\\>', '<cmd>TmuxNavigatePrevious<cr>', desc = 'Navigate Previous' },
     },
   },
@@ -69,6 +69,7 @@ return {
   },
   {
     'folke/zen-mode.nvim',
+    event = "VeryLazy",
     opts = {},
   },
   {
@@ -83,15 +84,8 @@ return {
       }
     end,
   },
+
   {
     'MunifTanjim/nui.nvim',
   },
-    {
-    'nvim-flutter/flutter-tools.nvim',
-	  dependencies = {
-		  'nvim-lua/plenary.nvim',
-		  'stevearc/dressing.nvim',     -- optional for vim.ui.select
-	  },
-	  config = true
-	}
 }
