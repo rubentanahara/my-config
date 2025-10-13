@@ -1,4 +1,3 @@
-local debugger_utils = require('sylow.utils.debugger')
 -- Helper functions
 local function splitstr(str)
   local result = {}
