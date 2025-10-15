@@ -26,7 +26,7 @@ local function setup_cmp()
     enabled = function()
       local is_prompt = vim.bo.buftype == 'prompt'
       local is_dap_prompt = utils.is_available('cmp-dap')
-      and vim.tbl_contains({ 'dap-repl', 'dapui_watches', 'dapui_hover' }, vim.bo.filetype)
+        and vim.tbl_contains({ 'dap-repl', 'dapui_watches', 'dapui_hover' }, vim.bo.filetype)
 
       return not (is_prompt and not is_dap_prompt)
     end,
@@ -80,12 +80,11 @@ local function setup_cmp()
       end, { 'i', 's' }),
     }),
     sources = cmp.config.sources({
-      {name = 'copilot', priority = 1200},
       { name = 'nvim_lsp', priority = 1000 },
+      { name = 'creates', priority = 950 },
       { name = 'luasnip', priority = 900 },
       { name = 'nvim_lua', priority = 800 },
       { name = 'buffer', priority = 500 },
-      { name = 'emoji', priority = 400 },
       { name = 'path', priority = 250 },
     }),
     formatting = {
@@ -149,7 +148,6 @@ return {
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-buffer',
       'hrsh7th/cmp-path',
-      'hrsh7th/cmp-emoji',
       'hrsh7th/cmp-cmdline',
       'hrsh7th/cmp-nvim-lua',
       'saadparwaiz1/cmp_luasnip',
@@ -166,8 +164,8 @@ return {
         sources = cmp.config.sources({
           { name = 'path' },
         }, {
-            { name = 'cmdline' },
-          }),
+          { name = 'cmdline' },
+        }),
       })
 
       cmp.setup.cmdline('/', {

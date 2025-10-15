@@ -168,7 +168,7 @@ local function load_extensions(telescope)
     'notify', 
     'fzf',
     'ui-select',
-    -- 'flutter',
+    'flutter',
     'undo', -- telescope-undo
   }
 

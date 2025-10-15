@@ -1,22 +1,3 @@
---  TESTING -----------------------------------------------------------------
---  Run tests inside of nvim [unit testing]
---  https://github.com/nvim-neotest/neotest
---
---
---  MANUAL:
---  -- Unit testing:
---  To tun an unit test you can run any of these commands:
---
---    :Neotest run      -- Runs the nearest test to the cursor.
---    :Neotest stop     -- Stop the nearest test to the cursor.
---    :Neotest run file -- Run all tests in the file.
---
---  -- E2e and Test Suite
---  Normally you will prefer to open your e2e framework GUI outside of nvim.
---  But you have the next commands in ../base/3-autocmds.lua:
---
---    :TestNodejs    -- Run all tests for this nodejs project.
---    :TestNodejsE2e -- Run the e2e tests/suite for this nodejs project.
 return {
   {
     'nvim-neotest/neotest',
@@ -65,16 +46,6 @@ return {
     end,
   },
 
-  --  Shows a float panel with the [code coverage]
-  --  https://github.com/andythigpen/nvim-coverage
-  --
-  --  Your project must generate coverage/lcov.info for this to work.
-  --
-  --  On jest, make sure your packages.json file has this:
-  --  "tests": "jest --coverage"
-  --
-  --  If you use other framework or language, refer to nvim-coverage docs:
-  --  https://github.com/andythigpen/nvim-coverage/blob/main/doc/nvim-coverage.txt
   {
     'andythigpen/nvim-coverage',
     cmd = {

@@ -45,6 +45,96 @@ function M.add_autocmds_to_buffer(augroup, bufnr, autocmds)
   end
 end
 
+-- Detect operating system and architecture
+function M.get_platform_info()
+  local os_name = vim.loop.os_uname().sysname
+  local arch = vim.loop.os_uname().machine
+
+  -- Normalize OS names
+  local os_map = {
+    ['Darwin'] = 'mac',
+    ['Windows'] = 'windows',
+    ['Windows_NT'] = 'windows',
+    ['Linux'] = 'linux',
+    ['Unix'] = 'unix',
+  }
+
+  -- Normalize architecture names
+  local arch_map = {
+    ['x86_64'] = 'amd64',
+    ['x64'] = 'amd64',
+    ['amd64'] = 'amd64',
+    ['i386'] = 'x86',
+    ['i686'] = 'x86',
+    ['arm64'] = 'arm64',
+    ['aarch64'] = 'arm64',
+    ['armv7l'] = 'arm',
+    ['armv6l'] = 'arm',
+  }
+
+  local normalized_os = os_map[os_name] or 'unknown'
+  local normalized_arch = arch_map[arch] or arch
+
+  return {
+    os = normalized_os,
+    arch = normalized_arch,
+    raw_os = os_name,
+    raw_arch = arch,
+    is_mac = normalized_os == 'mac',
+    is_windows = normalized_os == 'windows',
+    is_linux = normalized_os == 'linux',
+    is_unix = normalized_os == 'unix',
+    is_amd64 = normalized_arch == 'amd64',
+    is_x86 = normalized_arch == 'x86',
+    is_arm64 = normalized_arch == 'arm64',
+    is_arm = normalized_arch:find('arm') ~= nil,
+  }
+end
+
+-- Quick helper functions
+function M.is_mac()
+  return M.get_platform_info().is_mac
+end
+
+function M.is_windows()
+  return M.get_platform_info().is_windows
+end
+
+function M.is_linux()
+  return M.get_platform_info().is_linux
+end
+
+function M.is_amd64()
+  return M.get_platform_info().is_amd64
+end
+
+function M.is_arm64()
+  return M.get_platform_info().is_arm64
+end
+
+-- Get platform string for filenames/downloads
+function M.get_platform_string()
+  local info = M.get_platform_info()
+  return string.format('%s-%s', info.os, info.arch)
+end
+
+-- Example usage and test function
+function M.test_platform()
+  local info = M.get_platform_info()
+
+  print('=== Platform Detection ===')
+  print('OS: ' .. info.os .. ' (' .. info.raw_os .. ')')
+  print('Architecture: ' .. info.arch .. ' (' .. info.raw_arch .. ')')
+  print('Platform String: ' .. M.get_platform_string())
+  print('--- Quick Checks ---')
+  print('Is Mac: ' .. tostring(info.is_mac))
+  print('Is Windows: ' .. tostring(info.is_windows))
+  print('Is Linux: ' .. tostring(info.is_linux))
+  print('Is AMD64: ' .. tostring(info.is_amd64))
+  print('Is ARM64: ' .. tostring(info.is_arm64))
+  print('Is ARM: ' .. tostring(info.is_arm))
+end
+
 function M.without_animation(func)
   vim.g.minianimate_disable = true
   local result = func()
