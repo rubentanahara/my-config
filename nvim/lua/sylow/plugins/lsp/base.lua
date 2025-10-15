@@ -23,23 +23,23 @@ local function setup_mason_tool_installer()
   return {
     ensure_installed = {
       -- Formatters
-      'stylua',    -- lua
-      'prettier',  -- js,ts
+      'stylua', -- lua
+      'prettier', -- js,ts
       'csharpier', -- cs
-      'rustfmt',   -- rust
-      'black',     -- python
+      'rustfmt', -- rust
+      'black', -- python
       'xmlformatter',
       -- Linters
-      'luacheck',         -- lua
-      'eslint_d',         -- js,ts
-      'bacon',            -- rust
-      'flake8',           -- python
+      'luacheck', -- lua
+      'eslint_d', -- js,ts
+      'bacon', -- rust
+      'flake8', -- python
       -- DAPs
       'js-debug-adapter', -- js,ts
-      'netcoredbg',       -- cs
-      'codelldb',         -- rust
-      'debugpy',          -- python
-      'roslyn'
+      'netcoredbg', -- cs
+      'codelldb', -- rust
+      'debugpy', -- python
+      'roslyn', --cs
     },
     auto_update = false,
     run_on_start = true,
@@ -49,10 +49,10 @@ end
 local function setup_mason_lspconfig()
   return {
     ensure_installed = {
-      'lua_ls',        -- lua
-      'ts_ls',         -- js,ts
+      'lua_ls', -- lua
+      'ts_ls', -- js,ts
       'rust_analyzer', -- rust
-      'pyright',       -- python
+      'pyright', -- python
     },
     handlers = {
       function(server_name)
@@ -64,12 +64,12 @@ local function setup_mason_lspconfig()
 end
 
 local mason_keys = {
-  { '<leader>cmo', '<cmd>Mason<cr>',             desc = 'Mason' },
-  { '<leader>cmi', '<cmd>MasonInstall<cr>',      desc = 'Mason Install' },
-  { '<leader>cmu', '<cmd>MasonUninstall<cr>',    desc = 'Mason Uninstall' },
+  { '<leader>cmo', '<cmd>Mason<cr>', desc = 'Mason' },
+  { '<leader>cmi', '<cmd>MasonInstall<cr>', desc = 'Mason Install' },
+  { '<leader>cmu', '<cmd>MasonUninstall<cr>', desc = 'Mason Uninstall' },
   { '<leader>cma', '<cmd>MasonUninstallAll<cr>', desc = 'Mason Uninstall All' },
-  { '<leader>cml', '<cmd>MasonLog<cr>',          desc = 'Mason Log' },
-  { '<leader>cmU', '<cmd>MasonUpdate<cr>',       desc = 'Mason Update' },
+  { '<leader>cml', '<cmd>MasonLog<cr>', desc = 'Mason Log' },
+  { '<leader>cmU', '<cmd>MasonUpdate<cr>', desc = 'Mason Update' },
 }
 
 local mason_cmds = {
@@ -93,7 +93,6 @@ return {
   },
   {
     'williamboman/mason.nvim',
-    lazy = false,
     cmd = mason_cmds,
     keys = mason_keys,
     build = ':MasonUpdate',

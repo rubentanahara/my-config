@@ -61,7 +61,7 @@ return -- Status line
         left = '',
         right = '',
       },
-      -- disabled_filetypes = { 'alpha', 'neo-tree' },
+      disabled_filetypes = { 'alpha', 'neo-tree' },
       always_divide_middle = true,
     },
     sections = {

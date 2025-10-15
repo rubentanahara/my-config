@@ -118,9 +118,9 @@ local function get_lsp_mappings(client, bufnr)
 
   local is_autoformat_enabled = autoformat.enabled
   local is_filetype_allowed = vim.tbl_isempty(autoformat.allow_filetypes or {})
-      or vim.tbl_contains(autoformat.allow_filetypes, filetype)
+    or vim.tbl_contains(autoformat.allow_filetypes, filetype)
   local is_filetype_ignored = vim.tbl_isempty(autoformat.ignore_filetypes or {})
-      or not vim.tbl_contains(autoformat.ignore_filetypes, filetype)
+    or not vim.tbl_contains(autoformat.ignore_filetypes, filetype)
 
   if is_autoformat_enabled and is_filetype_allowed and is_filetype_ignored then
     utils.add_autocmds_to_buffer('lsp_auto_format', bufnr, {
@@ -271,7 +271,7 @@ local function get_lsp_mappings(client, bufnr)
     vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
   end
 
-  lsp_mappings.n['<leader>uH'] = {
+  lsp_mappings.n['<leader>tH'] = {
     function()
       ui.toggle_buffer_inlay_hints(bufnr)
     end,
@@ -369,15 +369,15 @@ end
 
 function M.apply_default_lsp_settings()
   local signs = {
-    { name = 'DiagnosticSignError',    text = get_icon('DiagnosticError'),        texthl = 'DiagnosticSignError' },
-    { name = 'DiagnosticSignWarn',     text = get_icon('DiagnosticWarn'),         texthl = 'DiagnosticSignWarn' },
-    { name = 'DiagnosticSignHint',     text = get_icon('DiagnosticHint'),         texthl = 'DiagnosticSignHint' },
-    { name = 'DiagnosticSignInfo',     text = get_icon('DiagnosticInfo'),         texthl = 'DiagnosticSignInfo' },
-    { name = 'DapStopped',             text = get_icon('DapStopped'),             texthl = 'DiagnosticWarn' },
-    { name = 'DapBreakpoint',          text = get_icon('DapBreakpoint'),          texthl = 'DiagnosticInfo' },
-    { name = 'DapBreakpointRejected',  text = get_icon('DapBreakpointRejected'),  texthl = 'DiagnosticError' },
+    { name = 'DiagnosticSignError', text = get_icon('DiagnosticError'), texthl = 'DiagnosticSignError' },
+    { name = 'DiagnosticSignWarn', text = get_icon('DiagnosticWarn'), texthl = 'DiagnosticSignWarn' },
+    { name = 'DiagnosticSignHint', text = get_icon('DiagnosticHint'), texthl = 'DiagnosticSignHint' },
+    { name = 'DiagnosticSignInfo', text = get_icon('DiagnosticInfo'), texthl = 'DiagnosticSignInfo' },
+    { name = 'DapStopped', text = get_icon('DapStopped'), texthl = 'DiagnosticWarn' },
+    { name = 'DapBreakpoint', text = get_icon('DapBreakpoint'), texthl = 'DiagnosticInfo' },
+    { name = 'DapBreakpointRejected', text = get_icon('DapBreakpointRejected'), texthl = 'DiagnosticError' },
     { name = 'DapBreakpointCondition', text = get_icon('DapBreakpointCondition'), texthl = 'DiagnosticInfo' },
-    { name = 'DapLogPoint',            text = get_icon('DapLogPoint'),            texthl = 'DiagnosticInfo' },
+    { name = 'DapLogPoint', text = get_icon('DapLogPoint'), texthl = 'DiagnosticInfo' },
   }
   for _, sign in ipairs(signs) do
     vim.fn.sign_define(sign.name, sign)
@@ -490,20 +490,22 @@ function M.apply_user_lsp_settings(server_name)
   })
 
   if server_name == 'lua_ls' then
+    opts.filetypes = { 'lua' }
     opts.settings = {
       Lua = {
         completion = {
-          callSnippet = "Replace"
+          callSnippet = 'Replace',
         },
         diagnostics = {
-          globals = { 'vim' }
+          globals = { 'vim' },
         },
         workspace = {
-          checkThirdParty = false
-        }
-      }
+          checkThirdParty = false,
+        },
+      },
     }
   elseif server_name == 'rust_analyzer' then
+    opts.filetypes = { 'rust' }
     opts.settings = {
       ['rust-analyzer'] = {
         cargo = {
@@ -513,33 +515,58 @@ function M.apply_user_lsp_settings(server_name)
           enable = true,
           command = 'clippy',
         },
-      }
+      },
     }
-  -- elseif server_name == 'roslyn' then
-  --   opts.settings = {
-  --     roslyn = {
-  --       handlers = {
-  --         ["textDocument/definition"] = function(...)
-  --           return require("omnisharp_extended").handler(...)
-  --         end,
-  --       },
-  --       keys = {
-  --         {
-  --           "gd",
-  --           utils.is_available("telescope.nvim") and function()
-  --             require("omnisharp_extended").telescope_lsp_definitions()
-  --           end or function()
-  --             require("omnisharp_extended").lsp_definitions()
-  --           end,
-  --           desc = "Goto Definition",
-  --         },
-  --       },
-  --       enable_roslyn_analyzers = true,
-  --       organize_imports_on_format = true,
-  --       enable_import_completion = true,
-  --       filetypes = { 'cs', 'vb', 'csproj', 'sln', 'slnx', 'props', 'csx', 'targets', 'tproj', 'slngen', 'fproj' },
-  --     }
-  --   }
+  elseif server_name == 'dartls' then
+    opts.mason = false
+    opts.cmd = { 'dart', 'language-server', '--protocol=lsp' }
+    opts.filetypes = { 'dart' }
+    opts.init_options = {
+      onlyAnalyzeProjectsWithOpenFiles = false,
+      suggestFromUnimportedLibraries = true,
+      closingLabels = true,
+      outline = false,
+      flutterOutline = false,
+    }
+    opts.settings = {
+      dart = {
+        analysisExcludedFolders = {
+          vim.fn.expand('$HOME/AppData/Local/Pub/Cache'),
+          vim.fn.expand('$HOME/.pub-cache'),
+          vim.fn.expand('/opt/homebrew/'),
+          vim.fn.expand('$HOME/tools/flutter/'),
+        },
+        updateImportsOnRename = true,
+        completeFunctionCalls = true,
+        showTodos = true,
+      },
+    }
+
+    -- elseif server_name == 'roslyn' then
+    --   opts.settings = {
+    --     roslyn = {
+    --       handlers = {
+    --         ["textDocument/definition"] = function(...)
+    --           return require("omnisharp_extended").handler(...)
+    --         end,
+    --       },
+    --       keys = {
+    --         {
+    --           "gd",
+    --           utils.is_available("telescope.nvim") and function()
+    --             require("omnisharp_extended").telescope_lsp_definitions()
+    --           end or function()
+    --             require("omnisharp_extended").lsp_definitions()
+    --           end,
+    --           desc = "Goto Definition",
+    --         },
+    --       },
+    --       enable_roslyn_analyzers = true,
+    --       organize_imports_on_format = true,
+    --       enable_import_completion = true,
+    --       filetypes = { 'cs', 'vb', 'csproj', 'sln', 'slnx', 'props', 'csx', 'targets', 'tproj', 'slngen', 'fproj' },
+    --     }
+    --   }
   end
 
   return opts

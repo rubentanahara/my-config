@@ -57,9 +57,36 @@ end
 -- Language-specific debugger configurations
 local function setup_language_debuggers()
   local dap = require('dap')
-  local is_windows = vim.fn.has('win32') == 1
+  local utils = require('sylow.utils')
+  local is_windows = utils.is_windows()
+  local is_mac = utils.is_mac()
+  local is_arm = utils.is_arm64()
 
-  require('netcoredbg-macOS-arm64').setup(dap)
+  -- C#
+  if is_mac and is_arm then
+    require('netcoredbg-macOS-arm64').setup(dap)
+  else
+    local mason_path = vim.fn.stdpath("data") .. "/mason/packages/netcoredbg/netcoredbg"
+    local netcoredbg_adapter = {
+      type = "executable",
+      command = mason_path,
+      args = { "--interpreter=vscode" },
+    }
+
+    dap.adapters.netcoredbg = netcoredbg_adapter -- needed for normal debugging
+    dap.adapters.coreclr = netcoredbg_adapter    -- needed for unit test debugging
+    dap.configurations.cs = {
+      {
+        type = 'coreclr',
+        name = 'NetCoreDbg: Launch',
+        request = 'launch',
+        cwd = '${fileDirname}',
+        program = function()
+          utils.build_dll_path()
+        end,
+      }
+    }
+  end
 
   -- Python
   dap.adapters.python = {
@@ -88,30 +115,114 @@ local function setup_language_debuggers()
   }
 
   -- C/C++
-  dap.configurations.c = {
+  dap.configurations.cpp = {
     {
-      name = 'Launch',
+      name = 'Debug Executable',
       type = 'codelldb',
       request = 'launch',
       program = function()
-        return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/bin/', 'file')
+        -- Find all executable files in build or cmake-build directories
+        local search_dirs = {
+          vim.fn.getcwd() .. '/build/',
+          vim.fn.getcwd() .. '/cmake-build/',
+          vim.fn.getcwd() .. '/target/debug/', -- Added for Rust-like projects
+        }
+
+        local executables = {}
+        for _, dir in ipairs(search_dirs) do
+          local files = vim.fn.globpath(dir, '*', false, true)
+          local dir_executables = vim.tbl_filter(function(file)
+            local filename = vim.fn.fnamemodify(file, ':t')
+            return not filename:match('^%.') and
+                not filename:match('%.so$') and
+                not filename:match('%.a$') and
+                not filename:match('%.d$')
+          end, files)
+
+          vim.list_extend(executables, dir_executables)
+        end
+
+        -- If only one executable found, use it
+        if #executables == 1 then
+          return executables[1]
+        end
+
+        -- If multiple executables, let user choose
+        if #executables > 1 then
+          return vim.ui.select(executables, {
+            prompt = 'Select executable to debug:',
+            format_item = function(file)
+              return vim.fn.fnamemodify(file, ':t')
+            end
+          }, function(choice)
+            return choice
+          end)
+        end
+
+        -- Fallback to manual input if no executables found
+        return vim.fn.input('Path to executable: ', vim.fn.getcwd(), 'file')
       end,
       cwd = '${workspaceFolder}',
-    },
+      stopOnEntry = false,
+    }
   }
-  dap.configurations.cpp = dap.configurations.c
+
+  dap.configurations.c = dap.configurations.cpp
 
   -- Rust
   dap.configurations.rust = {
     {
-      name = 'Launch',
+      name = 'Debug Executable',
       type = 'codelldb',
       request = 'launch',
       program = function()
-        return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/target/debug/', 'file')
+        -- Find all executable files in target/debug directory
+        local debug_dir = vim.fn.getcwd() .. '/target/debug/'
+        local files = vim.fn.globpath(debug_dir, '*', false, true)
+
+        -- Filter out files that are not executables
+        local executables = vim.tbl_filter(function(file)
+          local filename = vim.fn.fnamemodify(file, ':t')
+          -- Ignore common non-executable files
+          return not filename:match('^%.') and -- Ignore hidden files
+              not filename:match('%.so$') and -- Ignore shared libraries
+              not filename:match('%.a$') and -- Ignore static libraries
+              not filename:match('%.d$') and -- Ignore dependency files
+              not filename:match('%.rlib$')  -- Ignore Rust library files
+        end, files)
+
+        -- If only one executable found, use it
+        if #executables == 1 then
+          return executables[1]
+        end
+
+        -- If multiple executables, let user choose
+        if #executables > 1 then
+          -- Use a coroutine to handle the async selection
+          local co = coroutine.running()
+          if co then
+            vim.ui.select(executables, {
+              prompt = 'Select executable to debug:',
+              format_item = function(file)
+                return vim.fn.fnamemodify(file, ':t')
+              end
+            }, function(choice)
+              coroutine.resume(co, choice)
+            end)
+            return coroutine.yield()
+          else
+            -- Fallback if not in coroutine context
+            print("Multiple executables found, using first one: " .. executables[1])
+            return executables[1]
+          end
+        end
+
+        -- Fallback to manual input if no executables found
+        return vim.fn.input('Path to executable: ', debug_dir, 'file')
       end,
       cwd = '${workspaceFolder}',
-    },
+      stopOnEntry = false,
+    }
   }
 
   -- Go

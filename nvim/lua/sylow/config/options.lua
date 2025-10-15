@@ -5,8 +5,8 @@ local utils = require('sylow.utils')
 function _G.statusLine()
   return g.flutter_tools_decorations.app_version
 end
+opt.statusline = '%!v:statusLine()'
 
-vim.opt.statusline = '%!v:statusLine()'
 -- Globals
 vim.o.background = 'dark'                          -- Set the overall color theme to dark mode
 g.mapleader = ' '                                  -- Set space as the leader key for custom mappings
