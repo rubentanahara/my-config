@@ -29,11 +29,13 @@ local function setup_mason_tool_installer()
       'rustfmt', -- rust
       'black', -- python
       'xmlformatter',
+      'ktfmt', -- kotlin'
       -- Linters
       'luacheck', -- lua
       'eslint_d', -- js,ts
       'bacon', -- rust
       'flake8', -- python
+      'ktlint', -- kotlin'
       -- DAPs
       'js-debug-adapter', -- js,ts
       'netcoredbg', -- cs

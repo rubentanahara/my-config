@@ -438,14 +438,31 @@ local function setup_language_debuggers()
     type = 'executable',
     command = vim.fn.stdpath('data') .. '/mason/bin/kotlin-debug-adapter',
   }
-  dap.configurations.kotlin = {
-    {
-      type = 'kotlin',
-      request = 'launch',
-      name = 'Launch Kotlin',
-      projectRoot = '${workspaceFolder}',
-    },
+ dap.configurations.kotlin = {
+  {
+    type = "kotlin",
+    request = "launch",
+    name = "Debug current file",
+    mainClass = function()
+      -- This function tries to derive the main class from the current file path
+      local root = vim.fs.find("src", { path = vim.uv.cwd(), upward = true })[1] or ""
+      local fname = vim.api.nvim_buf_get_name(0)
+      -- Converts a file path like 'src/main/kotlin/websearch/Main.kt' to 'websearch.MainKt'
+      return fname:gsub(root, ""):gsub("main/kotlin/", ""):gsub(".kt", "Kt"):gsub("/", "."):sub(2, -1)
+    end,
+    projectRoot = "${workspaceFolder}",
+    enableJsonLogging = false,
+  },
+  {
+    type = "kotlin",
+    request = "attach",
+    name = "Attach to remote process",
+    port = 5005,
+    hostName = "localhost",
+    projectRoot = vim.fn.getcwd(),
+    timeout = 2000,
   }
+}
 end
 
 -- Base DAP setup
