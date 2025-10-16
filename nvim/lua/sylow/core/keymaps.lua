@@ -10,6 +10,8 @@ maps.i['<C-b>'] = { '<ESC>^i', desc = 'Beginning of line' }
 maps.i['<C-e>'] = { '<ESC>$a', desc = 'End of line' }
 maps.n['ss'] = { '<cmd>split<cr>', desc = 'Split horizontal' }
 maps.n['sv'] = { '<cmd>vsplit<cr>', desc = 'Split vertical' }
+maps.n['<leader>se'] = { '<C-w>=', desc = 'Equalize splits' }
+maps.n['<leader>sc'] = { '<cmd>close<cr>', desc = 'Close current split' }
 maps.n['gg'] = {
   function()
     utils.without_animation(function()
@@ -50,7 +52,6 @@ maps.x['G'] = {
   end,
   desc = 'Go to last line and column (visual)',
 }
-maps.n['<esc>'] = { '<cmd>noh<cr><esc>', desc = 'Clear search highlight' }
 maps.n['<leader><CR>'] = { utils.clear_search, desc = 'Clear search highlight' }
 maps.n['<C-s>'] = { '<cmd>w<cr>', desc = 'Save file' }
 maps.n['<C-q>'] = { '<cmd>q<cr>', desc = 'Quit' }

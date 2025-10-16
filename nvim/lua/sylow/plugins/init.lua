@@ -28,7 +28,6 @@ return {
       { '<C-\\>', '<cmd>TmuxNavigatePrevious<cr>', desc = 'Navigate Previous' },
     },
   },
-
   {
     'stevearc/dressing.nvim',
     event = 'VeryLazy',
@@ -59,23 +58,9 @@ return {
       },
     },
   },
-
   {
     'nvim-tree/nvim-web-devicons',
     event = 'VeryLazy',
-    opts = function()
-      return {
-        override = {
-          default_icon = {
-            icon = utils.get_icon('DefaultFile'),
-            color = '#6d8086',
-            cterm_color = '66',
-            name = 'Default',
-          },
-        },
-        strict = true,
-      }
-    end,
   },
 
   {
