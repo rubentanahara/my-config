@@ -51,6 +51,13 @@ return {
             '<leader>',
             group = 'Main Menu',
           },
+
+          {
+            '<leader>af',
+            icon = { icon = get_icon('Dart'), color = 'blue' },
+            desc = 'Flutter',
+            group = 'Flutter Tools',
+          },
           {
             '<leader>f',
             group = 'Find',
