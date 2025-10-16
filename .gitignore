@@ -36,16 +36,12 @@ Thumbs.db
 flutter/
 karabiner/automatic_backups/
 node_modules/
+uv/
 uv
+yarn
 jgit
 neofetch
 sql-studio
 azure-datalake-store
 opencode
 neofetch
-
-
-# Keep configurations that should be version controlled
-!.config/starship.toml
-!.config/nvim/init.lua
-!.config/tmux/tmux.conf
