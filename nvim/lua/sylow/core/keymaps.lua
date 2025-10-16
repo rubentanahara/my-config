@@ -1,7 +1,5 @@
 local utils = require('sylow.utils')
 local ui = require('sylow.utils.ui')
-local is_available = utils.is_available
-
 local maps = utils.get_mappings_template()
 
 maps.i['jk'] = { '<ESC>', desc = 'Exit insert mode' }
@@ -106,82 +104,6 @@ maps.n['+'] = { '<C-a>', desc = 'Increment number' }
 maps.n['-'] = { '<C-x>', desc = 'Decrement number' }
 maps.n['gcb'] = { 'o<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>', desc = 'Comment below' }
 maps.n['gca'] = { 'O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>', desc = 'Comment above' }
-if is_available('gitsigns.nvim') then
-  maps.n[']g'] = {
-    function()
-      require('gitsigns').nav_hunk('next')
-    end,
-    desc = 'Next Git hunk',
-  }
-  maps.n['[g'] = {
-    function()
-      require('gitsigns').nav_hunk('prev')
-    end,
-    desc = 'Previous Git hunk',
-  }
-  maps.n['<leader>gl'] = {
-    function()
-      require('gitsigns').blame_line()
-    end,
-    desc = 'View Git blame',
-  }
-  maps.n['<leader>gL'] = {
-    function()
-      require('gitsigns').blame_line { full = true }
-    end,
-    desc = 'View full Git blame',
-  }
-  maps.n['<leader>gp'] = {
-    function()
-      require('gitsigns').preview_hunk()
-    end,
-    desc = 'Preview Git hunk',
-  }
-  maps.n['<leader>gh'] = {
-    function()
-      require('gitsigns').reset_hunk()
-    end,
-    desc = 'Reset Git hunk',
-  }
-  maps.n['<leader>gr'] = {
-    function()
-      require('gitsigns').reset_buffer()
-    end,
-    desc = 'Reset Git buffer',
-  }
-  maps.n['<leader>gs'] = {
-    function()
-      require('gitsigns').stage_hunk()
-    end,
-    desc = 'Stage Git hunk',
-  }
-  maps.n['<leader>gS'] = {
-    function()
-      require('gitsigns').stage_buffer()
-    end,
-    desc = 'Stage Git buffer',
-  }
-  maps.n['<leader>gu'] = {
-    function()
-      require('gitsigns').undo_stage_hunk()
-    end,
-    desc = 'Unstage Git hunk',
-  }
-  maps.n['<leader>gd'] = {
-    function()
-      require('gitsigns').diffthis()
-    end,
-    desc = 'View Git diff',
-  }
-end
-if is_available('vim-fugitive') then
-  maps.n['<leader>gP'] = {
-    function()
-      vim.cmd(':GBrowse')
-    end,
-    desc = 'Open in github ',
-  }
-end
 maps.n['<leader>zc'] = { 'zc', desc = 'Close fold' }
 maps.n['<leader>zo'] = { 'zo', desc = 'Open fold' }
 maps.n['<leader>za'] = { 'za', desc = 'Toggle fold' }

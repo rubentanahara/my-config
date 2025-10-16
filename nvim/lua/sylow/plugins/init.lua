@@ -11,80 +11,129 @@ return {
       require('ts_context_commentstring').setup(opts)
     end,
   },
-  { 'tpope/vim-rhubarb' },
-  {
-    'tpope/vim-fugitive',
-    enabled = vim.fn.executable('git') == 1,
-    config = function()
-      vim.g.fugitive_no_maps = 1
-    end,
-  },
-  {
-    'lewis6991/gitsigns.nvim',
-    enabled = vim.fn.executable('git') == 1,
-    event = { 'BufReadPre', 'BufNewFile' },
-    opts = {},
-  },
   {
     'nvim-lua/plenary.nvim',
   },
   {
     'christoomey/vim-tmux-navigator',
     event = 'VeryLazy',
-    cmd = {
-      'TmuxNavigateLeft',
-      'TmuxNavigateDown',
-      'TmuxNavigateUp',
-      'TmuxNavigateRight',
-      'TmuxNavigatePrevious',
-    },
+    cond = function()
+      return vim.env.TMUX ~= nil
+    end,
     keys = {
-      { '<c-h>',  '<cmd>TmuxNavigateLeft<cr>',     desc = 'Navigate Left' },
-      { '<c-j>',  '<cmd>TmuxNavigateDown<cr>',     desc = 'Navigate Down' },
-      { '<c-k>',  '<cmd>TmuxNavigateUp<cr>',       desc = 'Navigate Up' },
-      { '<c-l>',  '<cmd>TmuxNavigateRight<cr>',    desc = 'Navigate Right' },
-      { '<c-\\>', '<cmd>TmuxNavigatePrevious<cr>', desc = 'Navigate Previous' },
+      { '<C-h>', '<cmd>TmuxNavigateLeft<cr>', desc = 'Navigate Left' },
+      { '<C-j>', '<cmd>TmuxNavigateDown<cr>', desc = 'Navigate Down' },
+      { '<C-k>', '<cmd>TmuxNavigateUp<cr>', desc = 'Navigate Up' },
+      { '<C-l>', '<cmd>TmuxNavigateRight<cr>', desc = 'Navigate Right' },
+      { '<C-\\>', '<cmd>TmuxNavigatePrevious<cr>', desc = 'Navigate Previous' },
     },
   },
+
   {
     'stevearc/dressing.nvim',
     event = 'VeryLazy',
-  },
-  {
-    'nvim-tree/nvim-web-devicons',
-    event = 'User BaseDeferred',
     opts = {
-      override = {
-        default_icon = {
-          icon = utils.get_icon('DefaultFile'),
+      input = {
+        enabled = true,
+        default_prompt = 'Input: ',
+        title_pos = 'left',
+        insert_only = true,
+        start_in_insert = true,
+        relative = 'cursor',
+        prefer_width = 40,
+        width = nil,
+        max_width = { 140, 0.9 },
+        min_width = { 20, 0.2 },
+        buf_options = {},
+        win_options = {
+          winblend = 10,
+          wrap = false,
         },
       },
-      strict = true,
+      select = {
+        enabled = true,
+        backend = { 'telescope', 'fzf_lua', 'fzf', 'builtin', 'nui' },
+        telescope = {
+          layout_config = { width = 0.8, height = 0.8 },
+        },
+      },
     },
   },
+
   {
-    "folke/ts-comments.nvim",
-    event = "VeryLazy",
+    'nvim-tree/nvim-web-devicons',
+    event = 'VeryLazy',
+    opts = function()
+      return {
+        override = {
+          default_icon = {
+            icon = utils.get_icon('DefaultFile'),
+            color = '#6d8086',
+            cterm_color = '66',
+            name = 'Default',
+          },
+        },
+        strict = true,
+      }
+    end,
+  },
+
+  {
+    'folke/ts-comments.nvim',
+    event = 'VeryLazy',
     opts = {},
   },
   {
     'folke/zen-mode.nvim',
-    event = "VeryLazy",
-    opts = {},
+    event = 'VeryLazy',
+    keys = {
+      { '<leader>zz', '<cmd>ZenMode<cr>', desc = 'Toggle Zen Mode' },
+    },
+    opts = {
+      window = {
+        backdrop = 0.95,
+        width = 120,
+        height = 1,
+        options = {
+          signcolumn = 'no',
+          number = false,
+          relativenumber = false,
+          cursorline = false,
+          cursorcolumn = false,
+          foldcolumn = '0',
+        },
+      },
+      plugins = {
+        options = {
+          enabled = true,
+          ruler = false,
+          showcmd = false,
+        },
+        twilight = { enabled = true },
+        gitsigns = { enabled = false },
+        tmux = { enabled = false },
+      },
+    },
   },
+
   {
     'SmiteshP/nvim-navic',
+    event = { 'BufReadPre', 'BufNewFile' },
     opts = function()
       return {
-        separator = utils.icons.PathSeparator,
+        separator = utils.get_icon('PathSeparator'),
         highlight = true,
         depth_limit = 5,
         icons = utils.icons.LSP_KINDS,
         lazy_update_context = true,
+        safe_output = true,
+        click = true,
       }
     end,
   },
+
   {
     'MunifTanjim/nui.nvim',
+    lazy = true,
   },
 }

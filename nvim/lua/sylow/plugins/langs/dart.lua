@@ -1,6 +1,6 @@
 return {
   'nvim-flutter/flutter-tools.nvim',
-  event = 'VeryLazy', -- Changed from lazy = false to event-based loading
+  ft = { 'dart' },
   dependencies = {
     'nvim-lua/plenary.nvim',
     'stevearc/dressing.nvim', -- optional for vim.ui.select
@@ -51,5 +51,20 @@ return {
   },
   config = function(_, opts)
     require('flutter-tools').setup(opts)
+
+    local map = vim.keymap.set
+
+    map('n', '<leader>afr', '<cmd>FlutterRun<cr>', { desc = 'Flutter Run' })
+    map('n', '<leader>afR', '<cmd>FlutterRestart<cr>', { desc = 'Flutter Restart' })
+    map('n', '<leader>afq', '<cmd>FlutterQuit<cr>', { desc = 'Flutter Quit' })
+    map('n', '<leader>afc', '<cmd>FlutterCopyProfilerUrl<cr>', { desc = 'Flutter Copy Profiler URL' })
+    map('n', '<leader>afd', '<cmd>FlutterDevices<cr>', { desc = 'Flutter Devices' })
+    map('n', '<leader>afD', '<cmd>FlutterDetach<cr>', { desc = 'Flutter Detach' })
+    map('n', '<leader>afe', '<cmd>FlutterEmulators<cr>', { desc = 'Flutter Emulators' })
+    map('n', '<leader>afo', '<cmd>FlutterOutlineToggle<cr>', { desc = 'Flutter Outline Toggle' })
+    map('n', '<leader>aft', '<cmd>FlutterDevTools<cr>', { desc = 'Flutter DevTools' })
+    map('n', '<leader>afl', '<cmd>FlutterLogClear<cr>', { desc = 'Flutter Log Clear' })
+    map('n', '<leader>afL', '<cmd>FlutterLogToggle<cr>', { desc = 'Flutter Log Toggle' })
+    map('n', '<leader>afv', '<cmd>FlutterVisualDebug<cr>', { desc = 'Flutter Visual Debug' })
   end,
 }

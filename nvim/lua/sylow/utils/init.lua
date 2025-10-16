@@ -6,6 +6,10 @@ local function create_augroup(name)
   return api.nvim_create_augroup('sylow_' .. name, { clear = true })
 end
 
+function M.is_git_repo()
+  return vim.fn.executable('git') == 1 and vim.fs.find('.git', { path = vim.fn.getcwd(), upward = true })[1]
+end
+
 function M.start_hlslens()
   require('hlslens').start()
 end
