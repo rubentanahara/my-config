@@ -16,7 +16,7 @@ return {
   },
   {
     'christoomey/vim-tmux-navigator',
-    event = 'VeryLazy',
+    lazy = false,
     cond = function()
       return vim.env.TMUX ~= nil
     end,

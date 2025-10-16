@@ -27,7 +27,7 @@ local keys = {
     '*',
     function()
       vim.cmd('normal! *')
-  utils.start_hlslens()
+      utils.start_hlslens()
     end,
     desc = 'Search word under cursor forward with HLSLens',
     mode = { 'n', 'x', 'o' },
@@ -36,7 +36,7 @@ local keys = {
     '#',
     function()
       vim.cmd('normal! #')
-  utils.start_hlslens()
+      utils.start_hlslens()
     end,
     desc = 'Search word under cursor backward with HLSLens',
     mode = { 'n', 'x', 'o' },
@@ -45,7 +45,7 @@ local keys = {
     'g*',
     function()
       vim.cmd('normal! g*')
-  utils.start_hlslens()
+      utils.start_hlslens()
     end,
     desc = 'Search partial word under cursor forward with HLSLens',
     mode = { 'n', 'x', 'o' },
@@ -54,7 +54,7 @@ local keys = {
     'g#',
     function()
       vim.cmd('normal! g#')
-  utils.start_hlslens()
+      utils.start_hlslens()
     end,
     desc = 'Search partial word under cursor backward with HLSLens',
     mode = { 'n', 'x', 'o' },

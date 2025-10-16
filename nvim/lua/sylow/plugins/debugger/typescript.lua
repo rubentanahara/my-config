@@ -1,5 +1,6 @@
 return {
   'mfussenegger/nvim-dap',
+  ft = { 'typescript', 'javascript', 'typescriptreact', 'javascriptreact' },
   opts = function()
     local mason_path = vim.fn.stdpath('data') .. '/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js'
     local dap = require('dap')

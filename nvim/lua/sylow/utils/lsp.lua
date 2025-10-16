@@ -452,7 +452,7 @@ function M.apply_user_lsp_mappings(client, bufnr)
   local server_name = client.name
 
   if server_name ~= 'copilot' then
-    local icon =  get_icon('LSPActive')
+    local icon = get_icon('LSPActive')
     lsp_mappings.v = lsp_mappings.v or {}
     lsp_mappings.v['<leader>l'] = { desc = icon .. ' ' .. server_name }
   end

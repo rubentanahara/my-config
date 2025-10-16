@@ -3,7 +3,11 @@ local LAZY_REPO = 'https://github.com/folke/lazy.nvim.git'
 local LAZY_ROCKS_ENABLED = vim.fn.executable('luarocks') == 1
 local DISABLED_PLUGINS = {
   'gzip',
+  'matchit',
+  'matchparen',
+  'netrwPlugin',
   'tarPlugin',
+  'tohtml',
   'tutor',
   'zipPlugin',
 }
@@ -88,7 +92,10 @@ local function initialize_lazy(lazy_path)
 
   local lazy_config = {
     spec = get_plugin_spec(),
-    defaults = { lazy = true, version = false },
+    defaults = { lazy = true },
+    pkg = {
+      enabled = false,
+    },
     performance = {
       rtp = {
         disabled_plugins = DISABLED_PLUGINS,
