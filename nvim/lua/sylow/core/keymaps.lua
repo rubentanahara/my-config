@@ -57,8 +57,11 @@ maps.n['<C-s>'] = { '<cmd>w<cr>', desc = 'Save file' }
 maps.n['<C-q>'] = { '<cmd>q<cr>', desc = 'Quit' }
 maps.n['<leader>n'] = { '<cmd>enew<cr>', desc = 'New file' }
 maps.n['gx'] = { utils.open_with_program, desc = 'Open file under cursor' }
-maps.v['J'] = { ":m '>+1<CR>gv=gv", desc = 'Move line up' }
-maps.v['K'] = { ":m '>-2<CR>gv=gv", desc = 'Move line down' }
+
+maps.n['<A-j>'] = { ":m '.+1<CR>gv==", desc = 'Move selection down' }
+maps.n['<A-k>'] = { ":m '.-2<CR>gv==", desc = 'Move selection up' }
+maps.v['<A-j>'] = { ":m '>+1<CR>gv=gv", desc = 'Move selection down' }
+maps.v['<A-k>'] = { ":m '<-2<CR>gv=gv", desc = 'Move selection up' }
 maps.v['<'] = { '<gv', desc = 'Unindent line' }
 maps.v['>'] = { '>gv', desc = 'Indent line' }
 maps.x['<S-Tab>'] = { '<gv', desc = 'Unindent line' }
