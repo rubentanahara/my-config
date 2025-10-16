@@ -21,7 +21,7 @@ local function configure_luasnip(_, opts)
 
   -- Custom snippet paths
   require('luasnip.loaders.from_vscode').lazy_load({
-    paths = { vim.fn.stdpath('config') .. '/snippets' }
+    paths = { vim.fn.stdpath('config') .. '/snippets' },
   })
 
   -- Filetype extensions for documentation snippets
@@ -32,6 +32,7 @@ local function configure_luasnip(_, opts)
     python = { 'pydoc' },
     rust = { 'rustdoc' },
     cs = { 'csharpdoc' },
+    cpp = { 'cppdoc' },
   }
 
   for ft, exts in pairs(filetype_extensions) do
@@ -106,9 +107,15 @@ return {
   {
     'L3MON4D3/LuaSnip',
     build = not is_windows and 'make install_jsregexp' or nil,
-    event = 'InsertEnter',
+    event = { 'BufReadPre', 'BufNewFile' },
     dependencies = {
-      'rafamadriz/friendly-snippets',
+      {
+        'rafamadriz/friendly-snippets',
+        config = function()
+          require('luasnip.loaders.from_vscode').lazy_load()
+          require('luasnip.loaders.from_vscode').lazy_load({ paths = { vim.fn.stdpath('config') .. '/snippets' } })
+        end,
+      },
       'zeioth/NormalSnippets',
       'benfowler/telescope-luasnip.nvim',
     },

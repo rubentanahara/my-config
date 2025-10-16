@@ -103,6 +103,8 @@ opt.splitright = true                               -- Open vertical splits to t
 opt.splitbelow = true                               -- Open horizontal splits below
 opt.splitkeep = 'screen'                            -- Keep text on screen when splitting
 opt.spelllang = 'en'                                -- Set spell checking language to US English
+vim.o.completeopt = 'menu,menuone,noselect,popup,fuzzy'
+vim.o.wildoptions = 'fuzzy,pum,tagfile'
 
 -- Search
 opt.hlsearch = true  -- Highlight all search matches
@@ -111,7 +113,7 @@ opt.incsearch = true -- Show matches as you type
 -- Performance
 opt.redrawtime = 1500  -- Time in ms spent redrawing the display
 opt.timeoutlen = 300   -- Time to wait for mapped sequence to complete (ms)
-opt.updatetime = 300   -- Faster completion and swap file writing
+opt.updatetime = 2000   -- Faster completion and swap file writing
 opt.undolevels = 10000 -- Maximum number of changes that can be undone
 
 -- Window
@@ -129,3 +131,15 @@ opt.viewoptions:remove 'curdir'                              -- Don't save curre
 opt.shortmess:append { s = true, I = true }                  -- Disable startup message.
 opt.backspace:append { 'nostop' }                            -- Don't stop backspacing at start of line
 opt.diffopt:append { 'algorithm:histogram', 'linematch:60' } -- Better diff algorithm and line matching
+
+local gui_cursor = {
+    'n-v-c:block',
+    'i-ci-ve:ver10',
+    'r-cr:hor20',
+    'o:hor50',
+    'a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor',
+    'sm:block-blinkwait175-blinkoff150-blinkon175',
+}
+
+vim.o.guicursor = table.concat(gui_cursor, ',')
+

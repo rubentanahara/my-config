@@ -11,7 +11,7 @@ end
 ------------------------------------------
 
 function M.change_number()
-  local number = vim.wo.number                 -- local to window
+  local number = vim.wo.number -- local to window
   local relativenumber = vim.wo.relativenumber -- local to window
   if not number and not relativenumber then
     vim.wo.number = true
@@ -141,8 +141,8 @@ function M.toggle_coverage_signs(bufnr)
   if vim.b[bufnr].coverage_signs_enabled then
     utils.notify(
       'Coverage signs on:'
-      .. '\n\n- Git signs will be temporary disabled.'
-      .. "\n- Diagnostic signs won't be automatically disabled."
+        .. '\n\n- Git signs will be temporary disabled.'
+        .. "\n- Diagnostic signs won't be automatically disabled."
     )
     vim.cmd('Gitsigns toggle_signs')
     require('coverage').load(true)
@@ -190,8 +190,8 @@ end
 
 function M.toggle_inlay_hints(bufnr)
   bufnr = bufnr or 0
-  vim.g.inlay_hints_enabled = not vim.g.inlay_hints_enabled                   -- flip global state
-  vim.b.inlay_hints_enabled = not vim.g.inlay_hints_enabled                   -- sync buffer state
+  vim.g.inlay_hints_enabled = not vim.g.inlay_hints_enabled -- flip global state
+  vim.b.inlay_hints_enabled = not vim.g.inlay_hints_enabled -- sync buffer state
   vim.lsp.buf.inlay_hint.enable(vim.g.inlay_hints_enabled, { bufnr = bufnr }) -- apply state
   utils.notify(string.format('Global inlay hints %s', bool2str(vim.g.inlay_hints_enabled)))
 end

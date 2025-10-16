@@ -24,6 +24,26 @@ local function get_args(config)
   return config
 end
 
+-- HACK: in nvim 0.9+, lspconfig will set &tagfunc to vim.lsp.tagfunc
+-- automatically. For lsp that does not support workspace symbol, this function
+-- may cause conflict because `cmp-nvim-tags` which uses tags to search
+-- workspace symbol, leading to an error when `vim.lsp.tagfunc` is called. To
+-- prevent this behavior, we disable it.
+--
+-- Besides, vim.lsp.tagfunc also has performance issue if you want to use it in
+-- auto completion.
+
+-- Occasionally, due to potential execution order issues: you might set tagfunc
+-- to nil, but the LSP could re-register it later. So that you may need a
+-- "brute force way" to ask neovim will always fallback to the default tag
+-- search method immediately.
+TAGFUNC_FALLBACK_IMMEDIATELY = function()
+    return vim.NIL
+end
+
+-- if tagfunc is already registered, nvim lsp will not try to set tagfunc as vim.lsp.tagfunc.
+vim.o.tagfunc = 'v:lua.TAGFUNC_FALLBACK_IMMEDIATELY'
+
 -- Key mappings
 local function get_dap_keys()
   return {
@@ -431,6 +451,15 @@ end
 -- Base DAP setup
 local function setup_dap()
   vim.api.nvim_set_hl(0, 'DapStoppedLine', { default = true, link = 'Visual' })
+  require('dap-view').setup {
+    winbar = {
+      -- merge the integrated terminal (console) with other sections
+      sections = { 'watches', 'scopes', 'exceptions', 'breakpoints', 'threads', 'repl', 'console' },
+    },
+    windows = {
+      height = math.ceil(vim.o.lines / 3),
+    },
+  }
 
   -- Setup language configurations
   setup_language_debuggers()
@@ -489,6 +518,7 @@ return {
       'rcarriga/nvim-dap-ui',
       'theHamsta/nvim-dap-virtual-text',
       'jay-babu/mason-nvim-dap.nvim',
+      'igorlfs/nvim-dap-view',
     },
     config = setup_dap,
   },
