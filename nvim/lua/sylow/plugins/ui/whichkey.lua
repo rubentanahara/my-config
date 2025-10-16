@@ -100,6 +100,12 @@ return {
             desc = 'Docs',
           },
           {
+            '<leader>m',
+            group = 'Mason',
+            icon = { icon = get_icon('Mason'), color = 'blue' },
+            desc = 'Mason',
+          },
+          {
             '<leader>g',
             group = 'Git',
             icon = { icon = get_icon('Git') },

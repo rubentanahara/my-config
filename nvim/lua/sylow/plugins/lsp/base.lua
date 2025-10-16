@@ -64,12 +64,12 @@ local function setup_mason_lspconfig()
 end
 
 local mason_keys = {
-  { '<leader>cmo', '<cmd>Mason<cr>', desc = 'Mason' },
-  { '<leader>cmi', '<cmd>MasonInstall<cr>', desc = 'Mason Install' },
-  { '<leader>cmu', '<cmd>MasonUninstall<cr>', desc = 'Mason Uninstall' },
-  { '<leader>cma', '<cmd>MasonUninstallAll<cr>', desc = 'Mason Uninstall All' },
-  { '<leader>cml', '<cmd>MasonLog<cr>', desc = 'Mason Log' },
-  { '<leader>cmU', '<cmd>MasonUpdate<cr>', desc = 'Mason Update' },
+  { '<leader>mo', '<cmd>Mason<cr>', desc = 'Mason' },
+  { '<leader>mi', '<cmd>MasonInstall<cr>', desc = 'Mason Install' },
+  { '<leader>mu', '<cmd>MasonUninstall<cr>', desc = 'Mason Uninstall' },
+  { '<leader>ma', '<cmd>MasonUninstallAll<cr>', desc = 'Mason Uninstall All' },
+  { '<leader>ml', '<cmd>MasonLog<cr>', desc = 'Mason Log' },
+  { '<leader>mU', '<cmd>MasonUpdate<cr>', desc = 'Mason Update' },
 }
 
 local mason_cmds = {

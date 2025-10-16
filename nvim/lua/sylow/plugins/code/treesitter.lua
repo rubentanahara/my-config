@@ -17,7 +17,7 @@ local function setup_treesitter()
         return utils.is_big_file(bufnr)
       end,
     },
-    incremental_selection = { enable = true },
+    additional_vim_regex_highlighting = false,
     indent = { enable = true },
     ensure_installed = {
       'lua',
@@ -25,11 +25,9 @@ local function setup_treesitter()
       'vim',
       'vimdoc',
       'c_sharp',
-      'ninja',
       'rst',
       'rust',
       'python',
-      'ron',
       'javascript',
       'typescript',
       'toml',
@@ -48,7 +46,7 @@ local function setup_treesitter()
       'json',
       'bicep',
       'xml',
-      'sql'
+      'sql',
     },
     query_linter = {
       enable = true,
@@ -181,7 +179,7 @@ return {
   },
   {
     'nvim-treesitter/nvim-treesitter',
-    event = 'User BaseDeferred',
+    event = { 'BufReadPre', 'BufNewFile' },
     cmd = {
       'TSBufDisable',
       'TSBufEnable',
@@ -204,7 +202,7 @@ return {
       -- Merge autotag configuration
       opts.autotag = require('nvim-ts-autotag').setup({})
 
-      -- Merge context commentstring configuration  
+      -- Merge context commentstring configuration
       opts.context_commentstring = setup_context_commentstring()
 
       return opts
