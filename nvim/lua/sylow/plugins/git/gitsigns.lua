@@ -3,6 +3,7 @@ local utils = require('sylow.utils')
 return {
   'lewis6991/gitsigns.nvim',
   event = { 'BufReadPre', 'BufNewFile' },
+  lazy= false,
   cond = function()
     return utils.is_git_repo()
   end,

@@ -27,30 +27,145 @@ end
 -- Key mappings
 local function get_dap_keys()
   return {
-    { "<leader>dB", function() require("dap").set_breakpoint(vim.fn.input('Breakpoint condition: ')) end, desc = "Breakpoint Condition" },
-    { "<leader>db", function() require("dap").toggle_breakpoint() end,                                    desc = "Toggle Breakpoint" },
-    { "<leader>dc", function() require("dap").continue() end,                                             desc = "Run/Continue" },
-    { "<leader>da", function() require("dap").continue({ before = get_args }) end,                        desc = "Run with Args" },
-    { "<leader>dC", function() require("dap").run_to_cursor() end,                                        desc = "Run to Cursor" },
-    { "<leader>dg", function() require("dap").goto_() end,                                                desc = "Go to Line (No Execute)" },
-    { "<leader>di", function() require("dap").step_into() end,                                            desc = "Step Into" },
-    { "<leader>dj", function() require("dap").down() end,                                                 desc = "Down" },
-    { "<leader>dk", function() require("dap").up() end,                                                   desc = "Up" },
-    { "<leader>dl", function() require("dap").run_last() end,                                             desc = "Run Last" },
-    { "<leader>do", function() require("dap").step_out() end,                                             desc = "Step Out" },
-    { "<leader>dO", function() require("dap").step_over() end,                                            desc = "Step Over" },
-    { "<leader>dP", function() require("dap").pause() end,                                                desc = "Pause" },
-    { "<leader>dr", function() require("dap").repl.toggle() end,                                          desc = "Toggle REPL" },
-    { "<leader>ds", function() require("dap").session() end,                                              desc = "Session" },
-    { "<leader>dt", function() require("dap").terminate() end,                                            desc = "Terminate" },
-    { "<leader>dw", function() require("dap.ui.widgets").hover() end,                                     desc = "Widgets" },
+    {
+      '<leader>dB',
+      function()
+        require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: '))
+      end,
+      desc = 'Breakpoint Condition',
+    },
+    {
+      '<leader>db',
+      function()
+        require('dap').toggle_breakpoint()
+      end,
+      desc = 'Toggle Breakpoint',
+    },
+    {
+      '<leader>dc',
+      function()
+        require('dap').continue()
+      end,
+      desc = 'Run/Continue',
+    },
+    {
+      '<leader>da',
+      function()
+        require('dap').continue({ before = get_args })
+      end,
+      desc = 'Run with Args',
+    },
+    {
+      '<leader>dC',
+      function()
+        require('dap').run_to_cursor()
+      end,
+      desc = 'Run to Cursor',
+    },
+    {
+      '<leader>dg',
+      function()
+        require('dap').goto_()
+      end,
+      desc = 'Go to Line (No Execute)',
+    },
+    {
+      '<leader>di',
+      function()
+        require('dap').step_into()
+      end,
+      desc = 'Step Into',
+    },
+    {
+      '<leader>dj',
+      function()
+        require('dap').down()
+      end,
+      desc = 'Down',
+    },
+    {
+      '<leader>dk',
+      function()
+        require('dap').up()
+      end,
+      desc = 'Up',
+    },
+    {
+      '<leader>dl',
+      function()
+        require('dap').run_last()
+      end,
+      desc = 'Run Last',
+    },
+    {
+      '<leader>do',
+      function()
+        require('dap').step_out()
+      end,
+      desc = 'Step Out',
+    },
+    {
+      '<leader>dO',
+      function()
+        require('dap').step_over()
+      end,
+      desc = 'Step Over',
+    },
+    {
+      '<leader>dP',
+      function()
+        require('dap').pause()
+      end,
+      desc = 'Pause',
+    },
+    {
+      '<leader>dr',
+      function()
+        require('dap').repl.toggle()
+      end,
+      desc = 'Toggle REPL',
+    },
+    {
+      '<leader>ds',
+      function()
+        require('dap').session()
+      end,
+      desc = 'Session',
+    },
+    {
+      '<leader>dt',
+      function()
+        require('dap').terminate()
+      end,
+      desc = 'Terminate',
+    },
+    {
+      '<leader>dw',
+      function()
+        require('dap.ui.widgets').hover()
+      end,
+      desc = 'Widgets',
+    },
   }
 end
 
 local function get_dapui_keys()
   return {
-    { "<leader>du", function() require("dapui").toggle({}) end, desc = "Dap UI" },
-    { "<leader>de", function() require("dapui").eval() end,     desc = "Eval",  mode = { "n", "v" } },
+    {
+      '<leader>du',
+      function()
+        require('dapui').toggle({})
+      end,
+      desc = 'Dap UI',
+    },
+    {
+      '<leader>de',
+      function()
+        require('dapui').eval()
+      end,
+      desc = 'Eval',
+      mode = { 'n', 'v' },
+    },
   }
 end
 
@@ -66,15 +181,15 @@ local function setup_language_debuggers()
   if is_mac and is_arm then
     require('netcoredbg-macOS-arm64').setup(dap)
   else
-    local mason_path = vim.fn.stdpath("data") .. "/mason/packages/netcoredbg/netcoredbg"
+    local mason_path = vim.fn.stdpath('data') .. '/mason/packages/netcoredbg/netcoredbg'
     local netcoredbg_adapter = {
-      type = "executable",
+      type = 'executable',
       command = mason_path,
-      args = { "--interpreter=vscode" },
+      args = { '--interpreter=vscode' },
     }
 
     dap.adapters.netcoredbg = netcoredbg_adapter -- needed for normal debugging
-    dap.adapters.coreclr = netcoredbg_adapter    -- needed for unit test debugging
+    dap.adapters.coreclr = netcoredbg_adapter -- needed for unit test debugging
     dap.configurations.cs = {
       {
         type = 'coreclr',
@@ -84,7 +199,7 @@ local function setup_language_debuggers()
         program = function()
           utils.build_dll_path()
         end,
-      }
+      },
     }
   end
 
@@ -96,22 +211,22 @@ local function setup_language_debuggers()
   }
   dap.configurations.python = {
     {
-      type = "python",
-      request = "launch",
-      name = "Launch file",
-      program = "${file}",
+      type = 'python',
+      request = 'launch',
+      name = 'Launch file',
+      program = '${file}',
     },
   }
 
   -- C/C++/Rust
   dap.adapters.codelldb = {
     type = 'server',
-    port = "${port}",
+    port = '${port}',
     executable = {
       command = vim.fn.stdpath('data') .. '/mason/bin/codelldb',
-      args = { "--port", "${port}" },
+      args = { '--port', '${port}' },
       detached = not is_windows,
-    }
+    },
   }
 
   -- C/C++
@@ -133,10 +248,10 @@ local function setup_language_debuggers()
           local files = vim.fn.globpath(dir, '*', false, true)
           local dir_executables = vim.tbl_filter(function(file)
             local filename = vim.fn.fnamemodify(file, ':t')
-            return not filename:match('^%.') and
-                not filename:match('%.so$') and
-                not filename:match('%.a$') and
-                not filename:match('%.d$')
+            return not filename:match('^%.')
+              and not filename:match('%.so$')
+              and not filename:match('%.a$')
+              and not filename:match('%.d$')
           end, files)
 
           vim.list_extend(executables, dir_executables)
@@ -153,7 +268,7 @@ local function setup_language_debuggers()
             prompt = 'Select executable to debug:',
             format_item = function(file)
               return vim.fn.fnamemodify(file, ':t')
-            end
+            end,
           }, function(choice)
             return choice
           end)
@@ -164,7 +279,7 @@ local function setup_language_debuggers()
       end,
       cwd = '${workspaceFolder}',
       stopOnEntry = false,
-    }
+    },
   }
 
   dap.configurations.c = dap.configurations.cpp
@@ -184,11 +299,11 @@ local function setup_language_debuggers()
         local executables = vim.tbl_filter(function(file)
           local filename = vim.fn.fnamemodify(file, ':t')
           -- Ignore common non-executable files
-          return not filename:match('^%.') and -- Ignore hidden files
-              not filename:match('%.so$') and -- Ignore shared libraries
-              not filename:match('%.a$') and -- Ignore static libraries
-              not filename:match('%.d$') and -- Ignore dependency files
-              not filename:match('%.rlib$')  -- Ignore Rust library files
+          return not filename:match('^%.') -- Ignore hidden files
+            and not filename:match('%.so$') -- Ignore shared libraries
+            and not filename:match('%.a$') -- Ignore static libraries
+            and not filename:match('%.d$') -- Ignore dependency files
+            and not filename:match('%.rlib$') -- Ignore Rust library files
         end, files)
 
         -- If only one executable found, use it
@@ -205,14 +320,14 @@ local function setup_language_debuggers()
               prompt = 'Select executable to debug:',
               format_item = function(file)
                 return vim.fn.fnamemodify(file, ':t')
-              end
+              end,
             }, function(choice)
               coroutine.resume(co, choice)
             end)
             return coroutine.yield()
           else
             -- Fallback if not in coroutine context
-            print("Multiple executables found, using first one: " .. executables[1])
+            print('Multiple executables found, using first one: ' .. executables[1])
             return executables[1]
           end
         end
@@ -222,7 +337,7 @@ local function setup_language_debuggers()
       end,
       cwd = '${workspaceFolder}',
       stopOnEntry = false,
-    }
+    },
   }
 
   -- Go
@@ -232,14 +347,14 @@ local function setup_language_debuggers()
     executable = {
       command = vim.fn.stdpath('data') .. '/mason/packages/delve/dlv',
       args = { 'dap', '-l', '127.0.0.1:${port}' },
-    }
+    },
   }
   dap.configurations.go = {
     {
-      type = "delve",
-      name = "Debug file",
-      request = "launch",
-      program = "./${relativeFileDirname}",
+      type = 'delve',
+      name = 'Debug file',
+      request = 'launch',
+      program = './${relativeFileDirname}',
     },
   }
 
@@ -263,34 +378,36 @@ local function setup_language_debuggers()
 
   -- Lua
   dap.adapters.nlua = function(callback, config)
-    callback({ type = 'server', host = config.host or "127.0.0.1", port = config.port or 8086 })
+    callback({ type = 'server', host = config.host or '127.0.0.1', port = config.port or 8086 })
   end
   dap.configurations.lua = {
     {
       type = 'nlua',
       request = 'attach',
-      name = "Attach to Neovim",
-      program = function() pcall(require "osv".launch({ port = 8086 })) end,
-    }
+      name = 'Attach to Neovim',
+      program = function()
+        pcall(require 'osv'.launch({ port = 8086 }))
+      end,
+    },
   }
 
   -- Dart/Flutter
   dap.adapters.dart = {
     type = 'executable',
     command = vim.fn.stdpath('data') .. '/mason/bin/dart-debug-adapter',
-    args = { 'dart' }
+    args = { 'dart' },
   }
   dap.adapters.flutter = {
     type = 'executable',
     command = vim.fn.stdpath('data') .. '/mason/bin/dart-debug-adapter',
-    args = { 'flutter' }
+    args = { 'flutter' },
   }
   dap.configurations.dart = {
     {
-      type = "dart",
-      request = "launch",
-      name = "Launch Dart",
-      program = "${workspaceFolder}/lib/main.dart",
+      type = 'dart',
+      request = 'launch',
+      name = 'Launch Dart',
+      program = '${workspaceFolder}/lib/main.dart',
     },
   }
 
@@ -306,7 +423,7 @@ local function setup_language_debuggers()
       type = 'kotlin',
       request = 'launch',
       name = 'Launch Kotlin',
-      projectRoot = "${workspaceFolder}",
+      projectRoot = '${workspaceFolder}',
     },
   }
 end
@@ -333,10 +450,18 @@ local function setup_dapui(_, opts)
   dapui.setup(opts)
 
   -- Auto open/close DAP UI
-  dap.listeners.before.attach.dapui_config = function() dapui.open() end
-  dap.listeners.before.launch.dapui_config = function() dapui.open() end
-  dap.listeners.before.event_terminated.dapui_config = function() dapui.close() end
-  dap.listeners.before.event_exited.dapui_config = function() dapui.close() end
+  dap.listeners.before.attach.dapui_config = function()
+    dapui.open()
+  end
+  dap.listeners.before.launch.dapui_config = function()
+    dapui.open()
+  end
+  dap.listeners.before.event_terminated.dapui_config = function()
+    dapui.close()
+  end
+  dap.listeners.before.event_exited.dapui_config = function()
+    dapui.close()
+  end
 end
 
 -- Mason DAP setup
@@ -344,11 +469,11 @@ local function setup_mason_dap()
   return {
     automatic_installation = true,
     ensure_installed = {
-      'netcoredbg',           -- C#
-      'codelldb',             -- C/C++/Rust
-      'debugpy',              -- Python
-      'js-debug-adapter',     -- JavaScript/TypeScript
-      'dart-debug-adapter',   -- Dart/Flutter
+      'netcoredbg', -- C#
+      'codelldb', -- C/C++/Rust
+      'debugpy', -- Python
+      'js-debug-adapter', -- JavaScript/TypeScript
+      'dart-debug-adapter', -- Dart/Flutter
       'kotlin-debug-adapter', -- Kotlin
     },
   }
@@ -391,25 +516,25 @@ return {
     },
     keys = get_dapui_keys,
     opts = {
-      icons = { expanded = "▾", collapsed = "▸", current_frame = "*" },
+      icons = { expanded = '▾', collapsed = '▸', current_frame = '*' },
       layouts = {
         {
           elements = {
-            { id = "scopes",      size = 0.25 },
-            { id = "breakpoints", size = 0.25 },
-            { id = "stacks",      size = 0.25 },
-            { id = "watches",     size = 0.25 },
+            { id = 'scopes', size = 0.25 },
+            { id = 'breakpoints', size = 0.25 },
+            { id = 'stacks', size = 0.25 },
+            { id = 'watches', size = 0.25 },
           },
           size = 40,
-          position = "left",
+          position = 'left',
         },
         {
           elements = {
-            { id = "repl",    size = 0.5 },
-            { id = "console", size = 0.5 },
+            { id = 'repl', size = 0.5 },
+            { id = 'console', size = 0.5 },
           },
           size = 10,
-          position = "bottom",
+          position = 'bottom',
         },
       },
     },
