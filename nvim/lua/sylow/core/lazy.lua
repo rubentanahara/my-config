@@ -1,5 +1,3 @@
-local utils = require('sylow.utils')
-
 local LAZY_PATH = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 local LAZY_REPO = 'https://github.com/folke/lazy.nvim.git'
 local LAZY_ROCKS_ENABLED = vim.fn.executable('luarocks') == 1
