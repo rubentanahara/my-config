@@ -541,32 +541,53 @@ function M.apply_user_lsp_settings(server_name)
         showTodos = true,
       },
     }
-
-    -- elseif server_name == 'roslyn' then
-    --   opts.settings = {
-    --     roslyn = {
-    --       handlers = {
-    --         ["textDocument/definition"] = function(...)
-    --           return require("omnisharp_extended").handler(...)
-    --         end,
-    --       },
-    --       keys = {
-    --         {
-    --           "gd",
-    --           utils.is_available("telescope.nvim") and function()
-    --             require("omnisharp_extended").telescope_lsp_definitions()
-    --           end or function()
-    --             require("omnisharp_extended").lsp_definitions()
-    --           end,
-    --           desc = "Goto Definition",
-    --         },
-    --       },
-    --       enable_roslyn_analyzers = true,
-    --       organize_imports_on_format = true,
-    --       enable_import_completion = true,
-    --       filetypes = { 'cs', 'vb', 'csproj', 'sln', 'slnx', 'props', 'csx', 'targets', 'tproj', 'slngen', 'fproj' },
-    --     }
-    --   }
+  elseif server_name == 'ts_ls' then
+    opts.filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' }
+    opts.settings = {
+      typescript = {
+        inlayHints = {
+          includeInlayParameterNameHints = 'all',
+          includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+          includeInlayFunctionParameterTypeHints = true,
+          includeInlayVariableTypeHints = true,
+          includeInlayPropertyDeclarationTypeHints = true,
+          includeInlayFunctionLikeReturnTypeHints = true,
+          includeInlayEnumMemberValueHints = true,
+        },
+      },
+      javascript = {
+        inlayHints = {
+          includeInlayParameterNameHints = 'all',
+          includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+          includeInlayFunctionParameterTypeHints = true,
+          includeInlayVariableTypeHints = true,
+          includeInlayPropertyDeclarationTypeHints = true,
+          includeInlayFunctionLikeReturnTypeHints = true,
+          includeInlayEnumMemberValueHints = true,
+        },
+      },
+    }
+  elseif server_name == 'kotlin_language_server' then
+    opts.filetypes = { 'kotlin', 'kt', 'kts' }
+    opts.cmd = { 'kotlin-language-server' }
+    -- Enhanced configuration for better experience
+    opts.settings = {
+      kotlin = {
+        compiler = {
+          jvm = {
+            target = '17', -- or your preferred Java version
+          },
+        },
+        codeGeneration = {
+          equalsAndHashCode = {
+            template = 'IDE',
+          },
+        },
+        completion = {
+          sort = 'lexicographical',
+        },
+      },
+    }
   end
 
   return opts

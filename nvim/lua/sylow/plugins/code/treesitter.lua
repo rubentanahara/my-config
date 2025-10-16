@@ -20,6 +20,7 @@ local function setup_treesitter()
     additional_vim_regex_highlighting = false,
     indent = { enable = true },
     ensure_installed = {
+    	'kotlin',
       'lua',
       'luadoc',
       'vim',
