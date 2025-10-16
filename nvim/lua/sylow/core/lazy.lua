@@ -23,7 +23,7 @@ local function clone_lazy()
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({
       { 'Failed to clone lazy.nvim:\n', 'ErrorMsg' },
-      { output,                         'WarningMsg' },
+      { output, 'WarningMsg' },
       { '\nPress any key to exit...' },
     }, true, {})
     vim.fn.getchar()
@@ -34,7 +34,7 @@ local function clone_lazy()
 end
 
 local function setup_post_install_loads(plugins)
-  local original_cmdheight = vim.opt.cmdheight;
+  local original_cmdheight = vim.opt.cmdheight
   vim.opt.cmdheight = 1
 
   vim.api.nvim_create_autocmd('User', {
@@ -97,8 +97,8 @@ local function initialize_lazy(lazy_path)
       },
     },
     checker = {
-      enabled = false, -- check for plugin updates periodically turn off
-      notify = false,  -- notify on update
+      enabled = false,
+      notify = false,
     },
     rocks = { enabled = LAZY_ROCKS_ENABLED },
   }
@@ -109,7 +109,6 @@ end
 local is_first_startup = not (vim.uv or vim.loop).fs_stat(LAZY_PATH)
 
 if is_first_startup then
-  utils.notify('First time setup: Lazy.nvim not found, cloning...', vim.log.levels.INFO)
   if not clone_lazy() then
     vim.notify('Lazy.nvim setup failed: could not clone repository', vim.log.levels.ERROR)
     return false
