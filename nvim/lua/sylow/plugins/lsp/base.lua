@@ -53,6 +53,7 @@ local function setup_mason_lspconfig()
       'ts_ls', -- js,ts
       'rust_analyzer', -- rust
       'pyright', -- python
+      'kotlin_language_server', -- kotlin'
     },
     handlers = {
       function(server_name)

@@ -20,14 +20,14 @@ return {
       }
     end,
   },
-  {
-    'seblyng/roslyn.nvim',
-    ---@module 'roslyn.config'
-    ---@type RoslynNvimConfig
-    ft = { 'cs', 'razor' },
-    opts = {},
-    lazy = false,
-  },
+  -- {
+  --   'seblyng/roslyn.nvim',
+  --   ---@module 'roslyn.config'
+  --   ---@type RoslynNvimConfig
+  --   ft = { 'cs', 'razor' },
+  --   opts = {},
+  --   lazy = false,
+  -- },
   {
     'nvim-neotest/neotest',
     requires = {

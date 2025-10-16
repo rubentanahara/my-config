@@ -9,6 +9,8 @@ return {
         lua = { 'stylua' },
         javascript = { 'prettier' },
         typescript = { 'prettier' },
+        kotlin = { 'ktlint' },
+				python = { 'black' },
       },
     })
 
