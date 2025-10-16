@@ -1,9 +1,5 @@
 #ln -s ~/.config/zshrc/.zshrc ~/.zshrc
 
-# ==============================================================================
-# PATH CONFIGURATION
-# ==============================================================================
-
 # Homebrew
 export PATH="/opt/homebrew/bin:$PATH"
 
@@ -51,10 +47,6 @@ export PATH="$HOME/.aspire/bin:$PATH"
 # Tmuxifier
 export PATH="$HOME/.tmuxifier/bin:$PATH"
 
-# ==============================================================================
-# SHELL BEHAVIOR & HISTORY
-# ==============================================================================
-
 # History configuration
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
@@ -66,10 +58,6 @@ export LC_ALL=en_US.UTF-8
 
 # Editor
 export EDITOR=nvim
-
-# ==============================================================================
-# SHELL PLUGINS & TOOLS
-# ==============================================================================
 
 # Starship prompt
 export STARSHIP_CONFIG="$HOME/.config/starship.toml"
@@ -99,10 +87,6 @@ source <(ng completion script)
 
 # Local environment
 . "$HOME/.local/bin/env"
-
-# ==============================================================================
-# CUSTOM FUNCTIONS
-# ==============================================================================
 
 # Directory management
 function mkd() {
@@ -314,10 +298,6 @@ curl_post()   { curl -s -i -X POST   "$@" | awk 'BEGIN{body=0} /^\r$/{body=1; pr
 curl_patch()  { curl -s -i -X PATCH  "$@" | awk 'BEGIN{body=0} /^\r$/{body=1; print ""; next} !body{print; next} body{print | "jq"}' | bat; }
 curl_put()    { curl -s -i -X PUT    "$@" | awk 'BEGIN{body=0} /^\r$/{body=1; print ""; next} !body{print; next} body{print | "jq"}' | bat; }
 curl_delete() { curl -s -i -X DELETE "$@" | awk 'BEGIN{body=0} /^\r$/{body=1; print ""; next} !body{print; next} body{print | "jq"}' | bat; }
-
-# ==============================================================================
-# ALIASES
-# ==============================================================================
 
 # Navigation
 alias ..="cd .."

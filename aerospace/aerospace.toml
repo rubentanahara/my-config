@@ -9,12 +9,12 @@ default-root-container-orientation = 'auto'
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
 [gaps]
-    inner.horizontal = 0
-    inner.vertical = 0
-    outer.left = 0
-    outer.bottom = 0
-    outer.top = 0
-    outer.right = 0
+    inner.horizontal = 10
+    inner.vertical = 10
+    outer.left = 10
+    outer.bottom = 10
+    outer.top = 10
+    outer.right = 10
 
 [key-mapping]
     preset = 'qwerty'
@@ -35,32 +35,29 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-3" = "workspace 3"
     "alt-4" = "workspace 4"
     "alt-5" = "workspace 5"
-    "alt-6" = "workspace 6"  # Workspace para música
+    "alt-6" = "workspace 6"
     
     "alt-shift-1" = "move-node-to-workspace 1"
     "alt-shift-2" = "move-node-to-workspace 2"
     "alt-shift-3" = "move-node-to-workspace 3"
     "alt-shift-4" = "move-node-to-workspace 4"
     "alt-shift-5" = "move-node-to-workspace 5"
-    "alt-shift-6" = "move-node-to-workspace 6"  # Mover ventanas al workspace de música
+    "alt-shift-6" = "move-node-to-workspace 6"
     
     "alt-t" = "layout tiles"
     "alt-c" = "layout accordion"
     "alt-f" = "layout floating"
     
-    "alt-minus" = "resize smart -50"       # Reducir tamaño según orientación
-    "alt-equal" = "resize smart +50"       # Aumentar tamaño según orientación
-    "alt-shift-minus" = "resize width -50" # Reducir anchura
-    "alt-shift-equal" = "resize width +50" # Aumentar anchura
-    "alt-ctrl-minus" = "resize height -50" # Reducir altura
-    "alt-ctrl-equal" = "resize height +50" # Aumentar altura
-    "alt-0" = "balance-sizes"              # Equilibrar tamaños de todas las ventanas
+    "alt-minus" = "resize smart -50"       
+    "alt-equal" = "resize smart +50"       
+    "alt-shift-minus" = "resize width -50" 
+    "alt-shift-equal" = "resize width +50" 
+    "alt-ctrl-minus" = "resize height -50" 
+    "alt-ctrl-equal" = "resize height +50" 
+    "alt-0" = "balance-sizes"              
     
-    "alt-g" = "exec-and-forget open -a Ghostty"
-    "alt-b" = "exec-and-forget open -a Arc"
-    "alt-p" = "exec-and-forget open -a Postman"
-    "alt-a" = "exec-and-forget open -a 'Android Studio Preview'"
-    "alt-d" = "exec-and-forget open -a DataGrip"
+    "alt-g" = "exec-and-forget open -a Wezterm"
+    "alt-b" = "exec-and-forget open -a Safari"
     "alt-s" = "exec-and-forget open -a Discord"
     "alt-n" = "exec-and-forget open -a Notion"
     "alt-w" = "exec-and-forget open -a 'Windows App'"
@@ -70,33 +67,6 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-y" = "macos-native-minimize"
     "alt-shift-q" = "close"
     "alt-shift-r" = "reload-config"
-
-# Asignar aplicaciones a espacios de trabajo específicos
-[[on-window-detected]]
-    if.app-id = 'com.arc.Browser'
-    run = 'move-node-to-workspace 1'
-
-# Asignar aplicaciones de notas al workspace 2
-[[on-window-detected]]
-    if.app-id = 'notion.id'
-    run = 'move-node-to-workspace 2'
-
-[[on-window-detected]]
-    if.app-id = 'com.apple.Notes'
-    run = 'move-node-to-workspace 2'
-
-# Asignar Postman al workspace 3 (aplicaciones de desarrollo)
-[[on-window-detected]]
-    if.app-id = 'com.postmanlabs.mac'
-    run = 'move-node-to-workspace 3'
-
-[[on-window-detected]]
-    if.app-id = 'com.google.android.studio'
-    run = 'move-node-to-workspace 3'
-
-[[on-window-detected]]
-    if.app-id = 'com.jetbrains.datagrip'
-    run = 'move-node-to-workspace 4'
 
 # Asignación de workspaces a monitores
 [workspace-to-monitor-force-assignment]
