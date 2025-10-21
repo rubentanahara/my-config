@@ -1,5 +1,4 @@
 return {
-  -- Setup Folding with nvim-ufo
   {
     'kevinhwang91/nvim-ufo',
     dependencies = {
@@ -7,9 +6,6 @@ return {
     },
     config = function()
       require('ufo').setup({
-        -- treesitter not required
-        -- ufo uses the same query files for folding (queries/<lang>/folds.scm)
-        -- performance and stability are better than `foldmethod=nvim_treesitter#foldexpr()`-
         provider_selector = function(_, _, _)
           return { 'treesitter', 'indent' }
         end,

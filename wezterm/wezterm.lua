@@ -14,7 +14,8 @@ config.colors = {
 }
 
 config.enable_kitty_graphics = true
-config.font = wezterm.font("FiraCode Nerd Font Mono", { weight = "Regular" })
+-- config.font = wezterm.font("FiraCode Nerd Font Mono", { weight = "Regular" })
+config.font = wezterm.font("JetBrains Mono", { weight = "Regular" })
 config.automatically_reload_config = true
 config.font_size = 14
 config.window_decorations = "RESIZE"

@@ -49,7 +49,7 @@ return {
         local lines = {}
         local win_height = vim.api.nvim_win_get_height(0)
         local used_lines = 3 + 1 + (7 * 2)
-        local padding_lines = math.max(1, win_height - used_lines)
+        local padding_lines = math.max(3, win_height - used_lines)
 
         for _ = 1, padding_lines do
           table.insert(lines, '')
