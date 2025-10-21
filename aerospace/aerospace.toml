@@ -56,7 +56,7 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-ctrl-equal" = "resize height +50" 
     "alt-0" = "balance-sizes"              
     
-    "alt-g" = "exec-and-forget open -a Wezterm"
+    "alt-g" = "exec-and-forget open -a Ghostty"
     "alt-b" = "exec-and-forget open -a Safari"
     "alt-s" = "exec-and-forget open -a Discord"
     "alt-n" = "exec-and-forget open -a Notion"

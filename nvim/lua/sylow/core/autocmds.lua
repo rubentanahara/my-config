@@ -50,8 +50,8 @@ utils.create_autocmd('LspAttach', {
   desc = 'Apply default LSP mappings when an LSP server attaches to a buffer',
   callback = function(e)
     local client = vim.lsp.get_client_by_id(e.data.client_id)
-    -- print(client.name)
     if client ~= nil then
+      print(client.name)
       lsp_utils.apply_user_lsp_mappings(client, e.buf)
     end
   end,

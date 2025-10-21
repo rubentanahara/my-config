@@ -1,8 +1,7 @@
 local utils = require('sylow.utils')
-local lsp_utils = require('sylow.utils.lsp')
 local get_icon = utils.get_icon
 
-return { 
+return {
   {
     'folke/which-key.nvim',
     event = 'VeryLazy',

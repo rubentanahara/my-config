@@ -19,6 +19,7 @@ local buffer_mappings = {
 return {
   {
     'famiu/bufdelete.nvim',
+    lazy = false,
   },
   {
     'akinsho/bufferline.nvim',

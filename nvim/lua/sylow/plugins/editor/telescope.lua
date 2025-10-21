@@ -12,54 +12,68 @@ end
 local keys = {
   {
     '<leader>fh',
-    function() telescope_builtin().help_tags() end,
+    function()
+      telescope_builtin().help_tags()
+    end,
     desc = 'Find Help',
   },
   {
     '<leader>fk',
-    function() telescope_builtin().keymaps() end,
+    function()
+      telescope_builtin().keymaps()
+    end,
     desc = 'Find Keymaps',
   },
   {
     '<leader>ff',
-    function() telescope_builtin().find_files() end,
+    function()
+      telescope_builtin().find_files()
+    end,
     desc = 'Find Files',
   },
   {
     '<leader>fg',
-    function() telescope_builtin().live_grep() end,
+    function()
+      telescope_builtin().live_grep()
+    end,
     desc = 'Find by Grep',
   },
   {
     '<leader>fd',
-    function() telescope_builtin().diagnostics() end,
+    function()
+      telescope_builtin().diagnostics()
+    end,
     desc = 'Find Diagnostics',
   },
   {
     '<leader>fr',
-    function() telescope_builtin().resume() end,
+    function()
+      telescope_builtin().resume()
+    end,
     desc = 'Find Resume',
   },
   {
     '<leader>f.',
-    function() telescope_builtin().oldfiles() end,
+    function()
+      telescope_builtin().oldfiles()
+    end,
     desc = 'Find Recent Files',
   },
   {
     '<leader>fb',
-    function() telescope_builtin().buffers() end,
+    function()
+      telescope_builtin().buffers()
+    end,
     desc = 'Find existing buffers',
   },
   {
     '<leader>f,',
     function()
-      telescope_builtin().current_buffer_fuzzy_find(
-        telescope_themes().get_dropdown({
-          winblend = 0,
-          previewer = true,
-          prompt_title = 'Live Grep in Current Buffer',
-        })
-      )
+      telescope_builtin().current_buffer_fuzzy_find(telescope_themes().get_dropdown({
+        winblend = 0,
+        previewer = true,
+        prompt_title = 'Live Grep in Current Buffer',
+      }))
     end,
     desc = 'Fuzzily search in current buffer',
   },
@@ -75,7 +89,9 @@ local keys = {
   },
   {
     '<leader>f;',
-    function() telescope_builtin().treesitter() end,
+    function()
+      telescope_builtin().treesitter()
+    end,
     desc = 'Lists Function names, variables, from Treesitter',
   },
 }
@@ -165,7 +181,7 @@ end
 local function load_extensions(telescope)
   local extensions = {
     -- 'luasnip',
-    'notify', 
+    'notify',
     'fzf',
     'ui-select',
     'flutter',
