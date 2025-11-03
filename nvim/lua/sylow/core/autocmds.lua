@@ -51,7 +51,6 @@ utils.create_autocmd('LspAttach', {
   callback = function(e)
     local client = vim.lsp.get_client_by_id(e.data.client_id)
     if client ~= nil then
-      print(client.name)
       lsp_utils.apply_user_lsp_mappings(client, e.buf)
     end
   end,
