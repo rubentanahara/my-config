@@ -53,8 +53,8 @@ maps.x['G'] = {
   desc = 'Go to last line and column (visual)',
 }
 maps.n['<leader><CR>'] = { utils.clear_search, desc = 'Clear search highlight' }
-maps.n['<C-s>'] = { '<cmd>w<cr>', desc = 'Save file' }
-maps.n['<C-q>'] = { '<cmd>q<cr>', desc = 'Quit' }
+maps.n['<leader>j'] = { '<cmd>w<cr>', desc = 'Save file' }
+maps.n['<leader>k'] = { '<cmd>q<cr>', desc = 'Quit' }
 maps.n['<leader>n'] = { '<cmd>enew<cr>', desc = 'New file' }
 maps.n['gx'] = { utils.open_with_program, desc = 'Open file under cursor' }
 

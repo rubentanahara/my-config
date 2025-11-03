@@ -69,6 +69,9 @@ eval "$(fzf --zsh)"
 # Tmuxifier
 eval "$(tmuxifier init -)"
 
+# Zoxide
+eval "$(zoxide init zsh)"
+
 # Zsh plugins
 source $HOMEBREW_PREFIX/opt/zsh-fast-syntax-highlighting/share/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
 source $HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh

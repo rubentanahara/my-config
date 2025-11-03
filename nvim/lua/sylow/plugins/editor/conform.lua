@@ -10,7 +10,8 @@ return {
         javascript = { 'prettier' },
         typescript = { 'prettier' },
         kotlin = { 'ktlint' },
-				python = { 'black' },
+        python = { 'black' },
+        csharp = { 'csharpier' },
       },
     })
 
