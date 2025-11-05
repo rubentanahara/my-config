@@ -41,7 +41,7 @@ local function setup_mason_tool_installer()
       'detekt', -- kotlin'
       -- DAPs
       'cpptools', -- cpp,c'
-      'dart_debug_adapter', -- dart'
+      'dart-debug-adapter', -- dart'
       'delve',
       'js-debug-adapter', -- js,ts
       -- 'netcoredbg', -- cs
