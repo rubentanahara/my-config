@@ -23,22 +23,29 @@ local function setup_mason_tool_installer()
   return {
     ensure_installed = {
       -- Formatters
+      'clang-format', -- cpp,c'
       'stylua', -- lua
       'prettier', -- js,ts
       'csharpier', -- cs
-      'rustfmt', -- rust
+      -- 'rustfmt', -- rust
       'black', -- python
       'xmlformatter',
       'ktfmt', -- kotlin'
       -- Linters
+      'cpplint', -- cpp,c'
       'luacheck', -- lua
       'eslint_d', -- js,ts
       'bacon', -- rust
       'flake8', -- python
       'ktlint', -- kotlin'
+      'detekt', -- kotlin'
       -- DAPs
+      'cpptools', -- cpp,c'
+      'dart_debug_adapter', -- dart'
+      'delve',
       'js-debug-adapter', -- js,ts
-      'netcoredbg', -- cs
+      -- 'netcoredbg', -- cs
+      'kotlin-debug-adapter', -- kotlin
       'codelldb', -- rust
       'debugpy', -- python
       'roslyn', --cs
@@ -51,6 +58,9 @@ end
 local function setup_mason_lspconfig()
   return {
     ensure_installed = {
+    	'roslyn', --cs
+    	'clangd', --cpp,c
+    	'markdown-oxide', -- markdown
       'lua_ls', -- lua
       'ts_ls', -- js,ts
       'rust_analyzer', -- rust
