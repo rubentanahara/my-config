@@ -40,6 +40,8 @@ local function setup_treesitter()
       'scss',
       'http',
       'go',
+      'java',
+      'regex',
       'terraform',
       'dockerfile',
       'gitignore',
@@ -199,11 +201,7 @@ return {
     build = ':TSUpdate',
     opts = function()
       local opts = setup_treesitter()
-
-      -- Merge autotag configuration
       opts.autotag = require('nvim-ts-autotag').setup({})
-
-      -- Merge context commentstring configuration
       opts.context_commentstring = setup_context_commentstring()
 
       return opts

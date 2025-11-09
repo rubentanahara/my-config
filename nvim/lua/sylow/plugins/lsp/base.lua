@@ -58,9 +58,9 @@ end
 local function setup_mason_lspconfig()
   return {
     ensure_installed = {
-    	'roslyn', --cs
+    	'jdtls', -- java'
     	'clangd', --cpp,c
-    	'markdown-oxide', -- markdown
+    	'markdown_oxide', -- markdown
       'lua_ls', -- lua
       'ts_ls', -- js,ts
       'rust_analyzer', -- rust

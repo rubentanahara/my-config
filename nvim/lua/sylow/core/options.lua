@@ -5,10 +5,11 @@ local utils = require('sylow.utils')
 function _G.statusLine()
   return g.flutter_tools_decorations.app_version
 end
-opt.statusline = '%!v:statusLine()'
+opt.statusline ='%!v:statusLine()'
 
 -- Globals
 vim.o.background = 'dark'                          -- Set the overall color theme to dark mode
+g.vim_markdown_math = 1
 g.mapleader = ' '                                  -- Set space as the leader key for custom mappings
 g.maplocalleader = '\\'                            -- Set backslash as the local leader key
 g.autoformat = false                               -- Disable autoformatting for all filetypes.

@@ -9,12 +9,10 @@ default-root-container-orientation = 'auto'
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
 [gaps]
-    inner.horizontal = 10
-    inner.vertical = 10
-    outer.left = 10
-    outer.bottom = 10
-    outer.top = 10
-    outer.right = 10
+    outer.left = 20
+    outer.bottom = 20
+    outer.top = 20
+    outer.right = 20
 
 [key-mapping]
     preset = 'qwerty'
@@ -36,6 +34,8 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-4" = "workspace 4"
     "alt-5" = "workspace 5"
     "alt-6" = "workspace 6"
+    "alt-7" = "workspace 7"
+    "alt-8" = "workspace 8"
     
     "alt-shift-1" = "move-node-to-workspace 1"
     "alt-shift-2" = "move-node-to-workspace 2"
@@ -43,7 +43,9 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-shift-4" = "move-node-to-workspace 4"
     "alt-shift-5" = "move-node-to-workspace 5"
     "alt-shift-6" = "move-node-to-workspace 6"
-    
+    "alt-shift-7" = "move-node-to-workspace 7"
+    "alt-shift-8" = "move-node-to-workspace 8"
+
     "alt-t" = "layout tiles"
     "alt-c" = "layout accordion"
     "alt-f" = "layout floating"
@@ -68,7 +70,6 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-shift-q" = "close"
     "alt-shift-r" = "reload-config"
 
-# Asignación de workspaces a monitores
 [workspace-to-monitor-force-assignment]
     1 = 'main'
     2 = 'main'
@@ -76,3 +77,5 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     4 = 'main'
     5 = 'main'
     6 = 'main' 
+    7 = 'main' 
+    8 = 'main' 

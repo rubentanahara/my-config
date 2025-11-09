@@ -12,6 +12,7 @@ return {
         kotlin = { 'ktlint' },
         python = { 'black' },
         csharp = { 'csharpier' },
+        markdown = { 'mdformat' },
       },
     })
 
