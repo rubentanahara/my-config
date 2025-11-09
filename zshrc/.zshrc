@@ -1,4 +1,19 @@
 #ln -s ~/.config/zshrc/.zshrc ~/.zshrc
+# Editor
+export EDITOR=nvim
+
+# Starship prompt
+export STARSHIP_CONFIG="$HOME/.config/starship.toml"
+eval "$(starship init zsh)"
+
+# FZF
+eval "$(fzf --zsh)"
+
+# Tmuxifier
+eval "$(tmuxifier init -)"
+
+# Zoxide
+eval "$(zoxide init zsh)"
 
 # Homebrew
 export PATH="/opt/homebrew/bin:$PATH"
@@ -61,21 +76,6 @@ export PATH="/usr/local/texlive/2024/bin/x86_64-darwin:$PATH"
 export MANPATH="/usr/local/texlive/2024/texmf-dist/doc/man:$MANPATH"
 export INFOPATH="/usr/local/texlive/2024/texmf-dist/doc/info:$INFOPATH"
 
-# Editor
-export EDITOR=nvim
-
-# Starship prompt
-export STARSHIP_CONFIG="$HOME/.config/starship.toml"
-eval "$(starship init zsh)"
-
-# FZF
-eval "$(fzf --zsh)"
-
-# Tmuxifier
-eval "$(tmuxifier init -)"
-
-# Zoxide
-eval "$(zoxide init zsh)"
 
 # Zsh plugins
 source $HOMEBREW_PREFIX/opt/zsh-fast-syntax-highlighting/share/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
@@ -89,9 +89,6 @@ export NVM_DIR="$HOME/.nvm"
 
 # Angular CLI completion
 source <(ng completion script)
-
-# Bun completions
-[ -s "/Users/rubentanahara/.bun/_bun" ] && source "/Users/rubentanahara/.bun/_bun"
 
 # Local environment
 . "$HOME/.local/bin/env"
@@ -144,7 +141,7 @@ function flutter-watch(){
   tmux send-keys "flutter run $1 $2 $3 $4 --pid-file=/tmp/tf1.pid" Enter \;\
   split-window -v \;\
   send-keys 'npx -y nodemon -e dart -x "cat /tmp/tf1.pid | xargs kill -s USR1"' Enter \;\
-  resize-pane -y 5 -t 1 \;\
+  resize-pane -y 1 -t 1 \;\
   select-pane -t 0 \;
 }
 
@@ -294,19 +291,6 @@ function andrunfast() {
     fi
 }
 
-# HTTP utilities
-curl_pretty() {
-  method=$1
-  shift
-  curl -s -i -X "$method" "$@" | awk 'BEGIN{body=0} /^\r$/{body=1; print ""; next} !body{print; next} body{print | "jq"}' | bat
-}
-
-curl_get()    { curl -s -i -X GET    "$@" | awk 'BEGIN{body=0} /^\r$/{body=1; print ""; next} !body{print; next} body{print | "jq"}' | bat; }
-curl_post()   { curl -s -i -X POST   "$@" | awk 'BEGIN{body=0} /^\r$/{body=1; print ""; next} !body{print; next} body{print | "jq"}' | bat; }
-curl_patch()  { curl -s -i -X PATCH  "$@" | awk 'BEGIN{body=0} /^\r$/{body=1; print ""; next} !body{print; next} body{print | "jq"}' | bat; }
-curl_put()    { curl -s -i -X PUT    "$@" | awk 'BEGIN{body=0} /^\r$/{body=1; print ""; next} !body{print; next} body{print | "jq"}' | bat; }
-curl_delete() { curl -s -i -X DELETE "$@" | awk 'BEGIN{body=0} /^\r$/{body=1; print ""; next} !body{print; next} body{print | "jq"}' | bat; }
-
 # Navigation
 alias ..="cd .."
 alias ...="cd ../.."
@@ -424,25 +408,3 @@ alias py="python3"
 
 # Docker
 alias dstart='open --background -a Docker'
-
-# GitHub CLI
-alias gh-prl='gh pr list --author @me'
-alias gh-myissues='gh issue list --author @me'
-alias gh-prc='gh pr create --fill'
-alias gh-prb='gh pr view --web'
-alias gh-prm='gh pr merge --squash'
-alias gh-open='gh repo view --web'
-alias gh-clone='gh repo clone -- --ssh'
-alias gh-fork='gh repo fork --clone'
-alias gh-wf='gh workflow list'
-alias gh-wft='gh workflow run'
-alias gh-logs='gh run view --log'
-alias gh-delete-branch='gh api -X DELETE repos/:owner/:repo/branches/:branch'
-alias gh-release='gh release create --draft'
-alias gh-branches='gh repo list --source'
-alias gh-issues='gh issue list --web'
-alias gh-prs='gh pr list --web'
-alias gh-star='gh repo star'
-alias gh-unstar='gh repo unstar'
-alias gh-rate='gh api rate_limit'
-alias gh-repo-info='gh repo view --json name,owner,description --jq ".name + \" by \" + .owner.login + \": \" + .description"'
