@@ -1,0 +1,24 @@
+{
+  "words": [
+    "sylow",
+    "keymaps",
+    "autocmds",
+    "statusline",
+    "nvim",
+    "Unfocusable",
+    "tlsv",
+    "rustc",
+    "ktlint",
+    "mdformat",
+    "keymap",
+    "abcabcabc",
+    "rustup",
+    "println",
+    "actix",
+    "utoipa",
+    "clippy"
+  ],
+  "userWords": [
+    "mapleader"
+  ]
+}

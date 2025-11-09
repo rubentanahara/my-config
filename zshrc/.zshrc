@@ -56,6 +56,11 @@ setopt appendhistory
 # Locale
 export LC_ALL=en_US.UTF-8
 
+# LaTeX paths
+export PATH="/usr/local/texlive/2024/bin/x86_64-darwin:$PATH"
+export MANPATH="/usr/local/texlive/2024/texmf-dist/doc/man:$MANPATH"
+export INFOPATH="/usr/local/texlive/2024/texmf-dist/doc/info:$INFOPATH"
+
 # Editor
 export EDITOR=nvim
 
