@@ -9,6 +9,8 @@ default-root-container-orientation = 'auto'
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
 [gaps]
+    inner.vertical = 20
+    inner.horizontal = 20
     outer.left = 20
     outer.bottom = 20
     outer.top = 20
