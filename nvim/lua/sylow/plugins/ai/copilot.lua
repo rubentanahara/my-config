@@ -19,7 +19,6 @@ return {
       },
       filetypes = {
         ['*'] = true,
-        markdown = false,
         text = false,
       },
     },

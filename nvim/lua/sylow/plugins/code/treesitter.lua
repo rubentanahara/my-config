@@ -17,7 +17,7 @@ local function setup_treesitter()
         return utils.is_big_file(bufnr)
       end,
     },
-    additional_vim_regex_highlighting = false,
+    additional_vim_regex_highlighting = true,
     indent = { enable = true },
     ensure_installed = {
     	'kotlin',

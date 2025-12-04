@@ -4,16 +4,9 @@ export EDITOR=nvim
 
 # Starship prompt
 export STARSHIP_CONFIG="$HOME/.config/starship.toml"
-eval "$(starship init zsh)"
 
-# FZF
-eval "$(fzf --zsh)"
-
-# Tmuxifier
-eval "$(tmuxifier init -)"
-
-# Zoxide
-eval "$(zoxide init zsh)"
+export DOTNET_ROOT=$HOME/.dotnet
+export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
 
 # Homebrew
 export PATH="/opt/homebrew/bin:$PATH"
@@ -24,9 +17,6 @@ export PATH="$HOME/.cargo/bin:$PATH"
 # Go
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
-
-# Dotnet
-export DOTNET_ROOT="/opt/homebrew/share/dotnet"
 
 # Neovim Mason
 export PATH="$HOME/.local/share/nvim/mason/bin:$PATH"
@@ -98,6 +88,16 @@ function mkd() {
   mkdir -p "$@" && cd "$_";
 }
 
+eval "$(starship init zsh)"
+
+# FZF
+eval "$(fzf --zsh)"
+
+# Tmuxifier
+eval "$(tmuxifier init -)"
+
+# Zoxide
+eval "$(zoxide init zsh)"
 # GitHub account switching
 function changeGitHubAccount() {
     local accounts=("personal" "gleam")
@@ -408,3 +408,9 @@ alias py="python3"
 
 # Docker
 alias dstart='open --background -a Docker'
+export DOTNET_ROOT=$HOME/.dotnet
+export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin

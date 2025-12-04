@@ -49,6 +49,8 @@ local function setup_mason_tool_installer()
       'codelldb', -- rust
       'debugpy', -- python
       'roslyn', --cs
+      'jdtls', --java
+      'roslyn',
     },
     auto_update = false,
     run_on_start = true,
@@ -58,9 +60,8 @@ end
 local function setup_mason_lspconfig()
   return {
     ensure_installed = {
-    	'jdtls', -- java'
-    	'clangd', --cpp,c
-    	'markdown_oxide', -- markdown
+      'clangd', --cpp,c
+      'markdown_oxide', -- markdown
       'lua_ls', -- lua
       'ts_ls', -- js,ts
       'rust_analyzer', -- rust

@@ -81,6 +81,7 @@ local function setup_cmp()
     }),
     sources = cmp.config.sources({
       { name = 'nvim_lsp', priority = 1000 },
+      { name = 'copilot' },
       { name = 'easy_dotnet', priority = 1000 },
       { name = 'creates', priority = 950 },
       { name = 'luasnip', priority = 900 },

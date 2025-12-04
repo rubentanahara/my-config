@@ -1,5 +1,5 @@
 font-family=Jetbrains Mono
-font-size=22
+font-size=14
 background=181616
 foreground=f3f3f3
 cursor-invert-fg-bg=true 
@@ -9,7 +9,7 @@ macos-icon-frame=chrome
 window-padding-balance=true
 window-padding-x=0
 window-padding-y=0
-window-decoration=true
+# window-decoration=true
 confirm-close-surface=false
 shell-integration-features=cursor,sudo,no-title
 shell-integration=zsh
