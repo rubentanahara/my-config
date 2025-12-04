@@ -588,6 +588,9 @@ function M.apply_user_lsp_settings(server_name)
         },
       },
     }
+  elseif server_name == 'bicep_lsp' then
+    opts.filetypes = { 'bicep' }
+    opts.cmd = { 'bicep', 'lsp', '--stdio' }
   end
 
   return opts

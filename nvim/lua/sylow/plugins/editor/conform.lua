@@ -13,6 +13,8 @@ return {
         python = { 'black' },
         csharp = { 'csharpier' },
         markdown = { 'mdformat' },
+        json = { 'jq' },
+        yaml = { 'yamlfmt' },
       },
     })
 
