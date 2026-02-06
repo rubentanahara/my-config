@@ -489,6 +489,8 @@ function M.apply_user_lsp_settings(server_name)
     flags = M.flags,
   })
 
+  utils.notify('Configuring LSP server: ' .. server_name)
+
   if server_name == 'lua_ls' then
     opts.filetypes = { 'lua' }
     opts.settings = {
@@ -504,6 +506,8 @@ function M.apply_user_lsp_settings(server_name)
         },
       },
     }
+  elseif 'powershell_es' then
+    print('Powershell')
   elseif server_name == 'rust_analyzer' then
     opts.filetypes = { 'rust' }
     opts.settings = {

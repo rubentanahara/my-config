@@ -16,4 +16,3 @@ shell-integration=zsh
 
 keybind=cmd+s>r=reload_config
 keybind=cmd+s>x=close_surface
-keybind = shift+enter=text:\x1b\r
