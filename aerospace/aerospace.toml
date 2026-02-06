@@ -48,9 +48,9 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-shift-7" = "move-node-to-workspace 7"
     "alt-shift-8" = "move-node-to-workspace 8"
 
-    "alt-t" = "layout tiles"
-    "alt-c" = "layout accordion"
-    "alt-f" = "layout floating"
+    # "alt-t" = "layout tiles"
+    # "alt-c" = "layout accordion"
+    # "alt-f" = "layout floating"
     
     "alt-minus" = "resize smart -50"       
     "alt-equal" = "resize smart +50"       
@@ -61,11 +61,12 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     "alt-0" = "balance-sizes"              
     
     "alt-g" = "exec-and-forget open -a Ghostty"
-    "alt-b" = "exec-and-forget open -a Safari"
+    "alt-b" = "exec-and-forget open -a 'Microsoft Edge'"
     "alt-s" = "exec-and-forget open -a Discord"
     "alt-n" = "exec-and-forget open -a Notion"
     "alt-w" = "exec-and-forget open -a 'Windows App'"
     "alt-o" = "exec-and-forget open -a Spotify"
+    "alt-p" = "exec-and-forget open -a Postman"
     
     "alt-m" = "fullscreen"
     "alt-y" = "macos-native-minimize"

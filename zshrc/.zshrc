@@ -1,5 +1,6 @@
 #ln -s ~/.config/zshrc/.zshrc ~/.zshrc
-# Editor
+
+# set Editor to Neovim
 export EDITOR=nvim
 
 # Starship prompt
@@ -134,6 +135,19 @@ function changeGitHubAccount() {
         gh auth logout
         gh auth login
     fi
+}
+
+function flutter-clean() {
+  flutter clean
+  rm -rf ios/Pods
+  rm -rf ios/.symlinks
+  rm -rf ios/Flutter/Flutter.framework
+  rm -rf ios/Flutter/Flutter.podspec
+  flutter pub get
+  cd ios && pod install && cd ..
+  dart run build_runner build --delete-conflicting-outputs
+  flutter gen-l10n
+  flutter analyze
 }
 
 # Flutter development
@@ -414,3 +428,13 @@ export ANDROID_HOME=$HOME/Library/Android/sdk
 export PATH=$PATH:$ANDROID_HOME/emulator
 export PATH=$PATH:$ANDROID_HOME/platform-tools
 export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
+
+# pnpm
+export PNPM_HOME="/Users/rubentanahara/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+
+

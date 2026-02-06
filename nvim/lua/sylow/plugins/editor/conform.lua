@@ -7,8 +7,8 @@ return {
     conform.setup({
       formatters_by_ft = {
         lua = { 'stylua' },
-        javascript = { 'prettier' },
-        typescript = { 'prettier' },
+        javascript = { 'prettier', 'biome' },
+        typescript = { 'prettier', 'biome' },
         kotlin = { 'ktlint' },
         python = { 'black' },
         csharp = { 'csharpier' },

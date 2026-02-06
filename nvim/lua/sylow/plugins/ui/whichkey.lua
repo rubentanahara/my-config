@@ -11,10 +11,6 @@ return {
       plugins = {
         marks = true, -- Shows marks when pressing ' or `
         registers = true, -- Shows registers when pressing " in NORMAL or <C-r> in INSERT
-        spelling = {
-          enabled = true, -- Enable showing spelling suggestions with z=
-          suggestions = 20, -- Number of suggestions to show
-        },
         presets = {
           operators = true, -- Adds help for operators like d, y, ...
           motions = true, -- Adds help for motions

@@ -1,6 +1,3 @@
-local utils = require('sylow.utils')
-local get_icon = utils.get_icon
-
 -- Local helper functions for better performance
 local function jump_next_todo()
   require('todo-comments').jump_next()
@@ -95,16 +92,3 @@ return {
     opts = setup_todo_comments,
   },
 }
---FIX:
---Fix this issue please
---TEST:
---Test this
---PERF:
---Better performance
---HACK:
---Hacking
---NOTE:
---This is a note
---WARN:
---Warning
---TODO:
