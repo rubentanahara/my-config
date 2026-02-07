@@ -473,9 +473,6 @@ local function setup_dap()
       -- merge the integrated terminal (console) with other sections
       sections = { 'watches', 'scopes', 'exceptions', 'breakpoints', 'threads', 'repl', 'console' },
     },
-    windows = {
-      height = math.ceil(vim.o.lines / 3),
-    },
   }
 
   -- Setup language configurations
