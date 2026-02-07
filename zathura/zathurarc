@@ -1,10 +1,3 @@
-set selection-clipboard clipboard
-set statusbar-h-padding 0
-set statusbar-v-padding 0
-set recolor-lightcolor "#1e1e2e"
-set recolor-darkcolor "#cdd6f4"
-set recolor false
-
 # Auto-reload when file changes
 set recolor-keephue true
 
@@ -15,3 +8,39 @@ map K zoom in
 map J zoom out
 map i recolor
 map p print
+
+# UI Settings
+set statusbar-h-padding 0
+set statusbar-v-padding 0
+set page-padding 1
+
+# Clipboard
+set selection-clipboard clipboard
+
+# Search
+set incremental-search true
+set search-hadjust true
+
+# Color Scheme (Dark Mode)
+set recolor true
+set recolor-lightcolor "#1e1e1e"
+set recolor-darkcolor "#d4d4d4"
+set recolor-keephue true
+
+# Window
+set adjust-open "best-fit"
+set pages-per-row 1
+
+# Scrolling
+set scroll-page-aware true
+set scroll-full-overlap 0.01
+set scroll-step 100
+
+# Zoom
+set zoom-min 10
+set zoom-max 1000
+set zoom-step 10
+
+# Status bar
+set window-title-basename true
+set statusbar-basename true
