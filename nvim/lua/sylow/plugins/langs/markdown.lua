@@ -186,14 +186,84 @@ return {
     build = 'cd app && yarn install',
     init = function()
       vim.g.mkdp_filetypes = { 'markdown' }
+
+      -- Create commands for markdown PDF workflows
+      vim.api.nvim_create_user_command('MarkdownPDF', function()
+        local file = vim.fn.expand('%:p')
+        local output = vim.fn.expand('%:p:r') .. '.pdf'
+        local cmd = string.format(
+          'pandoc "%s" -o "%s" --pdf-engine=xelatex -V geometry:margin=1in -V colorlinks=true -V linkcolor=blue -V urlcolor=blue --syntax-highlighting=tango && zathura "%s" &',
+          file,
+          output,
+          output
+        )
+        vim.fn.system(cmd)
+        vim.notify('Converting to PDF and opening in Zathura...', vim.log.levels.INFO)
+      end, { desc = 'Convert markdown to PDF and open in Zathura' })
+
+      vim.api.nvim_create_user_command('MarkdownPDFWatch', function()
+        local file = vim.fn.expand('%:p')
+
+        -- Call the shell function directly in tmux split or terminal
+        local shell_cmd = string.format('md2pdf-watch "%s"', file)
+
+        -- Try to open in a tmux split if available
+        local tmux_check = vim.fn.system('tmux display-message -p "#{session_name}" 2>/dev/null')
+        if vim.v.shell_error == 0 then
+          -- Use tmux split with proper shell sourcing
+          vim.fn.system(string.format(
+            [[tmux split-window -v -l 10 'source ~/.config/zshrc/.zshrc && %s']],
+            shell_cmd
+          ))
+          vim.notify('Hot-reload started in tmux split. Save to see changes!', vim.log.levels.INFO)
+        else
+          -- Open in a new terminal window
+          vim.fn.system(string.format(
+            [[osascript -e 'tell application "Terminal" to do script "source ~/.config/zshrc/.zshrc && %s"']],
+            shell_cmd
+          ))
+          vim.notify('Hot-reload started in new terminal. Save to see changes!', vim.log.levels.INFO)
+        end
+      end, { desc = 'Start hot-reload markdown to PDF with Zathura' })
+
+      vim.api.nvim_create_user_command('MarkdownPDFStop', function()
+        local file = vim.fn.expand('%:p')
+        local output = vim.fn.expand('%:p:r') .. '.pdf'
+        local temp_output = vim.fn.expand('%:p:r') .. '.tmp.pdf'
+
+        -- Kill Zathura process for this PDF
+        vim.fn.system(string.format([[pkill -f 'zathura.*%s']], vim.fn.fnamemodify(output, ':t')))
+
+        -- Kill entr process watching this file
+        vim.fn.system(string.format([[pkill -f 'entr.*%s']], vim.fn.fnamemodify(file, ':t')))
+
+        -- Clean up temp files
+        vim.fn.system(string.format([[rm -f '%s']], temp_output))
+
+        vim.notify('Stopped hot-reload and closed Zathura', vim.log.levels.INFO)
+      end, { desc = 'Stop hot-reload and close Zathura' })
     end,
     ft = { 'markdown' },
     keys = {
       {
         '<leader>mp',
-        ft = 'markdown',
         '<cmd>MarkdownPreviewToggle<cr>',
         desc = 'Markdown Preview',
+      },
+      {
+        '<leader>mz',
+        '<cmd>MarkdownPDF<cr>',
+        desc = 'Markdown to PDF (Zathura)',
+      },
+      {
+        '<leader>mw',
+        '<cmd>MarkdownPDFWatch<cr>',
+        desc = 'Markdown PDF Hot-Reload',
+      },
+      {
+        '<leader>mq',
+        '<cmd>MarkdownPDFStop<cr>',
+        desc = 'Stop PDF Hot-Reload & Close Zathura',
       },
     },
   },

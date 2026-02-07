@@ -89,6 +89,330 @@ function mkd() {
   mkdir -p "$@" && cd "$_";
 }
 
+# Document management
+function epub2pdf() {
+  if [ -f "$1" ]; then
+    output="${1%.epub}.pdf"
+    echo "Converting $1 to $output..."
+    ebook-convert "$1" "$output" && zathura "$output"
+  else
+    echo "File not found: $1"
+    echo "Usage: epub2pdf <file.epub>"
+  fi
+}
+
+# Quick EPUB to PDF without opening
+function epub2pdf-only() {
+  if [ -f "$1" ]; then
+    output="${1%.epub}.pdf"
+    echo "Converting $1 to $output..."
+    ebook-convert "$1" "$output"
+  else
+    echo "File not found: $1"
+    echo "Usage: epub2pdf-only <file.epub>"
+  fi
+}
+
+# Convert presenterm markdown to pandoc-compatible PDF
+function presenterm2pdf() {
+  if [ ! -f "$1" ]; then
+    echo "File not found: $1"
+    echo "Usage: presenterm2pdf <file.md> [--only]"
+    return 1
+  fi
+
+  local input="$1"
+  local temp_md="/tmp/presenterm_converted_$(basename "$input")"
+  local temp_dir="/tmp/presenterm_diagrams_$$"
+  local output="${input%.md}.pdf"
+  local only_convert=false
+
+  # Check for --only flag
+  if [ "$2" = "--only" ]; then
+    only_convert=true
+  fi
+
+  # Create temp directory for diagrams
+  mkdir -p "$temp_dir"
+
+  echo "Converting presenterm markdown to pandoc format..."
+
+  # First pass: Extract and render diagrams
+  echo "  → Detecting and rendering diagrams..."
+  awk -v temp_dir="$temp_dir" '
+    BEGIN {
+      diagram_num = 0
+      in_diagram = 0
+    }
+
+    /^```(mermaid|d2|typst)/ {
+      in_diagram = 1
+      # Extract diagram type
+      line = $0
+      gsub(/^```/, "", line)
+      gsub(/ .*$/, "", line)
+      diagram_type = line
+      diagram_num++
+      diagram_file = temp_dir "/diagram_" diagram_num
+      diagram_content = ""
+      print "    • Found " diagram_type " diagram #" diagram_num > "/dev/stderr"
+      next
+    }
+
+    in_diagram && /^```$/ {
+      in_diagram = 0
+
+      # Save diagram content to file and render
+      if (diagram_type == "d2") {
+        output_file = diagram_file ".d2"
+        print diagram_content > output_file
+        close(output_file)
+        cmd = "d2 --theme=200 \"" diagram_file ".d2\" \"" diagram_file ".png\" 2>&1"
+        result = system(cmd)
+        if (result == 0) {
+          print "    ✓ Rendered D2 diagram" > "/dev/stderr"
+        }
+      } else if (diagram_type == "typst") {
+        output_file = diagram_file ".typ"
+        print diagram_content > output_file
+        close(output_file)
+        cmd = "typst compile \"" diagram_file ".typ\" \"" diagram_file ".png\" 2>&1"
+        result = system(cmd)
+        if (result == 0) {
+          print "    ✓ Rendered Typst formula" > "/dev/stderr"
+        }
+      } else if (diagram_type == "mermaid") {
+        output_file = diagram_file ".mmd"
+        print diagram_content > output_file
+        close(output_file)
+        cmd = "mmdc -i \"" diagram_file ".mmd\" -o \"" diagram_file ".png\" -b transparent 2>&1"
+        result = system(cmd)
+        if (result == 0) {
+          print "    ✓ Rendered Mermaid diagram" > "/dev/stderr"
+        }
+      }
+
+      # Output image reference with width constraint
+      print "![Diagram](" diagram_file ".png){ width=90% }"
+      print ""
+      next
+    }
+
+    in_diagram {
+      if (diagram_content != "") diagram_content = diagram_content "\n"
+      diagram_content = diagram_content $0
+      next
+    }
+
+    { print }
+  ' "$input" > "$temp_md.stage1"
+
+  # Second pass: Process the markdown file to remove presenterm-specific syntax
+  awk '
+    # Track if we are in a code block
+    /^```/ {
+      if (!in_code) {
+        in_code = 1
+        in_latex = 0
+        # Check if this is a latex block
+        if ($0 ~ /```latex/) {
+          in_latex = 1
+          print "$$"  # Open LaTeX display math
+          next
+        }
+        # Remove presenterm attributes from code blocks
+        gsub(/ \+[^ ]+/, "", $0)
+        # Remove dynamic highlighting {1-4|6-10|all}
+        gsub(/ \{[^}]*\}/, "", $0)
+      } else {
+        if (in_latex) {
+          # Close the LaTeX block with $$
+          print "$$"
+          print ""  # Add blank line after
+          in_latex = 0
+        }
+        in_code = 0
+      }
+      if (!in_latex) print $0
+      next
+    }
+
+    # Handle content inside code blocks
+    in_code && !in_latex {
+      # Remove lines that start with "# " (presenterm hidden lines)
+      if ($0 ~ /^# /) next
+      print $0
+      next
+    }
+
+    # Handle LaTeX content
+    in_latex {
+      # Remove \[ and \] delimiters, keep the formula content
+      gsub(/^\\?\[[ ]*/, "")
+      gsub(/[ ]*\\?\]$/, "")
+      # Remove double backslashes if any
+      gsub(/\\\\([a-zA-Z])/, "\\1")
+      if ($0 != "") print $0
+      next
+    }
+
+    # Remove presenterm-specific comments
+    /<!-- (pause|end_slide|jump_to_middle|column_layout|column:|reset_layout) -->/ { next }
+    /<!-- (pause|end_slide|jump_to_middle|reset_layout)$/ { next }
+    /<!-- column_layout:/ { next }
+    /<!-- column:/ { next }
+
+    # Fix quadruple backticks to triple
+    { gsub(/````/, "```") }
+
+    # Print all other lines
+    { print }
+  ' "$temp_md.stage1" > "$temp_md"
+
+  rm "$temp_md.stage1"
+
+  echo "Generating PDF from converted markdown..."
+  pandoc "$temp_md" -o "$output" \
+    --pdf-engine=xelatex \
+    -V geometry:margin=1in \
+    -V colorlinks=true \
+    -V linkcolor=blue \
+    -V urlcolor=blue \
+    --syntax-highlighting=tango
+
+  if [ $? -eq 0 ]; then
+    echo "PDF created: $output"
+
+    # Clean up temp files
+    rm "$temp_md"
+    rm -rf "$temp_dir"
+
+    if [ "$only_convert" = false ]; then
+      zathura "$output"
+    fi
+  else
+    echo "Error: PDF conversion failed"
+    echo "Temp file saved at: $temp_md"
+    echo "Diagrams saved at: $temp_dir"
+    return 1
+  fi
+}
+
+# Markdown to PDF with Zathura
+function md2pdf() {
+  if [ -f "$1" ]; then
+    output="${1%.md}.pdf"
+    echo "Converting $1 to $output..."
+    pandoc "$1" -o "$output" \
+      --pdf-engine=xelatex \
+      -V geometry:margin=1in \
+      -V colorlinks=true \
+      -V linkcolor=blue \
+      -V urlcolor=blue \
+      --syntax-highlighting=tango \
+      && zathura "$output"
+  else
+    echo "File not found: $1"
+    echo "Usage: md2pdf <file.md>"
+  fi
+}
+
+# Quick Markdown to PDF without opening
+function md2pdf-only() {
+  if [ -f "$1" ]; then
+    output="${1%.md}.pdf"
+    echo "Converting $1 to $output..."
+    pandoc "$1" -o "$output" \
+      --pdf-engine=xelatex \
+      -V geometry:margin=1in \
+      -V colorlinks=true \
+      -V linkcolor=blue \
+      -V urlcolor=blue \
+      --syntax-highlighting=tango
+  else
+    echo "File not found: $1"
+    echo "Usage: md2pdf-only <file.md>"
+  fi
+}
+
+# Hot-reload Markdown to PDF with Zathura
+function md2pdf-watch() {
+  if [ ! -f "$1" ]; then
+    echo "File not found: $1"
+    echo "Usage: md2pdf-watch <file.md>"
+    return 1
+  fi
+
+  local input="$1"
+  local output="${input%.md}.pdf"
+  local temp_output="${output%.pdf}.tmp.pdf"
+
+  # Initial conversion
+  echo "Initial conversion: $input -> $output"
+  pandoc "$input" -o "$output" \
+    --pdf-engine=xelatex \
+    -V geometry:margin=1in \
+    -V colorlinks=true \
+    -V linkcolor=blue \
+    -V urlcolor=blue \
+    --syntax-highlighting=tango
+
+  # Open in Zathura
+  zathura "$output" &
+  local zathura_pid=$!
+
+  echo "Watching $input for changes... (Ctrl+C to stop)"
+  echo "Zathura PID: $zathura_pid"
+
+  # Trap to cleanup on exit
+  trap "kill $zathura_pid 2>/dev/null; rm -f '$temp_output'; exit" INT TERM
+
+  # Watch for changes with atomic file operations (Zathura auto-detects file changes)
+  echo "$input" | entr -p sh -c "
+    pandoc '$input' -o '$temp_output' \
+      --pdf-engine=xelatex \
+      -V geometry:margin=1in \
+      -V colorlinks=true \
+      -V linkcolor=blue \
+      -V urlcolor=blue \
+      --syntax-highlighting=tango && \
+    mv '$temp_output' '$output' && \
+    sleep 0.2 && \
+    echo '✓ PDF updated: $(date +%H:%M:%S)' || \
+    echo '✗ PDF update failed: $(date +%H:%M:%S)'
+  "
+
+  # Cleanup on normal exit
+  kill $zathura_pid 2>/dev/null
+  rm -f "$temp_output"
+}
+
+# Alternative: use latexmk for hot reload (more reliable on some systems)
+function md2pdf-watch-latexmk() {
+  if [ ! -f "$1" ]; then
+    echo "File not found: $1"
+    echo "Usage: md2pdf-watch-latexmk <file.md>"
+    return 1
+  fi
+
+  local input="$1"
+  local output="${input%.md}.pdf"
+  local tex_file="${input%.md}.tex"
+
+  echo "Converting to LaTeX and starting continuous preview..."
+
+  # Create a wrapper that converts MD→LaTeX, then watches with latexmk
+  echo "$input" | entr -r sh -c "
+    pandoc '$input' -o '$tex_file' --to=latex && \
+    latexmk -pdf -pvc -view=none '$tex_file'
+  " &
+
+  sleep 2
+  zathura "$output" &
+
+  wait
+}
+
 eval "$(starship init zsh)"
 
 # FZF
@@ -112,11 +436,11 @@ function changeGitHubAccount() {
     case "$1" in
         "personal")
             git config --global user.name "rubentanahara"
-            git config --global user.email "ruben.mtz.tanahara@outlook.com"
+            git config --global user.email "$GIT_PERSONAL_EMAIL"
             ;;
         "gleam")
             git config --global user.name "rubentanahara"
-            git config --global user.email "rmartinez@gleam.mx"
+            git config --global user.email "$GIT_WORK_EMAIL"
             ;;
         *)
             echo "Error: Invalid account '$1'"
