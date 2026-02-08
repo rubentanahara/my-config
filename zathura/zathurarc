@@ -12,7 +12,7 @@ map p print
 # UI Settings
 set statusbar-h-padding 0
 set statusbar-v-padding 0
-set page-padding 1
+# set page-padding 1  # This option is not supported in current Zathura version
 
 # Clipboard
 set selection-clipboard clipboard
