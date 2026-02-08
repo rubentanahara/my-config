@@ -401,13 +401,21 @@ function md2pdf-watch-latexmk() {
 
   echo "Converting to LaTeX and starting continuous preview..."
 
-  # Create a wrapper that converts MD→LaTeX, then watches with latexmk
+  # Do initial conversion to ensure PDF exists
+  pandoc "$input" -o "$tex_file" --to=latex
+  latexmk -pdf "$tex_file"
+
+  # Start watching for changes
   echo "$input" | entr -r sh -c "
     pandoc '$input' -o '$tex_file' --to=latex && \
     latexmk -pdf -pvc -view=none '$tex_file'
   " &
 
-  sleep 2
+  # Wait for PDF to exist before launching Zathura
+  while [ ! -f "$output" ]; do
+    sleep 0.5
+  done
+
   zathura "$output" &
 
   wait
@@ -629,6 +637,184 @@ function andrunfast() {
     fi
 }
 
+# Vault (iCloud Markdown Notes)
+# Quick navigation to Vault
+alias v="cd '$VAULT_DIR'"
+alias vnotes="cd '$VAULT_DIR/notes'"
+alias vprojects="cd '$VAULT_DIR/projects'"
+alias vlearning="cd '$VAULT_DIR/learning'"
+alias varchive="cd '$VAULT_DIR/archive'"
+alias vdaily="cd '$VAULT_DIR/daily'"
+alias vjournal="cd '$VAULT_DIR/journal'"
+
+# Create new note from template
+function vn() {
+  local today=$(date +"%Y-%m-%d")
+  local title="${*:-Quick-Note}"
+  local filepath="$VAULT_DIR/notes/$today.md"
+  local date=$(date +"%Y-%m-%d %H:%M")
+
+  if [ -f "$filepath" ]; then
+    echo "Note already exists: $filepath"
+    nvim "$filepath"
+    return
+  fi
+
+  sed "s/{{DATE}}/$date/g" "$VAULT_DIR/templates/note.md" | \
+  sed "s/{{TITLE}}/$title/g" > "$filepath"
+
+  nvim "$filepath"
+}
+
+# Create journal entry
+function vj() {
+  local today=$(date +"%Y-%m-%d")
+  local filepath="$VAULT_DIR/journal/$today.md"
+
+  if [ -f "$filepath" ]; then
+    echo "Opening today's journal entry: $filepath"
+    nvim "$filepath"
+    return
+  fi
+
+  sed "s/{{DATE}}/$today/g" "$VAULT_DIR/templates/journal.md" > "$filepath"
+  nvim "$filepath"
+}
+
+# Create daily note
+function vd() {
+  local today=$(date +"%Y-%m-%d")
+  local filepath="$VAULT_DIR/daily/$today.md"
+
+  if [ -f "$filepath" ]; then
+    echo "Opening today's note: $filepath"
+    nvim "$filepath"
+    return
+  fi
+
+  sed "s/{{DATE}}/$today/g" "$VAULT_DIR/templates/daily.md" > "$filepath"
+  nvim "$filepath"
+}
+
+# Create new project note
+function vp() {
+  local title="${*:-New-Project}"
+  local filename="${title// /-}.md"
+  local filepath="$VAULT_DIR/projects/$filename"
+  local date=$(date +"%Y-%m-%d")
+
+  if [ -f "$filepath" ]; then
+    echo "Project note already exists: $filepath"
+    nvim "$filepath"
+    return
+  fi
+
+  sed "s/{{DATE}}/$date/g" "$VAULT_DIR/templates/project.md" | \
+  sed "s/{{TITLE}}/$title/g" > "$filepath"
+
+  nvim "$filepath"
+}
+
+# Search notes
+function vs() {
+  if [ -z "$1" ]; then
+    echo "Usage: vs <search-term>"
+    return 1
+  fi
+
+  echo "Searching for: $1"
+  grep -r -i --include="*.md" "$1" "$VAULT_DIR" | head -20
+}
+
+# List recent notes
+function vl() {
+  local limit="${1:-10}"
+  echo "Recent notes (last $limit):"
+  find "$VAULT_DIR" -name "*.md" -type f -not -path "*/templates/*" -exec ls -lt {} + | head -n "$limit"
+}
+
+# Open note in Neovim with fuzzy search
+function vo() {
+  if [ -z "$1" ]; then
+    local selected=$(find "$VAULT_DIR" -name "*.md" -type f -not -path "*/templates/*" | fzf --preview 'bat --style=numbers --color=always {}')
+    [ -n "$selected" ] && nvim "$selected"
+  else
+    local filepath="$VAULT_DIR/$1"
+    if [ -f "$filepath" ]; then
+      nvim "$filepath"
+    else
+      echo "File not found: $filepath"
+    fi
+  fi
+}
+
+# Interactive note finder with preview
+function vf() {
+  cd "$VAULT_DIR" && \
+  find . -name "*.md" -type f -not -path "*/templates/*" | \
+  fzf --preview 'bat --style=numbers --color=always "$VAULT_DIR/{}"' \
+      --preview-window=right:60% \
+      --bind 'enter:execute(nvim "$VAULT_DIR/{}")'
+}
+
+# Convert Vault markdown to PDF
+function vpdf() {
+  if [ -z "$1" ]; then
+    echo "Usage: vpdf <file.md>"
+    return 1
+  fi
+
+  local input="$1"
+  if [[ ! "$input" == *.md ]]; then
+    input="${input}.md"
+  fi
+
+  if [ ! -f "$input" ]; then
+    input="$VAULT_DIR/$input"
+  fi
+
+  if [ -f "$input" ]; then
+    md2pdf "$input"
+  else
+    echo "File not found: $input"
+  fi
+}
+
+# Archive a note
+function varchive() {
+  if [ -z "$1" ]; then
+    echo "Usage: varchive <note-path>"
+    return 1
+  fi
+
+  local source="$1"
+  [ ! -f "$source" ] && source="$VAULT_DIR/$source"
+
+  if [ -f "$source" ]; then
+    local basename=$(basename "$source")
+    local archive_path="$VAULT_DIR/archive/$basename"
+    mv "$source" "$archive_path"
+    echo "Archived: $basename -> archive/"
+  else
+    echo "File not found: $source"
+  fi
+}
+
+# Show Vault stats
+function vstat() {
+  echo "=== Vault Statistics ==="
+  echo "Total notes: $(find "$VAULT_DIR" -name "*.md" -type f -not -path "*/templates/*" | wc -l | tr -d ' ')"
+  echo "\nNotes by category:"
+  echo "  Notes:    $(find "$VAULT_DIR/notes" -name "*.md" -type f 2>/dev/null | wc -l | tr -d ' ')"
+  echo "  Projects: $(find "$VAULT_DIR/projects" -name "*.md" -type f 2>/dev/null | wc -l | tr -d ' ')"
+  echo "  Learning: $(find "$VAULT_DIR/learning" -name "*.md" -type f 2>/dev/null | wc -l | tr -d ' ')"
+  echo "  Daily:    $(find "$VAULT_DIR/daily" -name "*.md" -type f 2>/dev/null | wc -l | tr -d ' ')"
+  echo "  Journal:  $(find "$VAULT_DIR/journal" -name "*.md" -type f 2>/dev/null | wc -l | tr -d ' ')"
+  echo "  Archive:  $(find "$VAULT_DIR/archive" -name "*.md" -type f 2>/dev/null | wc -l | tr -d ' ')"
+  echo "\nLast modified:"
+  find "$VAULT_DIR" -name "*.md" -type f -not -path "*/templates/*" -exec ls -lt {} + | head -3
+}
+
 # Navigation
 alias ..="cd .."
 alias ...="cd ../.."
@@ -670,6 +856,102 @@ alias dotnetFull='dnc && dnr && dnb && dnt'
 # Tmux
 alias tmx="tmux"
 alias devtmx="tmux new -s sylow.dev"
+
+# Tmux Vault sessions
+function vtmx() {
+  # Check if session exists
+  if tmux has-session -t vault 2>/dev/null; then
+    tmux attach-session -t vault
+  else
+    # Create new session with Vault workflow
+    tmux new-session -d -s vault -c "$VAULT_DIR"
+
+    # Window 1: Note editor
+    tmux rename-window -t vault:1 'editor'
+    tmux send-keys -t vault:1 'nvim .' C-m
+
+    # Window 2: File browser (yazi)
+    tmux new-window -t vault:2 -n 'browser' -c "$VAULT_DIR"
+    tmux send-keys -t vault:2 'yazi' C-m
+
+    # Window 3: Search/Shell
+    tmux new-window -t vault:3 -n 'shell' -c "$VAULT_DIR"
+
+    # Select first window
+    tmux select-window -t vault:1
+
+    # Attach to session
+    tmux attach-session -t vault
+  fi
+}
+
+# Quick tmux session for daily note
+function vdtmx() {
+  local today=$(date +"%Y-%m-%d")
+  local filepath="$VAULT_DIR/daily/$today.md"
+
+  # Create daily note if it doesn't exist
+  if [ ! -f "$filepath" ]; then
+    sed "s/{{DATE}}/$today/g" "$VAULT_DIR/templates/daily.md" > "$filepath"
+  fi
+
+  # Check if session exists
+  if tmux has-session -t daily 2>/dev/null; then
+    tmux attach-session -t daily
+  else
+    tmux new-session -d -s daily -c "$VAULT_DIR/daily"
+    tmux send-keys -t daily "nvim '$filepath'" C-m
+    tmux attach-session -t daily
+  fi
+}
+
+# Tmux session for a specific note
+function vntmx() {
+  if [ -z "$1" ]; then
+    echo "Usage: vntmx <note-name>"
+    return 1
+  fi
+
+  local title="$*"
+  local filename="${title// /-}.md"
+  local filepath="$VAULT_DIR/notes/$filename"
+  local session_name="note-${filename%.md}"
+
+  # Create note if it doesn't exist
+  if [ ! -f "$filepath" ]; then
+    local date=$(date +"%Y-%m-%d %H:%M")
+    sed "s/{{DATE}}/$date/g" "$VAULT_DIR/templates/note.md" | \
+    sed "s/{{TITLE}}/$title/g" > "$filepath"
+  fi
+
+  # Create or attach to session
+  if tmux has-session -t "$session_name" 2>/dev/null; then
+    tmux attach-session -t "$session_name"
+  else
+    tmux new-session -d -s "$session_name" -c "$VAULT_DIR/notes"
+    tmux send-keys -t "$session_name" "nvim '$filepath'" C-m
+    tmux attach-session -t "$session_name"
+  fi
+}
+
+# Split pane layout for note taking
+function vsplit() {
+  # Get current tmux session or create one
+  if ! tmux info &> /dev/null; then
+    tmux new-session -d -s vault-split -c "$VAULT_DIR"
+    tmux send-keys -t vault-split 'nvim' C-m
+    tmux split-window -h -t vault-split -c "$VAULT_DIR"
+    tmux send-keys -t vault-split:1.2 'yazi' C-m
+    tmux resize-pane -t vault-split:1.2 -x 40
+    tmux select-pane -t vault-split:1.1
+    tmux attach-session -t vault-split
+  else
+    tmux split-window -h -c "$VAULT_DIR"
+    tmux send-keys 'yazi' C-m
+    tmux resize-pane -R 40
+    tmux select-pane -L
+  fi
+}
 
 # Go
 alias gob="go build"
