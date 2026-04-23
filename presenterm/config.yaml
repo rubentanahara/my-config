@@ -1,0 +1,14 @@
+defaults:
+  # max_columns: 110
+  # max_columns_alignment: center
+  # max_rows: 38
+  # max_rows_alignment: center
+
+snippet:
+  exec:
+    enable: true
+
+executors:
+  - name: typescript
+    command: ["bun", "run"]
+    file_extension: ts
