@@ -1,0 +1,147 @@
+# ghostty-dark
+# Built from Ghostty + tmux colors (Ruben's terminal setup)
+#
+# Palette reference:
+#   bg       #181616  — main background (ghostty)
+#   bg_panel #242534  — panel/code bg   (tmux @color_blue)
+#   fg       #f3f3f3  — main text       (ghostty)
+#   cursor   #d4d4d4  — cursor          (ghostty)
+#   select   #264f78  — selection       (ghostty)
+#   gray1    #93a1a1  — light gray-teal (tmux)
+#   gray2    #586e75  — mid gray        (tmux)
+#   gray3    #657b83  — mid-light gray  (tmux)
+#   gray4    #839496  — lighter gray    (tmux)
+#   cyan     #2aa198  — Solarized cyan  (accent)
+#   blue     #268bd2  — Solarized blue  (accent)
+#   green    #859900  — Solarized green (accent)
+#   yellow   #b58900  — Solarized gold  (accent)
+#   orange   #cb4b16  — Solarized orange(accent)
+#   red      #dc322f  — Solarized red   (accent)
+
+palette:
+  colors:
+    bg:       "181616"
+    bg_panel: "242534"
+    fg:       "f3f3f3"
+    cursor:   "d4d4d4"
+    select:   "264f78"
+    gray1:    "93a1a1"
+    gray2:    "586e75"
+    gray3:    "657b83"
+    gray4:    "839496"
+    cyan:     "2aa198"
+    blue:     "268bd2"
+    green:    "859900"
+    yellow:   "b58900"
+    orange:   "cb4b16"
+    red:      "dc322f"
+    white:    "ffffff"
+
+default:
+  margin:
+    percent: 10
+  colors:
+    background: p:bg
+    foreground: p:fg
+
+intro_slide:
+  title:
+    alignment: center
+    colors:
+      foreground: p:gray1
+  subtitle:
+    alignment: center
+    colors:
+      foreground: p:gray3
+  author:
+    alignment: center
+    colors:
+      foreground: p:gray2
+    positioning: page_bottom
+  footer: false
+
+slide_title:
+  alignment: center
+  padding_top: 1
+  padding_bottom: 1
+  font_size: 20
+  bold: true
+  colors:
+    foreground: p:gray1
+    background: p:bg
+
+headings:
+  h1:
+    prefix: ""
+    bold: true
+    colors:
+      foreground: p:fg
+  h2:
+    prefix: ""
+    bold: true
+    colors:
+      foreground: p:gray1
+  h3:
+    prefix: ""
+    bold: false
+    italics: true
+    colors:
+      foreground: p:gray4
+  h4:
+    prefix: ""
+    bold: false
+    colors:
+      foreground: p:gray3
+  h5:
+    prefix: ""
+    colors:
+      foreground: p:gray2
+  h6:
+    prefix: ""
+    colors:
+      foreground: p:gray2
+
+code:
+  alignment: center
+  background: true
+  padding:
+    horizontal: 2
+    vertical: 1
+
+inline_code:
+  colors:
+    foreground: p:cyan
+    background: p:bg_panel
+
+block_quote:
+  prefix: "▍ "
+  colors:
+    foreground: p:gray3
+    prefix: p:gray2
+
+alert:
+  prefix: "▍ "
+  base_colors:
+    foreground: p:fg
+    background: p:bg_panel
+  styles:
+    note:
+      color: p:blue
+      title: "Note"
+    tip:
+      color: p:cyan
+      title: "Tip"
+    important:
+      color: p:gray1
+      title: "Important"
+    warning:
+      color: p:yellow
+      title: "Warning"
+    caution:
+      color: p:red
+      title: "Caution"
+
+footer:
+  style: template
+  center: "{current_slide} / {total_slides}"
+  height: 1
