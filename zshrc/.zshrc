@@ -4,16 +4,17 @@
 export EDITOR=nvim
 # lazysql sql_editor
 export SQL_EDITOR=nvim
-# export SQL_TERMINAL=zsh
+export SQL_TERMINAL=zsh
+
+# Homebrew
+export PATH="/opt/homebrew/bin:$PATH"
 
 # Starship prompt
 export STARSHIP_CONFIG="$HOME/.config/starship.toml"
 
+# Dotnet
 export DOTNET_ROOT=$HOME/.dotnet
 export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
-
-# Homebrew
-export PATH="/opt/homebrew/bin:$PATH"
 
 # Rust/Cargo
 export PATH="$HOME/.cargo/bin:$PATH"
@@ -56,7 +57,6 @@ export PATH="$HOME/.aspire/bin:$PATH"
 # Tmuxifier
 export PATH="$HOME/.tmuxifier/bin:$PATH"
 
-
 # History configuration
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
@@ -71,7 +71,6 @@ export PATH="/usr/local/texlive/2024/bin/x86_64-darwin:$PATH"
 export MANPATH="/usr/local/texlive/2024/texmf-dist/doc/man:$MANPATH"
 export INFOPATH="/usr/local/texlive/2024/texmf-dist/doc/info:$INFOPATH"
 
-
 # Zsh plugins
 source $HOMEBREW_PREFIX/opt/zsh-fast-syntax-highlighting/share/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
 source $HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh
@@ -81,9 +80,6 @@ source $HOMEBREW_PREFIX/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-
-# Angular CLI completion
-source <(ng completion script)
 
 # Local environment
 . "$HOME/.local/bin/env"
@@ -435,6 +431,7 @@ eval "$(tmuxifier init -)"
 
 # Zoxide
 eval "$(zoxide init zsh)"
+
 # GitHub account switching
 function changeGitHubAccount() {
     local accounts=("personal" "gleam")
@@ -1089,9 +1086,6 @@ esac
 #
 # opencode
 export PATH=/Users/rubentanahara/.opencode/bin:$PATH
-export LOGINPOC_DB_ADMIN_PASSWORD="SecurePassword#123!"
-export NEW_RELIC_LICENSE_KEY="6B1BE3241EFCE3605F8C9D47D98209BE92A7887E47651BB8EFA22D16AB6968E2"
-export CHAOS_ENABLED="false"
 
 alias claude-mem='bun "/Users/rubentanahara/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
 

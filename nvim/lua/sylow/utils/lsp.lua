@@ -6,9 +6,11 @@ local get_icon = utils.get_icon
 local M = {}
 
 local function get_lsp_mappings(client, bufnr)
+  local buf = type(bufnr) == 'string' and tonumber(bufnr) or bufnr
   local function has_capability(capability, filter)
-    for _, lsp_client in ipairs(vim.lsp.get_clients(filter)) do
-      if lsp_client.supports_method(capability, '') then
+    local clients = vim.lsp.get_clients(vim.tbl_extend('force', filter or {}, { bufnr = buf }))
+    for _, lsp_client in ipairs(clients) do
+      if lsp_client:supports_method(capability, { bufnr = buf }) then
         return true
       end
     end
@@ -70,7 +72,7 @@ local function get_lsp_mappings(client, bufnr)
     events = { 'InsertLeave' },
     desc = 'Refresh codelens',
     callback = function(args)
-      if client.supports_method('textDocument/codeLens') then
+      if client:supports_method('textDocument/codeLens', { bufnr = args.buf }) then
         if vim.g.codelens_enabled then
           vim.lsp.codelens.refresh({ bufnr = args.buf })
         end
@@ -78,16 +80,16 @@ local function get_lsp_mappings(client, bufnr)
     end,
   })
 
-  if client.supports_method('textDocument/codeLens') then -- on LspAttach
+  if client:supports_method('textDocument/codeLens', { bufnr = buf }) then -- on LspAttach
     if vim.g.codelens_enabled then
-      vim.lsp.codelens.refresh({ bufnr = 0 })
+      vim.lsp.codelens.refresh({ bufnr = buf })
     end
   end
 
   lsp_mappings.n['<leader>ll'] = {
     function()
       vim.lsp.codelens.run()
-      vim.lsp.codelens.refresh({ bufnr = 0 })
+      vim.lsp.codelens.refresh({ bufnr = buf })
     end,
     desc = 'LSP CodeLens run',
   }
@@ -151,7 +153,7 @@ local function get_lsp_mappings(client, bufnr)
       events = { 'CursorHold', 'CursorHoldI' },
       desc = 'highlight references when cursor holds',
       callback = function()
-        if has_capability('textDocument/documentHighlight', { bufnr = bufnr }) then
+        if has_capability('textDocument/documentHighlight') then
           vim.lsp.buf.document_highlight()
         end
       end,
