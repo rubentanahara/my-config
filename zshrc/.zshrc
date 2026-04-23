@@ -2,6 +2,9 @@
 
 # set Editor to Neovim
 export EDITOR=nvim
+# lazysql sql_editor
+export SQL_EDITOR=nvim
+# export SQL_TERMINAL=zsh
 
 # Starship prompt
 export STARSHIP_CONFIG="$HOME/.config/starship.toml"
@@ -52,6 +55,7 @@ export PATH="$HOME/.aspire/bin:$PATH"
 
 # Tmuxifier
 export PATH="$HOME/.tmuxifier/bin:$PATH"
+
 
 # History configuration
 HISTFILE=~/.zsh_history
@@ -484,11 +488,10 @@ function flutter-clean() {
 
 # Flutter development
 function flutter-watch(){
-  tmux send-keys "flutter run $1 $2 $3 $4 --pid-file=/tmp/tf1.pid" Enter \;\
-  split-window -v \;\
-  send-keys 'npx -y nodemon -e dart -x "cat /tmp/tf1.pid | xargs kill -s USR1"' Enter \;\
-  resize-pane -y 1 -t 1 \;\
-  select-pane -t 0 \;
+  tmux split-window -h -p 50 \;\
+  send-keys 'ulimit -n 65536 && npx -y nodemon --legacy-watch -e dart -x "[ -f /tmp/tf1.pid ] && cat /tmp/tf1.pid | xargs kill -s USR1 || true"' Enter \;\
+  select-pane -t 1 \;\
+  send-keys "flutter run $1 $2 $3 $4 --pid-file=/tmp/tf1.pid" Enter \;
 }
 
 # Android utilities
@@ -641,11 +644,12 @@ function andrunfast() {
 # Quick navigation to Vault
 alias v="cd '$VAULT_DIR'"
 alias vnotes="cd '$VAULT_DIR/notes'"
-alias vprojects="cd '$VAULT_DIR/projects'"
+alias vplanner="cd '$VAULT_DIR/planner'"
 alias vlearning="cd '$VAULT_DIR/learning'"
 alias varchive="cd '$VAULT_DIR/archive'"
 alias vdaily="cd '$VAULT_DIR/daily'"
 alias vjournal="cd '$VAULT_DIR/journal'"
+
 
 # Create new note from template
 function vn() {
@@ -698,9 +702,9 @@ function vd() {
 
 # Create new project note
 function vp() {
-  local title="${*:-New-Project}"
+  local title="${*:-New-Planner}"
   local filename="${title// /-}.md"
-  local filepath="$VAULT_DIR/projects/$filename"
+  local filepath="$VAULT_DIR/planner/$filename"
   local date=$(date +"%Y-%m-%d")
 
   if [ -f "$filepath" ]; then
@@ -712,6 +716,30 @@ function vp() {
   sed "s/{{DATE}}/$date/g" "$VAULT_DIR/templates/project.md" | \
   sed "s/{{TITLE}}/$title/g" > "$filepath"
 
+  nvim "$filepath"
+}
+
+# Create weekly planner
+function vw() {
+  local week_num=$(date +"%U")
+  local year=$(date +"%Y")
+  local week_start_day=$(date -v Mon +"%d" 2>/dev/null || date -d "monday" +"%d" 2>/dev/null || date +"%d")
+  local week_end_day=$(date -v Sun +"%d" 2>/dev/null || date -d "sunday" +"%d" 2>/dev/null || date +"%d")
+  local month=$(date -v Mon +"%B" 2>/dev/null || date -d "monday" +"%B" 2>/dev/null || date +"%B")
+  local date_range="$month $week_start_day-$week_end_day, $year"
+  local filename="Week-${week_num}-${year}.md"
+  local filepath="$VAULT_DIR/planner/$filename"
+
+  if [ -f "$filepath" ]; then
+    echo "Weekly planner already exists: $filepath"
+    nvim "$filepath"
+    return
+  fi
+
+  sed "s/\[XX\]/$week_num/g" "$VAULT_DIR/templates/weekly.md" | \
+  sed "s/\[Month Day-Day, Year\]/$date_range/g" > "$filepath"
+
+  echo "Created weekly planner: $filepath"
   nvim "$filepath"
 }
 
@@ -843,7 +871,7 @@ alias sz="source ~/.zshrc"
 alias nz="n ~/.zshrc"
 alias cc="cd ~/.config"
 alias nc="n ~/.config"
-alias dev="cd ~/Desktop/dev"
+alias dev="cd ~/Desktop/dev && devtmx"
 
 # Dotnet
 alias dwr="dotnet watch run"
@@ -1003,6 +1031,22 @@ alias psaux="ps aux --sort=-%mem"
 alias reboot="sudo reboot"
 alias shutdown="sudo shutdown now"
 
+# WiFi password retrieval
+function wifipass() {
+  local ssid="$1"
+  if [ -z "$ssid" ]; then
+    ssid="$(system_profiler SPAirPortDataType 2>/dev/null | awk '/Current Network Information:/{found=1; next} found && /^ *[^ ]/{gsub(/[: ]+$/, ""); print; exit}')"
+  fi
+
+  if [ -z "$ssid" ]; then
+    echo "Not connected to any WiFi network."
+    return 1
+  fi
+
+  echo "Getting password for: $ssid"
+  security find-generic-password -D "AirPort network password" -a "$ssid" -w
+}
+
 # Network
 alias pingg="ping google.com"
 alias myip="curl ifconfig.me"
@@ -1042,5 +1086,14 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+#
+# opencode
+export PATH=/Users/rubentanahara/.opencode/bin:$PATH
+export LOGINPOC_DB_ADMIN_PASSWORD="SecurePassword#123!"
+export NEW_RELIC_LICENSE_KEY="6B1BE3241EFCE3605F8C9D47D98209BE92A7887E47651BB8EFA22D16AB6968E2"
+export CHAOS_ENABLED="false"
 
+alias claude-mem='bun "/Users/rubentanahara/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
 
+# bun completions
+[ -s "/Users/rubentanahara/.bun/_bun" ] && source "/Users/rubentanahara/.bun/_bun"

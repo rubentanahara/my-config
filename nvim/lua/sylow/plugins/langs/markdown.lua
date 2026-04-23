@@ -22,7 +22,7 @@ return {
         },
         plantuml = {
           charset = nil,
-          -- cli_args = { '-Djava.awt.headless=true' },
+          cli_args = { '-Djava.awt.headless=true' },
         },
         d2 = {
           theme_id = nil,
@@ -40,50 +40,6 @@ return {
         },
       },
     },
-  },
-  -- {
-  --   'lervag/vimtex',
-  --   lazy = false, -- we don't want to lazy load VimTeX
-  --   -- tag = "v2.15", -- uncomment to pin to a specific release
-  --   init = function()
-  --     -- VimTeX configuration
-  --     vim.g.vimtex_view_method = 'skim' -- macOS PDF viewer
-  --     vim.g.vimtex_compiler_method = 'latexmk'
-  --
-  --     -- Try multiple potential paths for latexmk
-  --     local latexmk_paths = {
-  --       '/usr/local/texlive/2024/bin/x86_64-darwin/latexmk',
-  --       '/usr/local/bin/latexmk',
-  --       '/opt/homebrew/bin/latexmk',
-  --     }
-  --
-  --     for _, path in ipairs(latexmk_paths) do
-  --       if vim.fn.executable(path) == 1 then
-  --         vim.g.vimtex_compiler_method_executable = path
-  --         break
-  --       end
-  --     end
-  --   end,
-  -- },
-  {
-    'jbyuki/nabla.nvim',
-    dependencies = {
-      'nvim-neo-tree/neo-tree.nvim',
-      'williamboman/mason.nvim',
-    },
-    lazy = false,
-
-    config = function() end,
-
-    keys = function()
-      return {
-        {
-          '<leader>y',
-          ':lua require("nabla").popup()<cr>',
-          desc = 'NablaPopUp',
-        },
-      }
-    end,
   },
   {
     '3rd/image.nvim',
@@ -113,7 +69,7 @@ return {
     dependencies = {
       'echasnovski/mini.nvim',
       'nvim-treesitter/nvim-treesitter',
-      -- 'nvim-tree/nvim-web-devicons',
+      'nvim-tree/nvim-web-devicons',
     },
     enabled = true,
     opts = {
@@ -211,17 +167,16 @@ return {
         local tmux_check = vim.fn.system('tmux display-message -p "#{session_name}" 2>/dev/null')
         if vim.v.shell_error == 0 then
           -- Use tmux split with proper shell sourcing
-          vim.fn.system(string.format(
-            [[tmux split-window -v -l 10 'source ~/.config/zshrc/.zshrc && %s']],
-            shell_cmd
-          ))
+          vim.fn.system(string.format([[tmux split-window -v -l 10 'source ~/.config/zshrc/.zshrc && %s']], shell_cmd))
           vim.notify('Hot-reload started in tmux split. Save to see changes!', vim.log.levels.INFO)
         else
           -- Open in a new terminal window
-          vim.fn.system(string.format(
-            [[osascript -e 'tell application "Terminal" to do script "source ~/.config/zshrc/.zshrc && %s"']],
-            shell_cmd
-          ))
+          vim.fn.system(
+            string.format(
+              [[osascript -e 'tell application "Terminal" to do script "source ~/.config/zshrc/.zshrc && %s"']],
+              shell_cmd
+            )
+          )
           vim.notify('Hot-reload started in new terminal. Save to see changes!', vim.log.levels.INFO)
         end
       end, { desc = 'Start hot-reload markdown to PDF with Zathura' })

@@ -6,11 +6,11 @@ cursor-invert-fg-bg=true
 mouse-hide-while-typing=false
 macos-option-as-alt=true
 macos-icon-frame=chrome
-macos-titlebar-style = hidden
+# macos-titlebar-style = hidden
 window-padding-balance=true
 window-padding-x=0
 window-padding-y=0
-window-decoration=false
+window-decoration=true
 confirm-close-surface=false
 shell-integration-features=cursor,sudo,no-title
 shell-integration=zsh
@@ -18,3 +18,8 @@ shell-integration=zsh
 keybind=cmd+s>r=reload_config
 keybind=cmd+s>x=close_surface
 keybind = shift+enter=text:\x1b\r
+
+cursor-color = #ffffff
+
+selection-background = #264F78
+selection-foreground = #ffffff

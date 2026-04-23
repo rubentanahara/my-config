@@ -19,7 +19,7 @@ return {
         },
       },
       debugger = {
-        enabled = false,
+        enabled = true,
         exception_breakpoints = {},
         evaluate_to_string_in_debug_views = true,
       },
@@ -73,7 +73,7 @@ return {
     'akinsho/pubspec-assist.nvim',
     requires = 'plenary.nvim',
     config = function()
-      require('pubspec-assist').setup()
+      require('pubspec-assist').setup({})
     end,
   },
 }
