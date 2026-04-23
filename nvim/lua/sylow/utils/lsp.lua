@@ -489,8 +489,6 @@ function M.apply_user_lsp_settings(server_name)
     flags = M.flags,
   })
 
-  utils.notify('Configuring LSP server: ' .. server_name)
-
   if server_name == 'lua_ls' then
     opts.filetypes = { 'lua' }
     opts.settings = {
@@ -595,6 +593,40 @@ function M.apply_user_lsp_settings(server_name)
   elseif server_name == 'bicep_lsp' then
     opts.filetypes = { 'bicep' }
     opts.cmd = { 'bicep', 'lsp', '--stdio' }
+  elseif server_name == 'gopls' then
+    opts.filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' }
+    opts.settings = {
+      gopls = {
+        analyses = {
+          unusedparams = true,
+          shadow = true,
+          unusedvariable = true,
+        },
+        staticcheck = true,
+        gofumpt = true,
+        usePlaceholders = true,
+        completeUnimported = true,
+        experimentalPostfixCompletions = true,
+        codelenses = {
+          generate = true,
+          gc_details = true,
+          regenerate_cgo = true,
+          tidy = true,
+          upgrade_dependency = true,
+          vendor = true,
+          run_govulncheck = true,
+        },
+        hints = {
+          assignVariableTypes = true,
+          compositeLiteralFields = true,
+          compositeLiteralTypes = true,
+          constantValues = true,
+          functionTypeParameters = true,
+          parameterNames = true,
+          rangeVariableTypes = true,
+        },
+      },
+    }
   end
 
   return opts

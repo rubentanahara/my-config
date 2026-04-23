@@ -199,7 +199,7 @@ local function setup_language_debuggers()
 
   -- C#
   if is_mac and is_arm then
-    require('netcoredbg-macOS-arm64').setup(dap)
+    require('netcoredbg-macOS-arm64').setup()
   else
     local mason_path = vim.fn.stdpath('data') .. '/mason/packages/netcoredbg/netcoredbg'
     local netcoredbg_adapter = {
@@ -217,7 +217,7 @@ local function setup_language_debuggers()
         request = 'launch',
         cwd = '${fileDirname}',
         program = function()
-          utils.build_dll_path()
+          utils.smart_dll_picker()
         end,
       },
     }
