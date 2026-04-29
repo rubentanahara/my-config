@@ -8,13 +8,13 @@ default-root-container-orientation = 'auto'
 
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
-# [gaps]
-#     inner.vertical = 10
-#     inner.horizontal = 10
-#     outer.left = 10
-#     outer.bottom = 10
-#     outer.top = 10
-#     outer.right = 10
+[gaps]
+    inner.vertical = 10
+    inner.horizontal = 10
+    outer.left = 10
+    outer.bottom = 10
+    outer.top = 10
+    outer.right = 10
 
 [key-mapping]
     preset = 'qwerty'
@@ -62,7 +62,7 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
     
     "alt-g" = "exec-and-forget open -a Ghostty"
     "alt-b" = "exec-and-forget open -a 'Microsoft Edge'"
-    "alt-n" = "exec-and-forget open -a Notion"
+    "alt-n" = "exec-and-forget open -a Obsidian"
     "alt-w" = "exec-and-forget open -a 'Windows App'"
     "alt-o" = "exec-and-forget open -a Spotify"
     "alt-f" = "exec-and-forget open -a Figma"

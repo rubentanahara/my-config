@@ -6,21 +6,26 @@ local function setup_treesitter()
     highlight = {
       enable = true,
       use_languagetree = true,
-      disable = function(_, bufnr)
-        return utils.is_big_file(bufnr)
+      disable = function(lang, bufnr)
+        return lang == 'markdown' or lang == 'markdown_inline' or utils.is_big_file(bufnr)
       end,
     },
     matchup = {
       enable = true,
       enable_quotes = true,
-      disable = function(_, bufnr)
-        return utils.is_big_file(bufnr)
+      disable = function(lang, bufnr)
+        return lang == 'markdown' or lang == 'markdown_inline' or utils.is_big_file(bufnr)
       end,
     },
     additional_vim_regex_highlighting = true,
-    indent = { enable = true },
+    indent = {
+      enable = true,
+      disable = function(lang, bufnr)
+        return lang == 'markdown' or lang == 'markdown_inline' or utils.is_big_file(bufnr)
+      end,
+    },
     ensure_installed = {
-    	'kotlin',
+      'kotlin',
       'lua',
       'luadoc',
       'vim',
@@ -33,8 +38,6 @@ local function setup_treesitter()
       'typescript',
       'toml',
       'yaml',
-      'markdown',
-      'markdown_inline',
       'css',
       'html',
       'scss',
@@ -52,7 +55,7 @@ local function setup_treesitter()
       'sql',
     },
     query_linter = {
-      enable = true,
+      enable = false,
       use_virtual_text = true,
       lint_events = { 'BufWrite', 'CursorHold' },
     },
