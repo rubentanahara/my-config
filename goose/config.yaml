@@ -1,0 +1,5 @@
+mcpServers:
+  claude-mem:
+    command: /Users/rubentanahara/.nvm/versions/node/v22.22.2/bin/node
+    args:
+      - /Users/rubentanahara/.claude/plugins/marketplaces/thedotmack/plugin/scripts/mcp-server.cjs

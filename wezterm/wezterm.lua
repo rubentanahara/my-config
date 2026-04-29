@@ -27,10 +27,10 @@ config.animation_fps = 120
 config.front_end = "WebGpu"
 config.prefer_egl = true
 config.text_background_opacity = 1
--- config.window_background_opacity = 0.5
--- config.macos_window_background_blur = 20
+config.window_background_opacity = 0.5
+config.macos_window_background_blur = 20
 -- macOS-specific window background blur
--- config.macos_window_background_blur = 30
+config.macos_window_background_blur = 30
 config.audible_bell = "Disabled"
 config.use_dead_keys = false
 config.window_padding = {

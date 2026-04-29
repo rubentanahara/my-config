@@ -66,6 +66,9 @@ setopt appendhistory
 # Locale
 export LC_ALL=en_US.UTF-8
 
+# Obsidian Vault
+export VAULT_DIR="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/rubenmtztanahara"
+
 # LaTeX paths
 export PATH="/usr/local/texlive/2024/bin/x86_64-darwin:$PATH"
 export MANPATH="/usr/local/texlive/2024/texmf-dist/doc/man:$MANPATH"
@@ -637,209 +640,6 @@ function andrunfast() {
     fi
 }
 
-# Vault (iCloud Markdown Notes)
-# Quick navigation to Vault
-alias v="cd '$VAULT_DIR'"
-alias vnotes="cd '$VAULT_DIR/notes'"
-alias vplanner="cd '$VAULT_DIR/planner'"
-alias vlearning="cd '$VAULT_DIR/learning'"
-alias varchive="cd '$VAULT_DIR/archive'"
-alias vdaily="cd '$VAULT_DIR/daily'"
-alias vjournal="cd '$VAULT_DIR/journal'"
-
-
-# Create new note from template
-function vn() {
-  local today=$(date +"%Y-%m-%d")
-  local title="${*:-Quick-Note}"
-  local filepath="$VAULT_DIR/notes/$today.md"
-  local date=$(date +"%Y-%m-%d %H:%M")
-
-  if [ -f "$filepath" ]; then
-    echo "Note already exists: $filepath"
-    nvim "$filepath"
-    return
-  fi
-
-  sed "s/{{DATE}}/$date/g" "$VAULT_DIR/templates/note.md" | \
-  sed "s/{{TITLE}}/$title/g" > "$filepath"
-
-  nvim "$filepath"
-}
-
-# Create journal entry
-function vj() {
-  local today=$(date +"%Y-%m-%d")
-  local filepath="$VAULT_DIR/journal/$today.md"
-
-  if [ -f "$filepath" ]; then
-    echo "Opening today's journal entry: $filepath"
-    nvim "$filepath"
-    return
-  fi
-
-  sed "s/{{DATE}}/$today/g" "$VAULT_DIR/templates/journal.md" > "$filepath"
-  nvim "$filepath"
-}
-
-# Create daily note
-function vd() {
-  local today=$(date +"%Y-%m-%d")
-  local filepath="$VAULT_DIR/daily/$today.md"
-
-  if [ -f "$filepath" ]; then
-    echo "Opening today's note: $filepath"
-    nvim "$filepath"
-    return
-  fi
-
-  sed "s/{{DATE}}/$today/g" "$VAULT_DIR/templates/daily.md" > "$filepath"
-  nvim "$filepath"
-}
-
-# Create new project note
-function vp() {
-  local title="${*:-New-Planner}"
-  local filename="${title// /-}.md"
-  local filepath="$VAULT_DIR/planner/$filename"
-  local date=$(date +"%Y-%m-%d")
-
-  if [ -f "$filepath" ]; then
-    echo "Project note already exists: $filepath"
-    nvim "$filepath"
-    return
-  fi
-
-  sed "s/{{DATE}}/$date/g" "$VAULT_DIR/templates/project.md" | \
-  sed "s/{{TITLE}}/$title/g" > "$filepath"
-
-  nvim "$filepath"
-}
-
-# Create weekly planner
-function vw() {
-  local week_num=$(date +"%U")
-  local year=$(date +"%Y")
-  local week_start_day=$(date -v Mon +"%d" 2>/dev/null || date -d "monday" +"%d" 2>/dev/null || date +"%d")
-  local week_end_day=$(date -v Sun +"%d" 2>/dev/null || date -d "sunday" +"%d" 2>/dev/null || date +"%d")
-  local month=$(date -v Mon +"%B" 2>/dev/null || date -d "monday" +"%B" 2>/dev/null || date +"%B")
-  local date_range="$month $week_start_day-$week_end_day, $year"
-  local filename="Week-${week_num}-${year}.md"
-  local filepath="$VAULT_DIR/planner/$filename"
-
-  if [ -f "$filepath" ]; then
-    echo "Weekly planner already exists: $filepath"
-    nvim "$filepath"
-    return
-  fi
-
-  sed "s/\[XX\]/$week_num/g" "$VAULT_DIR/templates/weekly.md" | \
-  sed "s/\[Month Day-Day, Year\]/$date_range/g" > "$filepath"
-
-  echo "Created weekly planner: $filepath"
-  nvim "$filepath"
-}
-
-# Search notes
-function vs() {
-  if [ -z "$1" ]; then
-    echo "Usage: vs <search-term>"
-    return 1
-  fi
-
-  echo "Searching for: $1"
-  grep -r -i --include="*.md" "$1" "$VAULT_DIR" | head -20
-}
-
-# List recent notes
-function vl() {
-  local limit="${1:-10}"
-  echo "Recent notes (last $limit):"
-  find "$VAULT_DIR" -name "*.md" -type f -not -path "*/templates/*" -exec ls -lt {} + | head -n "$limit"
-}
-
-# Open note in Neovim with fuzzy search
-function vo() {
-  if [ -z "$1" ]; then
-    local selected=$(find "$VAULT_DIR" -name "*.md" -type f -not -path "*/templates/*" | fzf --preview 'bat --style=numbers --color=always {}')
-    [ -n "$selected" ] && nvim "$selected"
-  else
-    local filepath="$VAULT_DIR/$1"
-    if [ -f "$filepath" ]; then
-      nvim "$filepath"
-    else
-      echo "File not found: $filepath"
-    fi
-  fi
-}
-
-# Interactive note finder with preview
-function vf() {
-  cd "$VAULT_DIR" && \
-  find . -name "*.md" -type f -not -path "*/templates/*" | \
-  fzf --preview 'bat --style=numbers --color=always "$VAULT_DIR/{}"' \
-      --preview-window=right:60% \
-      --bind 'enter:execute(nvim "$VAULT_DIR/{}")'
-}
-
-# Convert Vault markdown to PDF
-function vpdf() {
-  if [ -z "$1" ]; then
-    echo "Usage: vpdf <file.md>"
-    return 1
-  fi
-
-  local input="$1"
-  if [[ ! "$input" == *.md ]]; then
-    input="${input}.md"
-  fi
-
-  if [ ! -f "$input" ]; then
-    input="$VAULT_DIR/$input"
-  fi
-
-  if [ -f "$input" ]; then
-    md2pdf "$input"
-  else
-    echo "File not found: $input"
-  fi
-}
-
-# Archive a note
-function varchive() {
-  if [ -z "$1" ]; then
-    echo "Usage: varchive <note-path>"
-    return 1
-  fi
-
-  local source="$1"
-  [ ! -f "$source" ] && source="$VAULT_DIR/$source"
-
-  if [ -f "$source" ]; then
-    local basename=$(basename "$source")
-    local archive_path="$VAULT_DIR/archive/$basename"
-    mv "$source" "$archive_path"
-    echo "Archived: $basename -> archive/"
-  else
-    echo "File not found: $source"
-  fi
-}
-
-# Show Vault stats
-function vstat() {
-  echo "=== Vault Statistics ==="
-  echo "Total notes: $(find "$VAULT_DIR" -name "*.md" -type f -not -path "*/templates/*" | wc -l | tr -d ' ')"
-  echo "\nNotes by category:"
-  echo "  Notes:    $(find "$VAULT_DIR/notes" -name "*.md" -type f 2>/dev/null | wc -l | tr -d ' ')"
-  echo "  Projects: $(find "$VAULT_DIR/projects" -name "*.md" -type f 2>/dev/null | wc -l | tr -d ' ')"
-  echo "  Learning: $(find "$VAULT_DIR/learning" -name "*.md" -type f 2>/dev/null | wc -l | tr -d ' ')"
-  echo "  Daily:    $(find "$VAULT_DIR/daily" -name "*.md" -type f 2>/dev/null | wc -l | tr -d ' ')"
-  echo "  Journal:  $(find "$VAULT_DIR/journal" -name "*.md" -type f 2>/dev/null | wc -l | tr -d ' ')"
-  echo "  Archive:  $(find "$VAULT_DIR/archive" -name "*.md" -type f 2>/dev/null | wc -l | tr -d ' ')"
-  echo "\nLast modified:"
-  find "$VAULT_DIR" -name "*.md" -type f -not -path "*/templates/*" -exec ls -lt {} + | head -3
-}
-
 # Navigation
 alias ..="cd .."
 alias ...="cd ../.."
@@ -1068,7 +868,6 @@ alias mcp="npx @michaellatman/mcp-get"
 alias py="python3"
 
 # Docker
-alias dstart='open --background -a Docker'
 export DOTNET_ROOT=$HOME/.dotnet
 export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
 export ANDROID_HOME=$HOME/Library/Android/sdk
@@ -1084,10 +883,35 @@ case ":$PATH:" in
 esac
 # pnpm end
 #
-# opencode
-export PATH=/Users/rubentanahara/.opencode/bin:$PATH
-
-alias claude-mem='bun "/Users/rubentanahara/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
 
 # bun completions
 [ -s "/Users/rubentanahara/.bun/_bun" ] && source "/Users/rubentanahara/.bun/_bun"
+
+alias claude-mem='bun "/Users/rubentanahara/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
+
+# opencode
+export PATH=/Users/rubentanahara/.opencode/bin:$PATH
+
+# template copy commands
+alias ops='cp "/Users/rubentanahara/Library/Mobile Documents/iCloud~md~obsidian/Documents/rubenmtztanahara/AI-templates/docs/project_spec.md" ./project_spec.md'
+alias obs='cp "/Users/rubentanahara/Library/Mobile Documents/iCloud~md~obsidian/Documents/rubenmtztanahara/AI-templates/docs/brainstorm.md" ./brainstorm.md'
+alias ocm='cp "/Users/rubentanahara/Library/Mobile Documents/iCloud~md~obsidian/Documents/rubenmtztanahara/AI-templates/docs/CLAUDE.md" ./CLAUDE.md'
+alias ocl='cp "/Users/rubentanahara/Library/Mobile Documents/iCloud~md~obsidian/Documents/rubenmtztanahara/AI-templates/docs/changelog.md" ./changelog.md'
+alias oar='cp "/Users/rubentanahara/Library/Mobile Documents/iCloud~md~obsidian/Documents/rubenmtztanahara/AI-templates/docs/architecture.md" ./architecture.md'
+alias ocs='cp "/Users/rubentanahara/Library/Mobile Documents/iCloud~md~obsidian/Documents/rubenmtztanahara/AI-templates/docs/settings.json" ./settings.json'
+
+get-agents() {
+  cp "/Users/rubentanahara/Library/Mobile Documents/iCloud~md~obsidian/Documents/rubenmtztanahara/AI-templates/agents/"*.md .
+}
+
+get-commands() {
+  cp "/Users/rubentanahara/Library/Mobile Documents/iCloud~md~obsidian/Documents/rubenmtztanahara/AI-templates/commands/"*.md .
+}
+
+get-ref() {
+  cp "/Users/rubentanahara/Library/Mobile Documents/iCloud~md~obsidian/Documents/rubenmtztanahara/AI-templates/AGENTS-REFERENCE.md" ./AGENTS-REFERENCE.md
+}
+
+obsi() {
+  [ -d .obsidian ] && open "obsidian://open?vault=$(basename $PWD)"
+}
