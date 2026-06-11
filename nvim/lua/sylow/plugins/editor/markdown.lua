@@ -1,5 +1,11 @@
 return {
-  'yousefhadder/markdown-plus.nvim',
-  ft = 'markdown',
-  opts = {},
+  {
+    'yousefhadder/markdown-plus.nvim',
+    lazy = false,
+    ft = 'markdown',
+    opts = {},
+  },
+  {
+    'ymic9963/mdnotes.nvim',
+  },
 }
