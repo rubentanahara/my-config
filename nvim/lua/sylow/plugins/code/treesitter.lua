@@ -1,6 +1,8 @@
 local utils = require('sylow.utils')
 
 local parsers = {
+  'markdown',
+  'markdown_inline',
   'kotlin',
   'lua',
   'luadoc',

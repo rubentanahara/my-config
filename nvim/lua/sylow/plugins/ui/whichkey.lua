@@ -135,6 +135,12 @@ return {
             group = 'Fold',
             icon = { icon = get_icon('NeoTree'), color = 'green' },
           },
+          {
+            '<leader>y',
+            group = 'Jupyter',
+            icon = { icon = '󰠮', color = 'orange' },
+            desc = 'Jupyter (Magma)',
+          },
         },
       },
     },
