@@ -103,9 +103,9 @@ function M.toggle_buffer_syntax(bufnr)
   -- HACK: this should just be `bufnr = bufnr or 0` but it looks like
   --       `vim.treesitter.stop` has a bug with `0` being current.
   bufnr = (bufnr and bufnr ~= 0) and bufnr or vim.api.nvim_win_get_buf(0)
-  local ts_avail, parsers = pcall(require, 'nvim-treesitter.parsers')
+  local has_parser = select(2, pcall(vim.treesitter.get_parser, bufnr)) ~= nil
   if vim.bo[bufnr].syntax == 'off' then
-    if ts_avail and parsers.has_parser() then
+    if has_parser then
       vim.treesitter.start(bufnr)
     end
     vim.bo[bufnr].syntax = 'on'
@@ -113,7 +113,7 @@ function M.toggle_buffer_syntax(bufnr)
       M.toggle_buffer_semantic_tokens(bufnr)
     end
   else
-    if ts_avail and parsers.has_parser() then
+    if has_parser then
       vim.treesitter.stop(bufnr)
     end
     vim.bo[bufnr].syntax = 'off'
