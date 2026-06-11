@@ -116,9 +116,6 @@ maps.n['<leader>zA'] = { 'zR', desc = 'Open all folds' }
 maps.n['<leader>zX'] = { 'zx', desc = 'Update folds' }
 maps.n['[z'] = { '[z', desc = 'Go to start of current fold' }
 maps.n[']z'] = { ']z', desc = 'Go to end of current fold' }
-maps.n['[d'] = { vim.diagnostic.get_prev, desc = 'Previous diagnostic' }
-maps.n[']d'] = { vim.diagnostic.get_next, desc = 'Next diagnostic' }
-maps.n['gl'] = { vim.diagnostic.open_float, desc = 'Show diagnostic' }
 maps.n['<leader>xd'] = { vim.diagnostic.open_float, desc = 'Line diagnostics' }
 maps.n['<leader>ub'] = { ui.toggle_background, desc = 'Background' }
 maps.n['<leader>tn'] = { ui.change_number, desc = 'Toggle line numbers' }
