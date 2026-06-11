@@ -12,13 +12,6 @@ local function magma_init_csharp()
   ]])
 end
 
-local function magma_init_fsharp()
-  vim.cmd([[
-    MagmaInit .net-fsharp
-    MagmaEvaluateArgument Microsoft.DotNet.Interactive.Formatting.Formatter.SetPreferredMimeTypesFor(typeof(System.Object),"text/plain")
-  ]])
-end
-
 return {
   {
     'dccsillag/magma-nvim',
@@ -34,7 +27,6 @@ return {
     config = function()
       vim.api.nvim_create_user_command('MagmaInitPython', magma_init_python, {})
       vim.api.nvim_create_user_command('MagmaInitCSharp', magma_init_csharp, {})
-      vim.api.nvim_create_user_command('MagmaInitFSharp', magma_init_fsharp, {})
     end,
     keys = {
       {
