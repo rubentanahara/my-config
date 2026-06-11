@@ -87,6 +87,15 @@ export NVM_DIR="$HOME/.nvm"
 # Local environment
 . "$HOME/.local/bin/env"
 
+# git split diffs
+function gd() {
+  if [ -n "$1" ]; then
+    git diff "$1" | git-split-diffs --color | less -RFX
+  else
+    git diff | git-split-diffs --color | less -RFX
+  fi
+}
+
 # Directory management
 function mkd() {
   mkdir -p "$@" && cd "$_";
@@ -844,6 +853,33 @@ function wifipass() {
   security find-generic-password -D "AirPort network password" -a "$ssid" -w
 }
 
+# Base curl helpers
+alias curlj='curl -sS -H "Accept: application/json"'
+alias curlv='curl -sv -H "Accept: application/json"'
+alias curlcode='curl -sS -o /dev/null -w "%{http_code}\n"'
+# JSON body helper (usage: curljson GET url | curljson POST url '{"a":1}')
+curljson() {
+  local method="${1:-GET}"
+  shift
+  curl -sS -X "$method" \
+    -H "Accept: application/json" \
+    -H "Content-Type: application/json" \
+    "$@"
+}
+# Verb shortcuts (pipe to jq when response is JSON)
+alias curlget='curljson GET'
+alias curlpost='curljson POST'
+alias curlput='curljson PUT'
+alias curlpatch='curljson PATCH'
+alias curldelete='curljson DELETE'
+# Pretty-print JSON responses
+alias curljq='curlj'
+alias jqpretty='jq .'
+# Optional: always pretty-print if jq exists
+curljqp() {
+  curlj "$@" | jq .
+}
+
 # Network
 alias pingg="ping google.com"
 alias myip="curl ifconfig.me"
@@ -915,3 +951,16 @@ get-ref() {
 obsi() {
   [ -d .obsidian ] && open "obsidian://open?vault=$(basename $PWD)"
 }
+
+get-github() {
+  cp -R "/Users/rubentanahara/Desktop/dev/sandbox/notesapp/.github" .
+}
+
+## [Completion]
+## Completion scripts setup. Remove the following line to uninstall
+[[ -f /Users/rubentanahara/.dart-cli-completion/zsh-config.zsh ]] && . /Users/rubentanahara/.dart-cli-completion/zsh-config.zsh || true
+## [/Completion]
+
+
+# kimi-code
+export PATH="/Users/rubentanahara/.kimi-code/bin:$PATH"
