@@ -71,7 +71,7 @@ return {
   },
   {
     'akinsho/pubspec-assist.nvim',
-    requires = 'plenary.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim' },
     config = function()
       require('pubspec-assist').setup({})
     end,
