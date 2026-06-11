@@ -230,7 +230,12 @@ function M.is_available(plugin)
 end
 
 function M.is_big_file(bufnr)
-  bufnr = bufnr or 0
+  if type(bufnr) ~= 'number' then
+    bufnr = 0
+  end
+  if not vim.api.nvim_buf_is_valid(bufnr) then
+    return false
+  end
 
   local filesize = vim.fn.getfsize(vim.api.nvim_buf_get_name(bufnr))
   local nlines = vim.api.nvim_buf_line_count(bufnr)
@@ -397,6 +402,63 @@ function M.build_dll_path_from_csproj()
 
   -- Fallback to generic method
   return M.build_dll_path()
+end
+
+local url_ns = vim.api.nvim_create_namespace('sylow_url')
+local url_augroup = 'sylow_url_effect'
+
+local function clear_url_highlights(bufnr)
+  if vim.api.nvim_buf_is_valid(bufnr) then
+    vim.api.nvim_buf_clear_namespace(bufnr, url_ns, 0, -1)
+  end
+end
+
+local function apply_url_highlights(bufnr)
+  if not vim.g.url_effect_enabled then
+    return
+  end
+  if not vim.api.nvim_buf_is_valid(bufnr) or vim.bo[bufnr].buftype ~= '' then
+    return
+  end
+  clear_url_highlights(bufnr)
+  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+  for lnum, line in ipairs(lines) do
+    local start = 1
+    while start <= #line do
+      local s, e = line:find('https?://[%w%-_%.%?%/%%&#=:+]+', start)
+      if not s then
+        break
+      end
+      vim.api.nvim_buf_set_extmark(bufnr, url_ns, lnum - 1, s - 1, {
+        end_col = e,
+        hl_group = 'Underlined',
+        priority = 100,
+      })
+      start = e + 1
+    end
+  end
+end
+
+function M.set_url_effect()
+  if vim.g.url_effect_enabled then
+    local group = vim.api.nvim_create_augroup(url_augroup, { clear = true })
+    vim.api.nvim_create_autocmd({ 'BufEnter', 'TextChanged', 'InsertLeave' }, {
+      group = group,
+      callback = function(args)
+        apply_url_highlights(args.buf)
+      end,
+    })
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+      if vim.api.nvim_buf_is_loaded(buf) then
+        apply_url_highlights(buf)
+      end
+    end
+  else
+    pcall(vim.api.nvim_clear_autocmds, { group = url_augroup })
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+      clear_url_highlights(buf)
+    end
+  end
 end
 
 -- Smart DLL picker that tries multiple strategies

@@ -126,12 +126,34 @@ utils.create_autocmd('FileType', {
 })
 
 utils.create_autocmd('VimResized', {
-  desc = 'Handles window resizing events and ensures the dashboard gets properly refreshed',
+  desc = 'Refresh dashboard and equalize window sizes on resize',
   pattern = '*',
   callback = function()
     if bo.filetype == 'dashboard' then
       cmd('doautocmd FileType dashboard')
     end
+    local current_tab = fn.tabpagenr()
+    cmd('tabdo wincmd =')
+    cmd('tabnext ' .. current_tab)
+  end,
+})
+
+utils.create_autocmd('VimEnter', {
+  desc = 'Apply URL underline effect on startup',
+  once = true,
+  callback = function()
+    if vim.g.url_effect_enabled then
+      utils.set_url_effect()
+    end
+  end,
+})
+
+utils.create_autocmd('User', {
+  desc = 'Patch deprecated client.is_stopped() usage in plugins',
+  pattern = 'VeryLazy',
+  once = true,
+  callback = function()
+    require('sylow.patches.lsp_deprecated').apply()
   end,
 })
 
@@ -139,14 +161,5 @@ utils.create_autocmd('TextYankPost', {
   desc = 'Highlight text on yank',
   callback = function()
     (vim.hl or vim.highlight).on_yank()
-  end,
-})
-
-utils.create_autocmd('VimResized', {
-  desc = 'Equalize window sizes when terminal is resized',
-  callback = function()
-    local current_tab = fn.tabpagenr()
-    cmd('tabdo wincmd =')
-    cmd('tabnext ' .. current_tab)
   end,
 })
