@@ -5,6 +5,7 @@ return {
     cmd = 'Copilot',
     event = 'InsertEnter',
     opts = {
+      copilot_model = 'gpt-41-copilot',
       panel = { enabled = false },
       suggestion = {
         enabled = true,

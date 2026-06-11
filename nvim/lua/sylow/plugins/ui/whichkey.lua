@@ -48,6 +48,12 @@ return {
           },
 
           {
+            '<leader>a',
+            group = 'AI',
+            icon = { icon = get_icon('Copilot'), color = 'green' },
+            desc = 'AI / Copilot',
+          },
+          {
             '<leader>af',
             icon = { icon = get_icon('Dart'), color = 'blue' },
             desc = 'Flutter',
