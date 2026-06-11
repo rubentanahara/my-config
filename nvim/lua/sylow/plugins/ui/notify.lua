@@ -7,7 +7,7 @@ return {
     return {
       timeout = 3500,
       fps = 144,
-      render = 'wrapped-compact',
+      render = 'compact',
       stages = 'slide',
       top_down = false,
       icons = {
@@ -32,11 +32,7 @@ return {
           pcall(require, 'nvim-treesitter')
         end
         vim.wo[win].conceallevel = 3
-        local buf = vim.api.nvim_win_get_buf(win)
-        if not pcall(vim.treesitter.start, buf, 'markdown') then
-          vim.bo[buf].syntax = 'markdown'
-        end
-        vim.wo[win].spell = false
+        vim.wo[win].spell = true
       end,
     }
   end,
