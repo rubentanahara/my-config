@@ -102,7 +102,7 @@ return -- Status line
           -- 12-hour format with AM/PM
           -- return ' ' .. os.date('%I:%M %p')
           -- 24 format
-          return " " .. os.date("%R")
+          return ' ' .. os.date('%R')
         end,
       },
     },
@@ -122,5 +122,5 @@ return -- Status line
     },
     tabline = {},
     extensions = { 'fugitive', 'nvim-tree', 'quickfix' },
-  }
+  },
 }
