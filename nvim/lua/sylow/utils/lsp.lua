@@ -74,7 +74,7 @@ local function get_lsp_mappings(client, bufnr)
     callback = function(args)
       if client:supports_method('textDocument/codeLens', { bufnr = args.buf }) then
         if vim.g.codelens_enabled then
-          vim.lsp.codelens.refresh({ bufnr = args.buf })
+          vim.lsp.codelens.enable(true, { bufnr = args.buf })
         end
       end
     end,
@@ -82,14 +82,14 @@ local function get_lsp_mappings(client, bufnr)
 
   if client:supports_method('textDocument/codeLens', { bufnr = buf }) then -- on LspAttach
     if vim.g.codelens_enabled then
-      vim.lsp.codelens.refresh({ bufnr = buf })
+      vim.lsp.codelens.enable(true, { bufnr = buf })
     end
   end
 
   lsp_mappings.n['<leader>ll'] = {
     function()
       vim.lsp.codelens.run()
-      vim.lsp.codelens.refresh({ bufnr = buf })
+      vim.lsp.codelens.enable(true, { bufnr = buf })
     end,
     desc = 'LSP CodeLens run',
   }

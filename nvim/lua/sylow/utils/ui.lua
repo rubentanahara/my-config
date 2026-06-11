@@ -128,7 +128,7 @@ function M.toggle_codelens(bufnr)
   bufnr = bufnr or 0
   vim.g.codelens_enabled = not vim.g.codelens_enabled
   if vim.g.codelens_enabled then
-    vim.lsp.codelens.refresh({ bufnr = bufnr })
+    vim.lsp.codelens.enable(true, { bufnr = bufnr })
   else
     vim.lsp.codelens.clear()
   end
