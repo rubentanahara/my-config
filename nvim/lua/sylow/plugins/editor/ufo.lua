@@ -7,7 +7,7 @@ return {
     config = function()
       require('ufo').setup({
         provider_selector = function(_, _, _)
-          return { 'treesitter', 'indent' }
+          return { 'lsp', 'indent' }
         end,
         open_fold_hl_timeout = 0, -- Disable highlight timeout after opening
       })
