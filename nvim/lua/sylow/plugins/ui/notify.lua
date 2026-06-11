@@ -2,7 +2,7 @@ local utils = require('sylow.utils')
 
 return {
   'rcarriga/nvim-notify',
-  event = 'User BaseDefered',
+  event = 'VeryLazy',
   opts = function()
     return {
       timeout = 3500,
@@ -32,7 +32,7 @@ return {
           pcall(require, 'nvim-treesitter')
         end
         vim.wo[win].conceallevel = 3
-        vim.wo[win].spell = true
+        vim.wo[win].spell = false
       end,
     }
   end,
