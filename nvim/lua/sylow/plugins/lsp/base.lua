@@ -50,7 +50,6 @@ local function setup_mason_tool_installer()
       'debugpy', -- python
       'roslyn', --cs
       'jdtls', --java
-      'roslyn',
     },
     auto_update = false,
     run_on_start = true,
