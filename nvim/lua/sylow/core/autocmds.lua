@@ -6,7 +6,7 @@ local bo = vim.bo
 local cmd = vim.cmd
 
 local options = {
-  text_filetypes = { 'text', 'plaintex', 'typst', 'gitcommit', 'markdown' },
+  text_filetypes = { 'text', 'plaintex', 'typst', 'gitcommit' },
   view_ignore_filetypes = { 'gitcommit', 'gitrebase', 'svg', 'hgcommit' },
   close_with_q_filetypes = {
     'PlenaryTestPopup',
