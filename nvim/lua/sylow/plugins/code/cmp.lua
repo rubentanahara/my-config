@@ -82,16 +82,22 @@ local function setup_cmp()
         end
       end, { 'i', 's' }),
     }),
-    sources = cmp.config.sources({
-      { name = 'nvim_lsp', priority = 1000 },
-      { name = 'copilot' },
-      { name = 'easy_dotnet', priority = 1000 },
-      { name = 'creates', priority = 950 },
-      { name = 'luasnip', priority = 900 },
-      { name = 'nvim_lua', priority = 800 },
-      { name = 'buffer', priority = 500 },
-      { name = 'path', priority = 250 },
-    }),
+    sources = (function()
+      local src = {
+        { name = 'nvim_lsp', priority = 1000 },
+        { name = 'luasnip', priority = 900 },
+        { name = 'nvim_lua', priority = 800 },
+        { name = 'buffer', priority = 500 },
+        { name = 'path', priority = 250 },
+      }
+      if utils.is_available('easy-dotnet.nvim') then
+        table.insert(src, 3, { name = 'easy_dotnet', priority = 1000 })
+      end
+      if utils.is_available('crates.nvim') then
+        table.insert(src, 4, { name = 'crates', priority = 950 })
+      end
+      return cmp.config.sources(src)
+    end)(),
     formatting = {
       fields = { 'kind', 'abbr', 'menu' },
       format = function(entry, item)
@@ -123,11 +129,6 @@ local function setup_cmp()
     window = {
       completion = cmp_window,
       documentation = cmp_window,
-    },
-    experimental = {
-      ghost_text = {
-        hl_group = 'CmpGhostText',
-      },
     },
   }
 end
