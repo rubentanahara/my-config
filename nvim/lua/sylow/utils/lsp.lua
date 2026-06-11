@@ -421,7 +421,7 @@ function M.apply_default_lsp_settings()
     [0] = vim.tbl_deep_extend(
       'force',
       default_diagnostics,
-      { underline = true, virtual_text = true, signs = false, update_in_insert = false }
+      { underline = false, virtual_text = false, signs = false, update_in_insert = false }
     ),
     -- status only
     vim.tbl_deep_extend('force', default_diagnostics, { virtual_text = false, signs = false }),
@@ -506,8 +506,6 @@ function M.apply_user_lsp_settings(server_name)
         },
       },
     }
-  elseif 'powershell_es' then
-    print('Powershell')
   elseif server_name == 'rust_analyzer' then
     opts.filetypes = { 'rust' }
     opts.settings = {

@@ -190,9 +190,9 @@ end
 
 function M.toggle_inlay_hints(bufnr)
   bufnr = bufnr or 0
-  vim.g.inlay_hints_enabled = not vim.g.inlay_hints_enabled -- flip global state
-  vim.b.inlay_hints_enabled = not vim.g.inlay_hints_enabled -- sync buffer state
-  vim.lsp.buf.inlay_hint.enable(vim.g.inlay_hints_enabled, { bufnr = bufnr }) -- apply state
+  vim.g.inlay_hints_enabled = not vim.g.inlay_hints_enabled
+  vim.b.inlay_hints_enabled = vim.g.inlay_hints_enabled
+  vim.lsp.inlay_hint.enable(vim.g.inlay_hints_enabled, { bufnr = bufnr })
   utils.notify(string.format('Global inlay hints %s', bool2str(vim.g.inlay_hints_enabled)))
 end
 
@@ -259,15 +259,8 @@ function M.toggle_wrap()
   utils.notify(string.format('wrap %s', bool2str(vim.wo.wrap)))
 end
 
-function M.toggle_zen_mode(bufnr)
-  bufnr = bufnr or 0
-  if not vim.b[bufnr].zen_mode then
-    vim.b[bufnr].zen_mode = true
-  else
-    vim.b[bufnr].zen_mode = false
-  end
-  utils.notify(string.format('zen mode %s', bool2str(vim.b[bufnr].zen_mode)))
-  vim.cmd 'ZenMode'
+function M.toggle_zen_mode()
+  vim.cmd('ZenMode')
 end
 
 function M.clear_search()
