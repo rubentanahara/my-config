@@ -61,7 +61,6 @@ local function setup_mason_lspconfig()
   return {
     ensure_installed = {
       'clangd', --cpp,c
-      'markdown_oxide', -- markdown
       'lua_ls', -- lua
       'ts_ls', -- js,ts
       'rust_analyzer', -- rust

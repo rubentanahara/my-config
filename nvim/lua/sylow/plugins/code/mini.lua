@@ -31,7 +31,6 @@ local function setup_mini_pairs()
     skip_next = [=[[%w%%%'%[%"%.%`%$]]=],
     skip_ts = { 'string' },
     skip_unbalanced = true,
-    markdown = true,
     modes = { insert = true, command = false, terminal = false },
     mappings = {
       ['('] = { action = 'open', pair = '()', neigh_pattern = '[^\\].' },

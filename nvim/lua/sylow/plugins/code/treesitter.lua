@@ -7,15 +7,12 @@ local parsers = {
   'gitignore', 'bash', 'json', 'bicep', 'xml', 'sql',
 }
 
-local disabled_filetypes = { markdown = true, markdown_inline = true }
-
 local function setup_highlight_and_indent()
   vim.api.nvim_create_autocmd('FileType', {
     group = vim.api.nvim_create_augroup('sylow_treesitter', { clear = true }),
     callback = function(args)
       local buf = args.buf
-      local lang = vim.bo[buf].filetype
-      if disabled_filetypes[lang] or utils.is_big_file(buf) then return end
+      if utils.is_big_file(buf) then return end
       pcall(vim.treesitter.start, buf)
       vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
     end,

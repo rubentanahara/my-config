@@ -117,9 +117,6 @@ return {
   MasonPending = '⟳',
   Mason = '󰏖',
 
-  -- Render-markdown
-  RenderMarkdown = { ' ', ' ', '󰲥 ', '󰲧 ', '󰲩 ', '󰲫 ' },
-
   LSP_KINDS = {
     Array = ' ',
     Boolean = '󰨙 ',

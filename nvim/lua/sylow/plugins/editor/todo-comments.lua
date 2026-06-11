@@ -54,7 +54,6 @@ local function setup_todo_comments()
       TEST = { icon = "⏲ ", color = "test", alt = { "TESTING", "PASSED", "FAILED" } },
       FORGETNOT = { icon = " ", color = "hint" },
     },
-    -- Patterns for hl markdown support
     highlight = {
       multiline = true,
       multiline_pattern = "^.",

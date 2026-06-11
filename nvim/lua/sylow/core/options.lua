@@ -9,7 +9,6 @@ opt.statusline ='%!v:statusLine()'
 
 -- Globals
 vim.o.background = 'dark'                          -- Set the overall color theme to dark mode
-g.vim_markdown_math = 1
 g.mapleader = ' '                                  -- Set space as the leader key for custom mappings
 g.maplocalleader = '\\'                            -- Set backslash as the local leader key
 g.autoformat = false                               -- Disable autoformatting for all filetypes.
@@ -28,7 +27,6 @@ g.lsp_signature_enabled = true                     -- Enable automatically showi
 g.notifications_enabled = true                     -- Enable notifications.
 g.semantic_tokens_enabled = true                   -- Enable lsp semantic tokens at start.
 g.url_effect_enabled = true                        -- Highlight URLs with an underline effect.
-g.markdown_recommended_style = 0                   -- Disable default markdown style to allow custom formatting
 g.default_colorscheme = 'kanagawa-dragon'
 
 -- Encoding
