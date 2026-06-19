@@ -76,8 +76,8 @@ export INFOPATH="/usr/local/texlive/2024/texmf-dist/doc/info:$INFOPATH"
 
 # Zsh plugins
 source $HOMEBREW_PREFIX/opt/zsh-fast-syntax-highlighting/share/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
-source $HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source $HOMEBREW_PREFIX/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+# source $HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+# source $HOMEBREW_PREFIX/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 # NVM
 export NVM_DIR="$HOME/.nvm"
@@ -964,3 +964,11 @@ get-github() {
 
 # kimi-code
 export PATH="/Users/rubentanahara/.kimi-code/bin:$PATH"
+
+## claude code
+alias ch='claude --model haiku'
+
+## .NET SDK (Homebrew formula: brew install dotnet)
+# Points DOTNET_ROOT at the Homebrew keg so tools/IDEs resolve SDK 10.0.301.
+export DOTNET_ROOT="/opt/homebrew/opt/dotnet/libexec"
+export PATH="$DOTNET_ROOT:$PATH"

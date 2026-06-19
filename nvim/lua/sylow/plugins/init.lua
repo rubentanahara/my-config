@@ -20,12 +20,20 @@ return {
     cond = function()
       return vim.env.TMUX ~= nil
     end,
+    -- Disable the plugin's built-in maps. Its terminal-mode tnoremaps use Vim's
+    -- `<C-w>:` window-command prefix, which Neovim's terminal mode lacks, so the
+    -- literal "TmuxNavigate*" command name leaks into the terminal program (e.g.
+    -- the Claude Code TUI). We define <cmd>-based maps below instead, which work
+    -- in both normal and terminal mode without escaping the buffer.
+    init = function()
+      vim.g.tmux_navigator_no_mappings = 1
+    end,
     keys = {
-      { '<C-h>', '<cmd>TmuxNavigateLeft<cr>', desc = 'Navigate Left' },
-      { '<C-j>', '<cmd>TmuxNavigateDown<cr>', desc = 'Navigate Down' },
-      { '<C-k>', '<cmd>TmuxNavigateUp<cr>', desc = 'Navigate Up' },
-      { '<C-l>', '<cmd>TmuxNavigateRight<cr>', desc = 'Navigate Right' },
-      { '<C-\\>', '<cmd>TmuxNavigatePrevious<cr>', desc = 'Navigate Previous' },
+      { '<C-h>', '<cmd>TmuxNavigateLeft<cr>', mode = { 'n', 't' }, desc = 'Navigate Left' },
+      { '<C-j>', '<cmd>TmuxNavigateDown<cr>', mode = { 'n', 't' }, desc = 'Navigate Down' },
+      { '<C-k>', '<cmd>TmuxNavigateUp<cr>', mode = { 'n', 't' }, desc = 'Navigate Up' },
+      { '<C-l>', '<cmd>TmuxNavigateRight<cr>', mode = { 'n', 't' }, desc = 'Navigate Right' },
+      { '<C-\\>', '<cmd>TmuxNavigatePrevious<cr>', mode = { 'n', 't' }, desc = 'Navigate Previous' },
     },
   },
   {
