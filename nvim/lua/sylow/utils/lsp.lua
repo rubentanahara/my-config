@@ -68,28 +68,17 @@ local function get_lsp_mappings(client, bufnr)
   }
 
   lsp_mappings.v['<leader>la'] = lsp_mappings.n['<leader>la']
-  utils.add_autocmds_to_buffer('lsp_codelens_refresh', bufnr, {
-    events = { 'InsertLeave' },
-    desc = 'Refresh codelens',
-    callback = function(args)
-      if client:supports_method('textDocument/codeLens', { bufnr = args.buf }) then
-        if vim.g.codelens_enabled then
-          vim.lsp.codelens.enable(true, { bufnr = args.buf })
-        end
-      end
-    end,
-  })
 
-  if client:supports_method('textDocument/codeLens', { bufnr = buf }) then -- on LspAttach
-    if vim.g.codelens_enabled then
-      vim.lsp.codelens.enable(true, { bufnr = buf })
-    end
+  -- Custom column-0 code lens renderer (sylow.utils.codelens). Replaces the
+  -- native vim.lsp.codelens, which indents lenses to the symbol column. The
+  -- module owns its own refresh autocmds, so we just attach once per buffer.
+  if client:supports_method('textDocument/codeLens', { bufnr = buf }) then
+    require('sylow.utils.codelens').attach(buf)
   end
 
   lsp_mappings.n['<leader>ll'] = {
     function()
-      vim.lsp.codelens.run()
-      vim.lsp.codelens.enable(true, { bufnr = buf })
+      require('sylow.utils.codelens').run()
     end,
     desc = 'LSP CodeLens run',
   }

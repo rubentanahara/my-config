@@ -66,6 +66,10 @@ local function setup_mason_lspconfig()
       'pyright', -- python
       'kotlin_language_server', -- kotlin'
     },
+    -- stylua is a formatter (run via conform.nvim), not a language server.
+    -- nvim-lspconfig ships a `stylua` config using `stylua --lsp`, which only
+    -- exists in stylua nightly; on stable it exits 2. Keep it from auto-enabling.
+    automatic_enable = { exclude = { 'stylua', 'stylua3p_ls' } },
     handlers = {
       function(server_name)
         local opts = lsp_utils.apply_user_lsp_settings(server_name)
