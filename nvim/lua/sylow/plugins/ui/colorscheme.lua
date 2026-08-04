@@ -6,6 +6,15 @@ return {
     vim.cmd('colorscheme kanagawa-dragon')
   end,
 }
+-- return { "bluz71/vim-moonfly-colors", name = "moonfly", lazy = false, priority = 1000, config = function() vim.cmd('colorscheme moonfly') end }
+-- return{
+--     "dgox16/oldworld.nvim",
+--     lazy = false,
+--     priority = 1000,
+--   	config = function()
+-- 				vim.cmd('colorscheme oldworld')
+-- 		end,
+-- }
 
 -- return {
 --   'thesimonho/kanagawa-paper.nvim',

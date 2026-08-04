@@ -127,11 +127,8 @@ end
 function M.toggle_codelens(bufnr)
   bufnr = bufnr or 0
   vim.g.codelens_enabled = not vim.g.codelens_enabled
-  if vim.g.codelens_enabled then
-    vim.lsp.codelens.enable(true, { bufnr = bufnr })
-  else
-    vim.lsp.codelens.clear()
-  end
+  -- Custom renderer keys off vim.g.codelens_enabled; sync every managed buffer.
+  require('sylow.utils.codelens').sync_all()
   utils.notify(string.format('CodeLens %s', bool2str(vim.g.codelens_enabled)))
 end
 
