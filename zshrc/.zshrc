@@ -76,8 +76,8 @@ export INFOPATH="/usr/local/texlive/2024/texmf-dist/doc/info:$INFOPATH"
 
 # Zsh plugins
 source $HOMEBREW_PREFIX/opt/zsh-fast-syntax-highlighting/share/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
-# source $HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-# source $HOMEBREW_PREFIX/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+source $HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $HOMEBREW_PREFIX/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 # NVM
 export NVM_DIR="$HOME/.nvm"
@@ -444,44 +444,6 @@ eval "$(tmuxifier init -)"
 # Zoxide
 eval "$(zoxide init zsh)"
 
-# GitHub account switching
-function changeGitHubAccount() {
-    local accounts=("personal" "gleam")
-    
-    if [ -z "$1" ]; then
-        echo "Usage: changeGitHubAccount <account>"
-        echo "Available accounts: ${accounts[*]}"
-        return 1
-    fi
-
-    case "$1" in
-        "personal")
-            git config --global user.name "rubentanahara"
-            git config --global user.email "$GIT_PERSONAL_EMAIL"
-            ;;
-        "gleam")
-            git config --global user.name "rubentanahara"
-            git config --global user.email "$GIT_WORK_EMAIL"
-            ;;
-        *)
-            echo "Error: Invalid account '$1'"
-            echo "Available accounts: ${accounts[*]}"
-            return 1
-            ;;
-    esac
-
-    echo "Successfully switched to $1 account"
-    echo "Git user: $(git config --global user.name)"
-    echo "Git email: $(git config --global user.email)"
-    
-    printf "Do you want to switch GitHub CLI authentication? (y/N): "
-    read -r response
-    if [[ "$response" =~ ^[Yy]$ ]]; then
-        gh auth logout
-        gh auth login
-    fi
-}
-
 function flutter-clean() {
   flutter clean
   rm -rf ios/Pods
@@ -689,103 +651,6 @@ alias dotnetFull='dnc && dnr && dnb && dnt'
 
 # Tmux
 alias tmx="tmux"
-alias devtmx="tmux new -s sylow.dev"
-
-# Tmux Vault sessions
-function vtmx() {
-  # Check if session exists
-  if tmux has-session -t vault 2>/dev/null; then
-    tmux attach-session -t vault
-  else
-    # Create new session with Vault workflow
-    tmux new-session -d -s vault -c "$VAULT_DIR"
-
-    # Window 1: Note editor
-    tmux rename-window -t vault:1 'editor'
-    tmux send-keys -t vault:1 'nvim .' C-m
-
-    # Window 2: File browser (yazi)
-    tmux new-window -t vault:2 -n 'browser' -c "$VAULT_DIR"
-    tmux send-keys -t vault:2 'yazi' C-m
-
-    # Window 3: Search/Shell
-    tmux new-window -t vault:3 -n 'shell' -c "$VAULT_DIR"
-
-    # Select first window
-    tmux select-window -t vault:1
-
-    # Attach to session
-    tmux attach-session -t vault
-  fi
-}
-
-# Quick tmux session for daily note
-function vdtmx() {
-  local today=$(date +"%Y-%m-%d")
-  local filepath="$VAULT_DIR/daily/$today.md"
-
-  # Create daily note if it doesn't exist
-  if [ ! -f "$filepath" ]; then
-    sed "s/{{DATE}}/$today/g" "$VAULT_DIR/templates/daily.md" > "$filepath"
-  fi
-
-  # Check if session exists
-  if tmux has-session -t daily 2>/dev/null; then
-    tmux attach-session -t daily
-  else
-    tmux new-session -d -s daily -c "$VAULT_DIR/daily"
-    tmux send-keys -t daily "nvim '$filepath'" C-m
-    tmux attach-session -t daily
-  fi
-}
-
-# Tmux session for a specific note
-function vntmx() {
-  if [ -z "$1" ]; then
-    echo "Usage: vntmx <note-name>"
-    return 1
-  fi
-
-  local title="$*"
-  local filename="${title// /-}.md"
-  local filepath="$VAULT_DIR/notes/$filename"
-  local session_name="note-${filename%.md}"
-
-  # Create note if it doesn't exist
-  if [ ! -f "$filepath" ]; then
-    local date=$(date +"%Y-%m-%d %H:%M")
-    sed "s/{{DATE}}/$date/g" "$VAULT_DIR/templates/note.md" | \
-    sed "s/{{TITLE}}/$title/g" > "$filepath"
-  fi
-
-  # Create or attach to session
-  if tmux has-session -t "$session_name" 2>/dev/null; then
-    tmux attach-session -t "$session_name"
-  else
-    tmux new-session -d -s "$session_name" -c "$VAULT_DIR/notes"
-    tmux send-keys -t "$session_name" "nvim '$filepath'" C-m
-    tmux attach-session -t "$session_name"
-  fi
-}
-
-# Split pane layout for note taking
-function vsplit() {
-  # Get current tmux session or create one
-  if ! tmux info &> /dev/null; then
-    tmux new-session -d -s vault-split -c "$VAULT_DIR"
-    tmux send-keys -t vault-split 'nvim' C-m
-    tmux split-window -h -t vault-split -c "$VAULT_DIR"
-    tmux send-keys -t vault-split:1.2 'yazi' C-m
-    tmux resize-pane -t vault-split:1.2 -x 40
-    tmux select-pane -t vault-split:1.1
-    tmux attach-session -t vault-split
-  else
-    tmux split-window -h -c "$VAULT_DIR"
-    tmux send-keys 'yazi' C-m
-    tmux resize-pane -R 40
-    tmux select-pane -L
-  fi
-}
 
 # Go
 alias gob="go build"
@@ -836,22 +701,6 @@ alias df="df -h"
 alias psaux="ps aux --sort=-%mem"
 alias reboot="sudo reboot"
 alias shutdown="sudo shutdown now"
-
-# WiFi password retrieval
-function wifipass() {
-  local ssid="$1"
-  if [ -z "$ssid" ]; then
-    ssid="$(system_profiler SPAirPortDataType 2>/dev/null | awk '/Current Network Information:/{found=1; next} found && /^ *[^ ]/{gsub(/[: ]+$/, ""); print; exit}')"
-  fi
-
-  if [ -z "$ssid" ]; then
-    echo "Not connected to any WiFi network."
-    return 1
-  fi
-
-  echo "Getting password for: $ssid"
-  security find-generic-password -D "AirPort network password" -a "$ssid" -w
-}
 
 # Base curl helpers
 alias curlj='curl -sS -H "Accept: application/json"'
@@ -923,39 +772,6 @@ esac
 # bun completions
 [ -s "/Users/rubentanahara/.bun/_bun" ] && source "/Users/rubentanahara/.bun/_bun"
 
-alias claude-mem='bun "/Users/rubentanahara/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
-
-# opencode
-export PATH=/Users/rubentanahara/.opencode/bin:$PATH
-
-# template copy commands
-alias ops='cp "/Users/rubentanahara/Library/Mobile Documents/iCloud~md~obsidian/Documents/rubenmtztanahara/AI-templates/docs/project_spec.md" ./project_spec.md'
-alias obs='cp "/Users/rubentanahara/Library/Mobile Documents/iCloud~md~obsidian/Documents/rubenmtztanahara/AI-templates/docs/brainstorm.md" ./brainstorm.md'
-alias ocm='cp "/Users/rubentanahara/Library/Mobile Documents/iCloud~md~obsidian/Documents/rubenmtztanahara/AI-templates/docs/CLAUDE.md" ./CLAUDE.md'
-alias ocl='cp "/Users/rubentanahara/Library/Mobile Documents/iCloud~md~obsidian/Documents/rubenmtztanahara/AI-templates/docs/changelog.md" ./changelog.md'
-alias oar='cp "/Users/rubentanahara/Library/Mobile Documents/iCloud~md~obsidian/Documents/rubenmtztanahara/AI-templates/docs/architecture.md" ./architecture.md'
-alias ocs='cp "/Users/rubentanahara/Library/Mobile Documents/iCloud~md~obsidian/Documents/rubenmtztanahara/AI-templates/docs/settings.json" ./settings.json'
-
-get-agents() {
-  cp "/Users/rubentanahara/Library/Mobile Documents/iCloud~md~obsidian/Documents/rubenmtztanahara/AI-templates/agents/"*.md .
-}
-
-get-commands() {
-  cp "/Users/rubentanahara/Library/Mobile Documents/iCloud~md~obsidian/Documents/rubenmtztanahara/AI-templates/commands/"*.md .
-}
-
-get-ref() {
-  cp "/Users/rubentanahara/Library/Mobile Documents/iCloud~md~obsidian/Documents/rubenmtztanahara/AI-templates/AGENTS-REFERENCE.md" ./AGENTS-REFERENCE.md
-}
-
-obsi() {
-  [ -d .obsidian ] && open "obsidian://open?vault=$(basename $PWD)"
-}
-
-get-github() {
-  cp -R "/Users/rubentanahara/Desktop/dev/sandbox/notesapp/.github" .
-}
-
 ## [Completion]
 ## Completion scripts setup. Remove the following line to uninstall
 [[ -f /Users/rubentanahara/.dart-cli-completion/zsh-config.zsh ]] && . /Users/rubentanahara/.dart-cli-completion/zsh-config.zsh || true
@@ -967,8 +783,17 @@ export PATH="/Users/rubentanahara/.kimi-code/bin:$PATH"
 
 ## claude code
 alias ch='claude --model haiku'
+alias cs='claude --model sonnet[1m]'
+alias cop='claude --model opusplan'
+alias co5='claude --model claude-opus-5'
+alias cf5='claude --model claude-fable-5'
+alias cg='ollama launch claude --model glm-5.2:cloud'
+alias cplt='copilot'
 
 ## .NET SDK (Homebrew formula: brew install dotnet)
 # Points DOTNET_ROOT at the Homebrew keg so tools/IDEs resolve SDK 10.0.301.
 export DOTNET_ROOT="/opt/homebrew/opt/dotnet/libexec"
 export PATH="$DOTNET_ROOT:$PATH"
+eval "$(direnv hook zsh)"
+
+export ANTHROPIC_BASE_URL=http://127.0.0.1:8787
