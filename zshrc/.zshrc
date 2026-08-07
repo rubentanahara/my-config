@@ -783,12 +783,13 @@ export PATH="/Users/rubentanahara/.kimi-code/bin:$PATH"
 
 ## claude code
 alias ch='claude --model haiku'
-alias cs='claude --model sonnet[1m]'
+alias cs='claude --model "sonnet[1m]"'
 alias cop='claude --model opusplan'
 alias co5='claude --model claude-opus-5'
 alias cf5='claude --model claude-fable-5'
 alias cg='ollama launch claude --model glm-5.2:cloud'
 alias cplt='copilot'
+alias qn='bash ~/.claude/skills/quick-note.sh'
 
 ## .NET SDK (Homebrew formula: brew install dotnet)
 # Points DOTNET_ROOT at the Homebrew keg so tools/IDEs resolve SDK 10.0.301.

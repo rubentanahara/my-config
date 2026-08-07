@@ -163,3 +163,20 @@ utils.create_autocmd('TextYankPost', {
     (vim.hl or vim.highlight).on_yank()
   end,
 })
+
+local glow_preview = require('sylow.core.glow_preview')
+
+utils.create_autocmd('BufEnter', {
+  desc = 'Show glow preview for markdown buffers',
+  callback = function(e)
+    glow_preview.on_buf_enter(e.buf)
+  end,
+})
+
+utils.create_autocmd('BufWritePost', {
+  desc = 'Refresh glow preview on markdown save',
+  pattern = '*.md',
+  callback = function(e)
+    glow_preview.on_write(e.buf)
+  end,
+})

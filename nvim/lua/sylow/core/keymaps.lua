@@ -134,6 +134,7 @@ maps.n['<leader>ty'] = { ui.toggle_buffer_syntax, desc = 'Toggle syntax highligh
 maps.n['<leader>th'] = { ui.toggle_foldcolumn, desc = 'Toggle foldcolumn' }
 maps.n['<leader>tN'] = { ui.toggle_ui_notifications, desc = 'UI notifications' }
 maps.n['<leader>tz'] = { ui.toggle_zen_mode, desc = 'Zen mode' }
+maps.n['<leader>tp'] = { function() require('sylow.core.glow_preview').toggle_persist() end, desc = 'Toggle glow preview persist' }
 maps.n['<leader>pl'] = { '<cmd>Lazy<cr>', desc = 'Open Lazy' }
 
 utils.set_mappings(maps, { silent = true, noremap = true })
