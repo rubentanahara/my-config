@@ -551,9 +551,6 @@ return {
       highlight_changed_variables = true,
       show_stop_reason = true,
     },
-    config = function(_, opts)
-      require('nvim-dap-virtual-text').setup(opts)
-    end,
   },
 
   -- DAP UI
@@ -599,8 +596,5 @@ return {
     },
     cmd = { 'DapInstall', 'DapUninstall' },
     opts = setup_mason_dap,
-    config = function(_, opts)
-      require('mason-nvim-dap').setup(opts)
-    end,
   },
 }

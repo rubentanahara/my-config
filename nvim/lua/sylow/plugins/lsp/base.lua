@@ -113,25 +113,16 @@ return {
     keys = mason_keys,
     build = ':MasonUpdate',
     opts = setup_mason,
-    config = function(_, opts)
-      require('mason').setup(opts)
-    end,
   },
   {
     'WhoIsSethDaniel/mason-tool-installer.nvim',
     dependencies = { 'williamboman/mason.nvim' },
     opts = setup_mason_tool_installer,
-    config = function(_, opts)
-      require('mason-tool-installer').setup(opts)
-    end,
   },
   {
     'williamboman/mason-lspconfig.nvim',
     dependencies = { 'williamboman/mason.nvim' },
     opts = setup_mason_lspconfig,
-    config = function(_, opts)
-      require('mason-lspconfig').setup(opts)
-    end,
   },
   {
     'neovim/nvim-lspconfig',

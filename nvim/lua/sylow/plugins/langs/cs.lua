@@ -1,6 +1,7 @@
 return {
   {
     'Cliffback/netcoredbg-macOS-arm64.nvim',
+    lazy = true,
     dependencies = { 'mfussenegger/nvim-dap' },
   },
   -- {
@@ -53,9 +54,6 @@ return {
           vim.lsp.buf.workspace_diagnostics { client_id = args.data.client_id }
         end,
       })
-    end,
-    config = function(_, opts)
-      require('roslyn').setup(opts)
     end,
   },
 }

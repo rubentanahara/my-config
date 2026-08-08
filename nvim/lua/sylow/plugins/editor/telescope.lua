@@ -209,6 +209,7 @@ return {
   },
   {
     'nvim-telescope/telescope-fzf-native.nvim',
+    lazy = true,
     build = 'make',
     dependencies = { 'nvim-telescope/telescope.nvim' },
     config = function()
@@ -217,6 +218,7 @@ return {
   },
   {
     'nvim-telescope/telescope-ui-select.nvim',
+    lazy = true,
     dependencies = { 'nvim-telescope/telescope.nvim' },
     config = function()
       require('telescope').load_extension('ui-select')

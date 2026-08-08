@@ -63,8 +63,5 @@ return {
         min_coverage = 80.0, -- passes if higher than
       },
     },
-    config = function(_, opts)
-      require('coverage').setup(opts)
-    end,
   },
 }
