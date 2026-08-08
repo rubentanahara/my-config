@@ -28,9 +28,6 @@ return {
     'yousefhadder/markdown-plus.nvim',
     ft = 'markdown',
     opts = {},
-    config = function(_, opts)
-      require('markdown-plus').setup(opts)
-    end,
   },
   {
     'selimacerbas/markdown-preview.nvim',
