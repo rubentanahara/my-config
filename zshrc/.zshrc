@@ -651,6 +651,7 @@ alias dotnetFull='dnc && dnr && dnb && dnt'
 
 # Tmux
 alias tmx="tmux"
+alias tmxdev="tmux new-session -s dev -n dev -d && tmux send-keys -t dev 'cd ~/Desktop/dev' C-m && tmux attach-session -t dev"
 
 # Go
 alias gob="go build"
