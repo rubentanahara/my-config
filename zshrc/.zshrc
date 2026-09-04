@@ -639,7 +639,7 @@ alias sz="source ~/.zshrc"
 alias nz="n ~/.zshrc"
 alias cc="cd ~/.config"
 alias nc="n ~/.config"
-alias dev="cd ~/Desktop/dev && devtmx"
+alias dev="cd ~/Desktop/dev && tmxdev"
 
 # Dotnet
 alias dwr="dotnet watch run"
@@ -799,3 +799,11 @@ export PATH="$DOTNET_ROOT:$PATH"
 eval "$(direnv hook zsh)"
 
 export ANTHROPIC_BASE_URL=http://127.0.0.1:8787
+export SYSPROG_PASSWORD='Mozart2010'
+export SYSPROG_USER='SYSPROG'
+
+export PERSONAL_ACCESS_TOKEN="4jKsaq7458BZ0SX6hUjixRdiU6ZD1moVL41hlsFhspvgKqsbGut6JQQJ99CHACAAAAAQJqmoAAASAZDO4UbI"
+
+export MOZARTNETDEVTEST_JDBC_URL="jdbc:mysql://ftpinfotek.dnsalias.net:3306/mozartnetdevtest"
+export MOZARTNETDEVTEST_USER="mozart"
+export MOZARTNETDEVTEST_PASS="mozart123"
