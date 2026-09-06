@@ -58,11 +58,6 @@ return {
     },
   },
   {
-    'nvim-tree/nvim-web-devicons',
-    event = 'VeryLazy',
-  },
-
-  {
     'folke/ts-comments.nvim',
     event = 'VeryLazy',
     opts = {},

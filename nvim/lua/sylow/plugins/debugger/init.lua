@@ -475,12 +475,6 @@ end
 -- Base DAP setup
 local function setup_dap()
   vim.api.nvim_set_hl(0, 'DapStoppedLine', { default = true, link = 'Visual' })
-  require('dap-view').setup {
-    winbar = {
-      -- merge the integrated terminal (console) with other sections
-      sections = { 'watches', 'scopes', 'exceptions', 'breakpoints', 'threads', 'repl', 'console' },
-    },
-  }
 
   -- Setup language configurations
   setup_language_debuggers()
@@ -539,7 +533,6 @@ return {
       'rcarriga/nvim-dap-ui',
       'theHamsta/nvim-dap-virtual-text',
       'jay-babu/mason-nvim-dap.nvim',
-      'igorlfs/nvim-dap-view',
     },
     config = setup_dap,
   },
