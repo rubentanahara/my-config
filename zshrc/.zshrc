@@ -801,11 +801,5 @@ export PATH="$DOTNET_ROOT:$PATH"
 eval "$(direnv hook zsh)"
 
 export ANTHROPIC_BASE_URL=http://127.0.0.1:8787
-export SYSPROG_PASSWORD='Mozart2010'
-export SYSPROG_USER='SYSPROG'
 
-export PERSONAL_ACCESS_TOKEN="***REMOVED***"
-
-export MOZARTNETDEVTEST_JDBC_URL="jdbc:mysql://ftpinfotek.dnsalias.net:3306/mozartnetdevtest"
-export MOZARTNETDEVTEST_USER="mozart"
-export MOZARTNETDEVTEST_PASS="mozart123"
+[ -f "$HOME/.config/zshrc/.zshrc.local" ] && source "$HOME/.config/zshrc/.zshrc.local"
