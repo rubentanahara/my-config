@@ -217,7 +217,7 @@ local function setup_language_debuggers()
         request = 'launch',
         cwd = '${fileDirname}',
         program = function()
-          utils.smart_dll_picker()
+          return utils.smart_dll_picker()
         end,
       },
     }
@@ -411,7 +411,9 @@ local function setup_language_debuggers()
       request = 'attach',
       name = 'Attach to Neovim',
       program = function()
-        pcall(require 'osv'.launch({ port = 8086 }))
+        pcall(function()
+          require('osv').launch({ port = 8086 })
+        end)
       end,
     },
   }
