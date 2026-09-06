@@ -21,28 +21,28 @@ return {
   },
   keys = {
     {
-      '<leader>gi',
+      '<leader>ghi',
       function()
         Snacks.picker.gh_issue()
       end,
       desc = 'GitHub Issues (open)',
     },
     {
-      '<leader>gI',
+      '<leader>ghI',
       function()
         Snacks.picker.gh_issue({ state = 'all' })
       end,
       desc = 'GitHub Issues (all)',
     },
     {
-      '<leader>gp',
+      '<leader>ghp',
       function()
         Snacks.picker.gh_pr()
       end,
       desc = 'GitHub Pull Requests (open)',
     },
     {
-      '<leader>gP',
+      '<leader>ghP',
       function()
         Snacks.picker.gh_pr({ state = 'all' })
       end,
