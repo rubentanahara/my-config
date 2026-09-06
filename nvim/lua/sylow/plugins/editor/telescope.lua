@@ -172,9 +172,6 @@ local function setup_telescope()
         find_command = find_command,
       },
     },
-    extensions = {
-      ['ui-select'] = { telescope_themes().get_dropdown() },
-    },
   }
 end
 
@@ -183,7 +180,6 @@ local function load_extensions(telescope)
     -- 'luasnip',
     'notify',
     'fzf',
-    'ui-select',
     'flutter',
     'undo', -- telescope-undo
   }
@@ -214,14 +210,6 @@ return {
     dependencies = { 'nvim-telescope/telescope.nvim' },
     config = function()
       require('telescope').load_extension('fzf')
-    end,
-  },
-  {
-    'nvim-telescope/telescope-ui-select.nvim',
-    lazy = true,
-    dependencies = { 'nvim-telescope/telescope.nvim' },
-    config = function()
-      require('telescope').load_extension('ui-select')
     end,
   },
   {
