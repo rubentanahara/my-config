@@ -32,7 +32,7 @@ return {
       {
         '<localleader>r',
         function()
-          return vim.fn.nvim_exec('MagmaEvaluateOperator', true)
+          return vim.api.nvim_exec2('MagmaEvaluateOperator', { output = true }).output
         end,
         expr = true,
         silent = true,
