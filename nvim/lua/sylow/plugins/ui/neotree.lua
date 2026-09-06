@@ -38,41 +38,6 @@ return {
         desc = 'Git Status',
       },
     },
-    opts = {
-      sources = { 'filesystem', 'buffers', 'git_status', 'document_symbols' },
-      open_files_do_not_replace_types = { 'terminal', 'trouble', 'qf' },
-      filesystem = {
-        bind_to_cwd = false,
-        follow_current_file = {
-          enabled = true,
-          leave_dirs_open = true,
-        },
-        filtered_items = {
-          visible = false,
-          hide_dotfiles = false,
-          hide_gitignored = false,
-          hide_by_name = { '.DS_Store', 'thumbs.db', 'node_modules', '__pycache__' },
-        },
-      },
-      window = {
-        windblend = 100,
-        position = 'left',
-        width = 30,
-        mappings = {
-          ['<space>'] = 'none',
-          ['l'] = 'open',
-          ['h'] = 'close_node',
-        },
-      },
-      default_component_configs = {
-        indent = {
-          with_expanders = true,
-          expander_collapsed = '',
-          expander_expanded = '',
-          expander_highlight = 'NeoTreeExpander',
-        },
-      },
-    },
     config = function()
       -- If you want icons for diagnostic errors, you'll need to define them somewhere:
       vim.fn.sign_define('DiagnosticSignError', {
@@ -427,16 +392,6 @@ return {
           },
         },
       })
-
-      vim.cmd([[nnoremap \ :Neotree reveal<cr>]])
-      vim.keymap.set('n', '<leader>e', ':Neotree toggle<CR>', {
-        noremap = true,
-        silent = true,
-      }) -- focus file explorer
-      vim.keymap.set('n', '<leader>ngs', ':Neotree float git_status<CR>', {
-        noremap = true,
-        silent = true,
-      }) -- open git status window
     end,
   },
 }
