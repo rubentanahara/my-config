@@ -2,16 +2,6 @@ local utils = require('sylow.utils')
 
 return {
   {
-    'JoosepAlviste/nvim-ts-context-commentstring',
-    opts = {
-      enable_autocmd = false, -- Recommended to disable for efficiency
-    },
-    config = function(_, opts)
-      vim.g.skip_ts_context_commentstring_module = true
-      require('ts_context_commentstring').setup(opts)
-    end,
-  },
-  {
     'nvim-lua/plenary.nvim',
     lazy = true,
   },

@@ -467,11 +467,6 @@ function M.apply_user_lsp_settings(server_name)
   M.capabilities.textDocument.completion.completionItem.resolveSupport = {
     properties = { 'documentation', 'detail', 'additionalTextEdits' },
   }
-  M.capabilities.textDocument.foldingRange = {
-    dynamicRegistration = false,
-    lineFoldingOnly = true,
-  }
-
   M.flags = {}
 
   local server_config = lspconfig[server_name] or {}

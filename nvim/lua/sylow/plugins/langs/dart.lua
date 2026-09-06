@@ -69,9 +69,4 @@ return {
       map('n', '<leader>afv', '<cmd>FlutterVisualDebug<cr>', { desc = 'Flutter Visual Debug' })
     end,
   },
-  {
-    'akinsho/pubspec-assist.nvim',
-    dependencies = { 'nvim-lua/plenary.nvim' },
-    opts = {},
-  },
 }
