@@ -316,6 +316,9 @@ function md2pdf() {
     output="${1%.md}.pdf"
     echo "Converting $1 to $output..."
     pandoc "$1" -o "$output" \
+      -f markdown+mark \
+      --resource-path="$(dirname "$1")" \
+      --lua-filter="$HOME/.config/pandoc/obsidian.lua" \
       --pdf-engine=xelatex \
       -V geometry:margin=1in \
       -V colorlinks=true \
@@ -335,6 +338,9 @@ function md2pdf-only() {
     output="${1%.md}.pdf"
     echo "Converting $1 to $output..."
     pandoc "$1" -o "$output" \
+      -f markdown+mark \
+      --resource-path="$(dirname "$1")" \
+      --lua-filter="$HOME/.config/pandoc/obsidian.lua" \
       --pdf-engine=xelatex \
       -V geometry:margin=1in \
       -V colorlinks=true \
@@ -779,16 +785,12 @@ esac
 ## [/Completion]
 
 
-# kimi-code
-export PATH="/Users/rubentanahara/.kimi-code/bin:$PATH"
-
 ## claude code
 alias ch='claude --model haiku'
 alias cs='claude --model "sonnet[1m]"'
 alias cop='claude --model opusplan'
 alias co5='claude --model claude-opus-5'
 alias cf5='claude --model claude-fable-5'
-alias cg='ollama launch claude --model glm-5.2:cloud'
 alias cplt='copilot'
 alias qn='bash ~/.claude/skills/quick-note.sh'
 
