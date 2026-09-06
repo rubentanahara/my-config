@@ -19,7 +19,7 @@ local buffer_mappings = {
 return {
   {
     'famiu/bufdelete.nvim',
-    lazy = false,
+    cmd = { 'Bdelete', 'Bwipeout' },
   },
   {
     'akinsho/bufferline.nvim',

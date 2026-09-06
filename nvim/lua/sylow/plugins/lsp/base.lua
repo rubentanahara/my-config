@@ -39,15 +39,7 @@ local function setup_mason_tool_installer()
       'flake8', -- python
       'ktlint', -- kotlin'
       'detekt', -- kotlin'
-      -- DAPs
-      'cpptools', -- cpp,c'
-      'dart-debug-adapter', -- dart'
-      'delve',
-      'js-debug-adapter', -- js,ts
-      -- 'netcoredbg', -- cs
-      'kotlin-debug-adapter', -- kotlin
-      'codelldb', -- rust
-      'debugpy', -- python
+      -- LSP
       'roslyn', --cs
       'jdtls', --java
     },

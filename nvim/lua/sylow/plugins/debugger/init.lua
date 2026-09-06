@@ -519,6 +519,7 @@ local function setup_mason_dap()
       'js-debug-adapter', -- JavaScript/TypeScript
       'dart-debug-adapter', -- Dart/Flutter
       'kotlin-debug-adapter', -- Kotlin
+      'delve', -- Go
     },
   }
 end
