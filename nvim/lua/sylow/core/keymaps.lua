@@ -73,35 +73,33 @@ maps.n['x'] = {
     if vim.fn.col '.' == 1 then
       local line = vim.fn.getline '.'
       if line:match '^%s*$' then
-        vim.api.nvim_feedkeys('"_dd', 'n', false)
+        vim.api.nvim_feedkeys('dd', 'n', false)
         vim.api.nvim_feedkeys('$', 'n', false)
       else
-        vim.api.nvim_feedkeys('"_x', 'n', false)
+        vim.api.nvim_feedkeys('x', 'n', false)
       end
     else
-      vim.api.nvim_feedkeys('"_x', 'n', false)
+      vim.api.nvim_feedkeys('x', 'n', false)
     end
   end,
-  desc = 'Delete character (no yank)',
+  desc = 'Cut character',
 }
 maps.n['X'] = {
   function()
     if vim.fn.col '.' == 1 then
       local line = vim.fn.getline '.'
       if line:match '^%s*$' then
-        vim.api.nvim_feedkeys('"_dd', 'n', false)
+        vim.api.nvim_feedkeys('dd', 'n', false)
         vim.api.nvim_feedkeys('$', 'n', false)
       else
-        vim.api.nvim_feedkeys('"_X', 'n', false)
+        vim.api.nvim_feedkeys('X', 'n', false)
       end
     else
-      vim.api.nvim_feedkeys('"_X', 'n', false)
+      vim.api.nvim_feedkeys('X', 'n', false)
     end
   end,
-  desc = 'Delete character backward (no yank)',
+  desc = 'Cut character backward',
 }
-maps.x['x'] = { '"_x', desc = 'Delete without yanking' }
-maps.x['X'] = { '"_X', desc = 'Delete backward without yanking' }
 maps.v['p'] = { 'P', desc = 'Paste without yanking' }
 maps.v['P'] = { 'p', desc = 'Paste and yank' }
 maps.n['+'] = { '<C-a>', desc = 'Increment number' }

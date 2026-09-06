@@ -11,6 +11,27 @@ return {
     'OXY2DEV/markview.nvim',
     ft = 'markdown',
     opts = {},
+    build = function(plugin)
+      local renderer = plugin.dir .. '/lua/markview/renderers/markdown.lua'
+      local lines = vim.fn.readfile(renderer)
+      local patch = '\tis_wrapped = false;'
+
+      if vim.list_contains(lines, patch) then
+        return
+      end
+
+      local width_guard = vim.iter(ipairs(lines)):find(function(_, line)
+        return line:find('Most likely the text was wrapped somewhere', 1, true) ~= nil
+      end)
+
+      if not width_guard then
+        vim.notify('markview: wrapped-table patch no longer applies', vim.log.levels.WARN)
+        return
+      end
+
+      table.insert(lines, width_guard + 5, patch)
+      vim.fn.writefile(lines, renderer)
+    end,
   },
   {
     'tadmccorkle/markdown.nvim',
