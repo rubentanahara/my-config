@@ -91,16 +91,6 @@ return {
             group = 'Debug',
           },
           {
-            '<leader>tt',
-            group = 'Test',
-          },
-          {
-            '<leader>dc',
-            group = 'Docs',
-            icon = { icon = get_icon('Docs'), color = 'green' },
-            desc = 'Docs',
-          },
-          {
             '<leader>m',
             group = 'Mason',
             icon = { icon = get_icon('Mason'), color = 'blue' },
