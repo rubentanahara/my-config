@@ -12,10 +12,6 @@ export PATH="/opt/homebrew/bin:$PATH"
 # Starship prompt
 export STARSHIP_CONFIG="$HOME/.config/starship.toml"
 
-# Dotnet
-export DOTNET_ROOT=$HOME/.dotnet
-export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
-
 # Rust/Cargo
 export PATH="$HOME/.cargo/bin:$PATH"
 
@@ -634,7 +630,7 @@ alias md="mkdir"
 alias del="rm -rf"
 alias cpv="cp -iv"
 alias mvv="mv -iv"
-alias dux="du -h --max-depth=1"
+alias dux="du -h -d 1"
 alias tree="tree -C"
 
 # Development tools
@@ -702,10 +698,10 @@ alias grm="git rm"
 alias gstash="git stash"
 
 # System monitoring
-alias mem="free -h"
+alias mem="top -l 1 -s 0 | grep PhysMem"
 alias cpu="top -o cpu"
 alias df="df -h"
-alias psaux="ps aux --sort=-%mem"
+alias psaux="ps aux -m"
 alias reboot="sudo reboot"
 alias shutdown="sudo shutdown now"
 
@@ -739,7 +735,7 @@ curljqp() {
 # Network
 alias pingg="ping google.com"
 alias myip="curl ifconfig.me"
-alias ports="netstat -tulanp"
+alias ports="lsof -i -P -n | grep LISTEN"
 alias flushdns="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"
 
 # Homebrew
@@ -758,14 +754,6 @@ alias mcp="npx @michaellatman/mcp-get"
 
 # Python
 alias py="python3"
-
-# Docker
-export DOTNET_ROOT=$HOME/.dotnet
-export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
-export ANDROID_HOME=$HOME/Library/Android/sdk
-export PATH=$PATH:$ANDROID_HOME/emulator
-export PATH=$PATH:$ANDROID_HOME/platform-tools
-export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
 
 # pnpm
 export PNPM_HOME="/Users/rubentanahara/Library/pnpm"
