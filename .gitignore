@@ -14,6 +14,7 @@ nvim.normalvim
 .env
 .envrc
 .direnv/
+zshrc/.zshrc.local
 
 # Tool-specific
 configstore/
@@ -21,6 +22,7 @@ github-copilot/
 gh/
 gh-dash/
 nvim/.netrwhist
+tmux/plugins/
 
 # Logs and cache
 logs/

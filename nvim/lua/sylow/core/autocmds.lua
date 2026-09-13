@@ -103,7 +103,7 @@ utils.create_autocmd('FileType', {
   pattern = 'neo-tree',
   callback = function(opts)
     vim.schedule(function()
-      vim.api.nvim_buf_set_option(opts.buf, 'buflisted', false)
+      vim.bo[opts.buf].buflisted = false
     end)
   end,
 })

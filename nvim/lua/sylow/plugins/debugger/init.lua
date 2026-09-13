@@ -217,7 +217,7 @@ local function setup_language_debuggers()
         request = 'launch',
         cwd = '${fileDirname}',
         program = function()
-          utils.smart_dll_picker()
+          return utils.smart_dll_picker()
         end,
       },
     }
@@ -411,7 +411,9 @@ local function setup_language_debuggers()
       request = 'attach',
       name = 'Attach to Neovim',
       program = function()
-        pcall(require 'osv'.launch({ port = 8086 }))
+        pcall(function()
+          require('osv').launch({ port = 8086 })
+        end)
       end,
     },
   }
@@ -473,12 +475,6 @@ end
 -- Base DAP setup
 local function setup_dap()
   vim.api.nvim_set_hl(0, 'DapStoppedLine', { default = true, link = 'Visual' })
-  require('dap-view').setup {
-    winbar = {
-      -- merge the integrated terminal (console) with other sections
-      sections = { 'watches', 'scopes', 'exceptions', 'breakpoints', 'threads', 'repl', 'console' },
-    },
-  }
 
   -- Setup language configurations
   setup_language_debuggers()
@@ -523,6 +519,7 @@ local function setup_mason_dap()
       'js-debug-adapter', -- JavaScript/TypeScript
       'dart-debug-adapter', -- Dart/Flutter
       'kotlin-debug-adapter', -- Kotlin
+      'delve', -- Go
     },
   }
 end
@@ -537,7 +534,6 @@ return {
       'rcarriga/nvim-dap-ui',
       'theHamsta/nvim-dap-virtual-text',
       'jay-babu/mason-nvim-dap.nvim',
-      'igorlfs/nvim-dap-view',
     },
     config = setup_dap,
   },

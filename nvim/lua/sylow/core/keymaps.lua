@@ -56,7 +56,12 @@ maps.n['<leader><CR>'] = { utils.clear_search, desc = 'Clear search highlight' }
 maps.n['<leader>j'] = { '<cmd>w<cr>', desc = 'Save file' }
 maps.n['<leader>k'] = { '<cmd>q<cr>', desc = 'Quit' }
 maps.n['<leader>n'] = { '<cmd>enew<cr>', desc = 'New file' }
-maps.n['gx'] = { utils.open_with_program, desc = 'Open file under cursor' }
+maps.n['gx'] = {
+  function()
+    vim.ui.open(vim.fn.expand('<cfile>'))
+  end,
+  desc = 'Open file under cursor',
+}
 
 maps.n['<A-j>'] = { ":m '.+1<CR>gv==", desc = 'Move selection down' }
 maps.n['<A-k>'] = { ":m '.-2<CR>gv==", desc = 'Move selection up' }
