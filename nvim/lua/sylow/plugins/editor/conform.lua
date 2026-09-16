@@ -4,13 +4,21 @@ return {
   config = function()
     local conform = require('conform')
 
+    local function js_formatter(bufnr)
+      local biome_root = vim.fs.find({ 'biome.json', 'biome.jsonc' }, {
+        upward = true,
+        path = vim.api.nvim_buf_get_name(bufnr),
+      })[1]
+      return biome_root and { 'biome' } or { 'prettier' }
+    end
+
     conform.setup({
       formatters_by_ft = {
         lua = { 'stylua' },
-        javascript = { 'prettier' },
-        javascriptreact = { 'prettier' },
-        typescript = { 'prettier' },
-        typescriptreact = { 'prettier' },
+        javascript = js_formatter,
+        javascriptreact = js_formatter,
+        typescript = js_formatter,
+        typescriptreact = js_formatter,
         kotlin = { 'ktlint' },
         python = { 'black' },
         csharp = { 'csharpier' },

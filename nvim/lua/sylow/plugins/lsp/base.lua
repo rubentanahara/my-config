@@ -54,6 +54,8 @@ local function setup_mason_lspconfig()
       'clangd', --cpp,c
       'lua_ls', -- lua
       'ts_ls', -- js,ts
+      'eslint-lsp', -- js,ts lint (lspconfig: eslint)
+      'biome', -- js,ts lint/format
       'rust_analyzer', -- rust
       'pyright', -- python
       'kotlin_language_server', -- kotlin'
