@@ -777,8 +777,8 @@ esac
 alias ch='claude --model haiku'
 alias cs='claude --model "sonnet[1m]"'
 alias cop='claude --model opusplan'
-alias co5='claude --model claude-opus-5'
-alias cf5='claude --model claude-fable-5'
+alias co5='claude --model "opus[1m]"'
+alias cf5='claude --model fable'
 alias cplt='copilot'
 alias qn='bash ~/.claude/skills/quick-note.sh'
 
