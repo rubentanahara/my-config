@@ -152,7 +152,7 @@ end
 
 function M.toggle_cmp()
   vim.g.cmp_enabled = not vim.g.cmp_enabled
-  local ok, _ = pcall(require, 'cmp')
+  local ok, _ = pcall(require, 'blink.cmp')
   utils.notify(ok and string.format('completion %s', bool2str(vim.g.cmp_enabled)) or 'completion not available')
 end
 

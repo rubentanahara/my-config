@@ -164,4 +164,5 @@ return {
   Vim = ' ',
   Lazy = '💤',
   Copilot = ' ',
+  Claude = '',
 }

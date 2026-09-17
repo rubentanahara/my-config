@@ -46,12 +46,11 @@ return {
             '<leader>',
             group = 'Main Menu',
           },
-
           {
             '<leader>a',
             group = 'AI',
-            icon = { icon = get_icon('Copilot'), color = 'green' },
-            desc = 'AI / Copilot',
+            icon = { icon = get_icon('Claude'), color = 'green' },
+            desc = 'AI / Copilot + Claude',
           },
           {
             '<leader>af',

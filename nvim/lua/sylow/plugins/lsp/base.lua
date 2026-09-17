@@ -54,11 +54,12 @@ local function setup_mason_lspconfig()
       'clangd', --cpp,c
       'lua_ls', -- lua
       'ts_ls', -- js,ts
-      'eslint-lsp', -- js,ts lint (lspconfig: eslint)
+      'eslint', -- js,ts lint
       'biome', -- js,ts lint/format
       'rust_analyzer', -- rust
       'pyright', -- python
       'kotlin_language_server', -- kotlin'
+      'roslyn_analyzer', -- cs
     },
     -- stylua is a formatter (run via conform.nvim), not a language server.
     -- nvim-lspconfig ships a `stylua` config using `stylua --lsp`, which only

@@ -467,6 +467,7 @@ function M.apply_user_lsp_settings(server_name)
   M.capabilities.textDocument.completion.completionItem.resolveSupport = {
     properties = { 'documentation', 'detail', 'additionalTextEdits' },
   }
+  M.capabilities = require('blink.cmp').get_lsp_capabilities(M.capabilities)
   M.flags = {}
 
   local server_config = lspconfig[server_name] or {}
