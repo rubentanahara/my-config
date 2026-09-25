@@ -138,6 +138,29 @@ maps.n['<leader>th'] = { ui.toggle_foldcolumn, desc = 'Toggle foldcolumn' }
 maps.n['<leader>tN'] = { ui.toggle_ui_notifications, desc = 'UI notifications' }
 maps.n['<leader>tz'] = { ui.toggle_zen_mode, desc = 'Zen mode' }
 maps.n['<leader>tp'] = { '<cmd>Markview toggle<cr>', desc = 'Toggle markdown preview' }
+maps.n['<leader>mg'] = {
+  function()
+    if vim.bo.filetype ~= 'markdown' then
+      vim.notify('Glow: not a markdown file', vim.log.levels.WARN)
+      return
+    end
+    local win = vim.api.nvim_get_current_win()
+    local md_buf = vim.api.nvim_get_current_buf()
+    vim.cmd.enew()
+    local glow_buf = vim.api.nvim_get_current_buf()
+    vim.fn.jobstart({ 'glow', '-p', vim.api.nvim_buf_get_name(md_buf) }, {
+      term = true,
+      on_exit = function()
+        if vim.api.nvim_win_is_valid(win) then
+          vim.api.nvim_win_set_buf(win, md_buf)
+        end
+        vim.api.nvim_buf_delete(glow_buf, { force = true })
+      end,
+    })
+    vim.cmd.startinsert()
+  end,
+  desc = 'Markdown: Glow preview',
+}
 maps.n['<leader>pl'] = { '<cmd>Lazy<cr>', desc = 'Open Lazy' }
 
 utils.set_mappings(maps, { silent = true, noremap = true })
