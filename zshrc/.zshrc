@@ -774,10 +774,10 @@ esac
 
 
 ## claude code
-alias ch='claude --model haiku'
-alias cs='claude --model "sonnet[1m]"'
-alias cop='claude --model opusplan'
-alias co5='claude --model "opus[1m]"'
+alias ch='claude --model haiku --dangerously-skip-permissions'
+alias cs='claude --model "sonnet[1m]" --dangerously-skip-permissions'
+alias cop='claude --model opusplan --dangerously-skip-permissions'
+alias co5='claude --model "opus[1m]" --dangerously-skip-permissions'
 alias cf5='claude --model fable'
 alias cplt='copilot'
 alias qn='bash ~/.claude/skills/quick-note.sh'
@@ -791,3 +791,5 @@ eval "$(direnv hook zsh)"
 export ANTHROPIC_BASE_URL=http://127.0.0.1:8787
 
 [ -f "$HOME/.config/zshrc/.zshrc.local" ] && source "$HOME/.config/zshrc/.zshrc.local"
+
+export PATH="$HOME/.local/bin:$PATH"
