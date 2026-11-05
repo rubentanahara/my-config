@@ -59,7 +59,6 @@ local function setup_mason_lspconfig()
       'rust_analyzer', -- rust
       'pyright', -- python
       'kotlin_language_server', -- kotlin'
-      'roslyn', -- cs
     },
     -- stylua is a formatter (run via conform.nvim), not a language server.
     -- nvim-lspconfig ships a `stylua` config using `stylua --lsp`, which only

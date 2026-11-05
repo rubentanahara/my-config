@@ -206,7 +206,7 @@ local function get_lsp_mappings(client, bufnr)
   }
 
   local lsp_hover_config = M.lsp_hover_config
-  lsp_mappings.n['gh'] = {
+  lsp_mappings.n['K'] = {
     function()
       vim.lsp.buf.hover(lsp_hover_config)
     end,
