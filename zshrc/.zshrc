@@ -620,6 +620,7 @@ alias ....="cd ../../.."
 alias ~="cd ~"
 alias cd..="cd .."
 alias c="clear"
+alias cpwd='pwd | tr -d "\n" | pbcopy && pwd'
 
 # File operations
 alias ll="lsd -lah"
