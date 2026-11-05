@@ -55,3 +55,7 @@ caveman/
 herdr/
 lazysql/
 neonctl/
+ponytail/
+.codegraph/
+ai-usage/
+*.bak-*
