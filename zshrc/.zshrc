@@ -73,7 +73,7 @@ export INFOPATH="/usr/local/texlive/2024/texmf-dist/doc/info:$INFOPATH"
 # Zsh plugins
 source $HOMEBREW_PREFIX/opt/zsh-fast-syntax-highlighting/share/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
 source $HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source $HOMEBREW_PREFIX/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+[[ -o interactive ]] && source $HOMEBREW_PREFIX/share/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 # NVM
 export NVM_DIR="$HOME/.nvm"
@@ -650,6 +650,7 @@ alias dnc="dotnet clean"
 alias dnr="dotnet restore"
 alias dnt='dotnet test --logger "console;verbosity=detailed"'
 alias dotnetFull='dnc && dnr && dnb && dnt'
+dotnet9() { DOTNET_ROOT="$HOME/.dotnet" "$HOME/.dotnet/dotnet" "$@"; }
 
 # Tmux
 alias tmx="tmux"
@@ -780,6 +781,25 @@ alias cop='claude --model opusplan --dangerously-skip-permissions'
 alias co5='claude --model "opus[1m]" --dangerously-skip-permissions'
 alias cf5='claude --model fable'
 alias cplt='copilot'
+CLI_SESSION_AGENT=grand-architect
+codex() {
+  local kickoff
+  kickoff="$(git rev-parse --show-toplevel 2> /dev/null)/.github/hooks/session-kickoff.json"
+  if (( $# == 0 )) && [[ -f $kickoff ]]; then
+    command codex -p "$CLI_SESSION_AGENT" "$(jq -r '.hooks.sessionStart[0].prompt' "$kickoff")"
+  elif (( $# == 0 )) || [[ $1 == -* || $1 == *" "* ]]; then
+    command codex -p "$CLI_SESSION_AGENT" "$@"
+  else
+    command codex "$@"
+  fi
+}
+copilot() {
+  if [[ " $* " == *" --agent"* ]]; then
+    command copilot "$@"
+  else
+    command copilot --agent "$CLI_SESSION_AGENT" "$@"
+  fi
+}
 alias qn='bash ~/.claude/skills/quick-note.sh'
 
 ## .NET SDK (Homebrew formula: brew install dotnet)
