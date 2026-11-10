@@ -814,3 +814,5 @@ export ANTHROPIC_BASE_URL=http://127.0.0.1:8787
 [ -f "$HOME/.config/zshrc/.zshrc.local" ] && source "$HOME/.config/zshrc/.zshrc.local"
 
 export PATH="$HOME/.local/bin:$PATH"
+
+[ -f "$HOME/.config/zsh/harness.zsh" ] && source "$HOME/.config/zsh/harness.zsh"

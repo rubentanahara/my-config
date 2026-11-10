@@ -8,13 +8,13 @@ default-root-container-orientation = 'auto'
 
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
-[gaps]
-    inner.vertical = 10
-    inner.horizontal = 10
-    outer.left = 10
-    outer.bottom = 10
-    outer.top = 10
-    outer.right = 10
+# [gaps]
+#     inner.vertical = 10
+#     inner.horizontal = 10
+#     outer.left = 10
+#     outer.bottom = 10
+#     outer.top = 10
+#     outer.right = 10
 
 [key-mapping]
     preset = 'qwerty'

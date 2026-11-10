@@ -1,0 +1,11 @@
+{
+  "project_title": "replace-with-project-name",
+  "priority_legend": {
+    "P0": "On the critical path, or the reference shape other slices copy.",
+    "P1": "In scope but not on the critical path.",
+    "P2": "Polish. Drop first if time is short.",
+    "P3": "Parked. Not scheduled."
+  },
+  "sprints": [],
+  "epics": []
+}
