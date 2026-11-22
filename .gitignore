@@ -23,6 +23,8 @@ gh/
 gh-dash/
 nvim/.netrwhist
 tmux/plugins/
+atuin/atuin-receipt.json
+gcx/
 
 # Logs and cache
 logs/
