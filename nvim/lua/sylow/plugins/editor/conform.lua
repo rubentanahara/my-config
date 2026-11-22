@@ -24,6 +24,8 @@ return {
         csharp = { 'csharpier' },
         json = { 'jq' },
         yaml = { 'yamlfmt' },
+        toml = { 'taplo' },
+        swift = { 'swiftformat' },
       },
     })
 

@@ -19,8 +19,17 @@ local function setup_mason()
   }
 end
 
+local MACOS_ONLY_TOOLS = {
+  'swiftformat',
+  'swiftlint',
+  'xcbeautify',
+  'xcode-build-server',
+  'xcodegen',
+  'xcodeprojectcli',
+}
+
 local function setup_mason_tool_installer()
-  return {
+  local opts = {
     ensure_installed = {
       -- Formatters
       'clang-format', -- cpp,c'
@@ -31,6 +40,7 @@ local function setup_mason_tool_installer()
       'black', -- python
       'xmlformatter',
       'ktfmt', -- kotlin'
+      'yamlfmt',
       -- Linters
       'cpplint', -- cpp,c'
       'luacheck', -- lua
@@ -46,6 +56,10 @@ local function setup_mason_tool_installer()
     auto_update = false,
     run_on_start = true,
   }
+  if utils.is_mac() then
+    vim.list_extend(opts.ensure_installed, MACOS_ONLY_TOOLS)
+  end
+  return opts
 end
 
 local function setup_mason_lspconfig()
@@ -58,17 +72,20 @@ local function setup_mason_lspconfig()
       'biome', -- js,ts lint/format
       'rust_analyzer', -- rust
       'pyright', -- python
-      'kotlin_language_server', -- kotlin'
+      'kotlin_lsp',
+      'taplo',
+      'yamlls',
     },
     -- stylua is a formatter (run via conform.nvim), not a language server.
     -- nvim-lspconfig ships a `stylua` config using `stylua --lsp`, which only
     -- exists in stylua nightly; on stable it exits 2. Keep it from auto-enabling.
-    automatic_enable = { exclude = { 'stylua', 'stylua3p_ls' } },
+    automatic_enable = { exclude = { 'stylua', 'stylua3p_ls', 'rust_analyzer' } },
     handlers = {
       function(server_name)
         local opts = lsp_utils.apply_user_lsp_settings(server_name)
         require('lspconfig')[server_name].setup(opts)
       end,
+      rust_analyzer = function() end,
     },
   }
 end

@@ -31,6 +31,7 @@ local parsers = {
   'bicep',
   'xml',
   'sql',
+  'swift',
 }
 
 local function setup_highlight_and_indent()

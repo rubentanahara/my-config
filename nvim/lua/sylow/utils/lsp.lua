@@ -125,7 +125,10 @@ local function get_lsp_mappings(client, bufnr)
         end
 
         -- Get autoformat setting (buffer or global)
-        local autoformat_enabled = vim.b.autoformat_enabled or vim.g.autoformat_enabled
+        local autoformat_enabled = vim.b[bufnr].autoformat_enabled
+        if autoformat_enabled == nil then
+          autoformat_enabled = vim.g.autoformat_enabled
+        end
         local has_no_filter = not autoformat.filter
         local passes_filter = autoformat.filter and autoformat.filter(bufnr)
 
@@ -488,19 +491,6 @@ function M.apply_user_lsp_settings(server_name)
         },
         workspace = {
           checkThirdParty = false,
-        },
-      },
-    }
-  elseif server_name == 'rust_analyzer' then
-    opts.filetypes = { 'rust' }
-    opts.settings = {
-      ['rust-analyzer'] = {
-        cargo = {
-          allFeatures = true,
-        },
-        checkOnSave = {
-          enable = true,
-          command = 'clippy',
         },
       },
     }

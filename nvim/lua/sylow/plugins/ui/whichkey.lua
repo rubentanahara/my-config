@@ -126,6 +126,14 @@ return {
             desc = 'Diagnostics',
           },
           {
+            '<leader>X',
+            group = 'Xcode',
+          },
+          {
+            '<leader>A',
+            group = 'Android',
+          },
+          {
             '<leader>z',
             group = 'Fold',
             icon = { icon = get_icon('NeoTree'), color = 'green' },
