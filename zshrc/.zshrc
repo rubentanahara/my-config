@@ -644,6 +644,17 @@ alias cc="cd ~/.config"
 alias nc="n ~/.config"
 alias dev="cd ~/Desktop/dev && tmxdev"
 
+# PDF
+if (( $+commands[zathura] )); then
+  zathura_plugin_dir="${HOMEBREW_PREFIX:-/opt/homebrew}/opt/zathura/lib/zathura"
+  poppler_plugin="${HOMEBREW_PREFIX:-/opt/homebrew}/opt/zathura-pdf-poppler/libpdf-poppler.dylib"
+  if [[ -f "$poppler_plugin" && ! -e "$zathura_plugin_dir/libpdf-poppler.dylib" ]]; then
+    mkdir -p "$zathura_plugin_dir" && ln -sf "$poppler_plugin" "$zathura_plugin_dir/libpdf-poppler.dylib"
+  fi
+  unset zathura_plugin_dir poppler_plugin
+  alias pdf="zathura --fork"
+fi
+
 # Dotnet
 alias dwr="dotnet watch run"
 alias dnb="dotnet build"
@@ -760,8 +771,8 @@ alias py="python3"
 # pnpm
 export PNPM_HOME="/Users/rubentanahara/Library/pnpm"
 case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
 #
@@ -782,6 +793,22 @@ alias cop='claude --model opusplan --dangerously-skip-permissions'
 alias co5='claude --model "opus[1m]" --dangerously-skip-permissions'
 alias cf5='claude --model fable'
 alias cplt='copilot'
+cc-product() {
+  local model="claude-opus-5-5[1m]"
+  if [[ ($1 == -m || $1 == --model) && -n $2 ]]; then
+    model=$2
+    shift 2
+  fi
+  claude --model "$model" --agent product-engineer --dangerously-skip-permissions "$@"
+}
+cc-ga() {
+  local model="claude-opus-5-5[1m]"
+  if [[ ($1 == -m || $1 == --model) && -n $2 ]]; then
+    model=$2
+    shift 2
+  fi
+  claude --model "$model" --agent grand-architect --dangerously-skip-permissions "$@"
+}
 CLI_SESSION_AGENT=grand-architect
 codex() {
   local kickoff
@@ -811,8 +838,27 @@ eval "$(direnv hook zsh)"
 
 export ANTHROPIC_BASE_URL=http://127.0.0.1:8787
 
+
+function awsinv() {
+  local region="${1:-us-east-2}"
+  aws lightsail get-container-services --region "$region" --query 'containerServices[].[`"lightsail-container"`,containerServiceName,state]' --output text
+  aws lightsail get-relational-databases --region "$region" --query 'relationalDatabases[].[`"lightsail-database"`,name,state]' --output text
+  aws rds describe-db-instances --region "$region" --query 'DBInstances[].[`"rds-instance"`,DBInstanceIdentifier,DBInstanceStatus]' --output text
+  aws cognito-idp list-user-pools --max-results 20 --region "$region" --query 'UserPools[].[`"cognito-user-pool"`,Name,Id]' --output text
+  aws s3api list-buckets --query 'Buckets[].[`"s3-bucket"`,Name,CreationDate]' --output text
+  aws ec2 describe-instances --region "$region" --query 'Reservations[].Instances[].[`"ec2-instance"`,InstanceId,State.Name]' --output text
+}
+
 [ -f "$HOME/.config/zshrc/.zshrc.local" ] && source "$HOME/.config/zshrc/.zshrc.local"
 
 export PATH="$HOME/.local/bin:$PATH"
 
 [ -f "$HOME/.config/zsh/harness.zsh" ] && source "$HOME/.config/zsh/harness.zsh"
+
+[ -f "$HOME/.atuin/bin/env" ] && . "$HOME/.atuin/bin/env"
+
+(( $+commands[atuin] )) && eval "$(atuin init zsh)"
+
+autoload -Uz bashcompinit && bashcompinit
+autoload -Uz compinit && compinit
+complete -C '/opt/homebrew/bin/aws_completer' aws
