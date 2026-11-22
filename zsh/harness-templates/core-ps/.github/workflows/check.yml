@@ -1,0 +1,20 @@
+name: check
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v7
+      - run: ./make.ps1 setup
+      - run: ./make.ps1 check
+      - run: |
+          git status --porcelain
+          if (git status --porcelain) { exit 1 }

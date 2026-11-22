@@ -14,6 +14,8 @@ Each guardrail names what enforces it, why it exists, and when it can go.
 | No secrets in commits | `.husky/pre-commit` (gitleaks) | Secrets never reach the remote | never |
 | No push to `main`, no push that drops pushed commits | `.husky/pre-push` | `main` changes only through a pull request | never |
 | Format, lint, build, tests | `make check`, required by CI on every pull request | One definition of green | never |
+| `feature_list.json` states and evidence are consistent | `make check` step `features` (`feature.sh validate`) | A hand edit to `passing` or `blocked` has no evidence | never |
+| `make check` leaves no changed or untracked files | `.github/workflows/check.yml` | Stray and generated files never reach a pull request | never |
 | Story stays inside its `owns` | `feature.sh done` | Stories in one wave must not touch the same files | never |
 | Independent review cannot change files | `verify` skill, run in a fresh session or subagent | A reviewer that edits grades its own work | never |
 | `main` changes only through a reviewed PR with a green `check` | branch protection on GitHub | The last line when every local guardrail is bypassed | never |

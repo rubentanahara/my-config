@@ -1,0 +1,7 @@
+INSTALL_CMD := throw "set INSTALL_CMD in commands.mk"
+BUILD_CMD := throw "set BUILD_CMD in commands.mk"
+LINT_CMD := throw "set LINT_CMD in commands.mk"
+FORMAT_CMD := throw "set FORMAT_CMD in commands.mk"
+TEST_CMD := throw "set TEST_CMD in commands.mk"
+TEST_STORY_CMD := throw "set TEST_STORY_CMD in commands.mk (it receives FILTER)"
+RUN_CMD := throw "set RUN_CMD in commands.mk"

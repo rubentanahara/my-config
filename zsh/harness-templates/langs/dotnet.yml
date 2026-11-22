@@ -1,0 +1,3 @@
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 9.0.x

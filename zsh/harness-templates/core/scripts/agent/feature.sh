@@ -14,83 +14,17 @@ readonly USAGE='Usage:
   scripts/agent/feature.sh block <id> "<reason>"
   scripts/agent/feature.sh unblock <id>             make a blocked story startable again
   scripts/agent/feature.sh scope <id>               files changed on this branch that the story does not own
+  scripts/agent/feature.sh validate                 fail when feature_list.json was edited by hand
   scripts/agent/feature.sh reset                    remove every sprint, epic and story; keep project_title, priority_legend and shared'
 
-readonly STORIES_JQ='def fail(errors): (errors | join("\n")) + "\n" | halt_error(1);
-def stories: [.epics[] | .sprint as $sprint | .id as $epic | .stories[]
-  | . + {epic: $epic, sprint: (if has("sprint") then .sprint else $sprint end)}];
-def covers($path): . as $prefix | $prefix == $path or (($prefix | endswith("/")) and ($path | startswith($prefix)));
-def overlap($a; $b): [$a[] as $x | $b[] as $y | select(($x | covers($y)) or ($y | covers($x))) | $y];
-def claims($shared): [(.owns // [])[] | . as $path | select(any($shared[]; covers($path)) | not)];'
-
-readonly WAVES_JQ="$STORIES_JQ"'
-  . as $root
-  | stories as $all
-  | ($all | map(select(.state == "passing") | .id)) as $passing
-  | {open: [$all[] | select((.state | IN($open_states[])) and .sprint != null)], skipped: []}
-  | until((.open | map(.id)) as $ids | all(.open[]; (.depends_on - $passing - $ids) | length == 0);
-      (.open | map(.id)) as $ids
-      | [.open[] | select((.depends_on - $passing - $ids) | length > 0)] as $stuck
-      | .skipped += [$stuck[] | "\(.id) waits on \((.depends_on - $passing - $ids) | join(", ")), which is blocked, parked, or waiting on one."]
-      | .open -= $stuck)
-  | .skipped as $skipped
-  | .open as $open
-  | [$open[] | .sprint as $sprint | .id as $id | .depends_on[] as $dep | $open[] | select(.id == $dep and .sprint > $sprint)
-      | "\($id) (sprint \($sprint)) depends on \(.id), which is in later sprint \(.sprint)."] as $late
-  | if ($late | length) > 0 then fail($late) else . end
-  | ($root.shared // []) as $shared
-  | {remaining: [$open[] | .sprint as $sprint | . + {after: [$open[] | select(.sprint < $sprint) | .id], claims: claims($shared)}],
-     done: $passing, waves: [], notes: []}
-  | until(.remaining | length == 0;
-      .done as $done
-      | (.remaining | map(select((.depends_on + .after - $done) | length == 0))) as $ready
-      | if ($ready | length) == 0 then fail(["Dependency cycle among: \(.remaining | map(select((.depends_on - $done) | length > 0) | .id) | join(", "))"]) else . end
-      | (reduce $ready[] as $story ({picked: [], notes: []};
-          [.picked[] | select((.claims | length) == 0 or ($story.claims | length) == 0 or (overlap(.claims; $story.claims) | length) > 0)] as $clashes
-          | if (.picked | length) == 0 or ($clashes | length) == 0 then .picked += [$story]
-            elif ($story.claims | length) == 0 then .notes += [{id: $story.id, text: "\($story.id) runs alone: it has no owns."}]
-            elif ($clashes[0].claims | length) == 0 then .notes += [{id: $story.id, text: "\($story.id) waits for \($clashes[0].id), which has no owns and runs alone."}]
-            else .notes += [{id: $story.id, text: "\($story.id) waits for \($clashes[0].id): both own \(overlap($clashes[0].claims; $story.claims)[0])."}]
-            end)) as $round
-      | ($round.picked | map(.id)) as $wave
-      | .waves += [$wave] | .done += $wave | .notes += $round.notes
-      | .remaining |= map(select(.id as $id | $wave | index($id) | not)))
-  | {waves, skipped: ($skipped + (.notes | unique_by(.id) | map(.text)))}'
+JQ_DIR="$(dirname "${BASH_SOURCE[0]}")/jq"
+STORIES_JQ=$(< "$JQ_DIR/stories.jq")
+WAVES_JQ="$STORIES_JQ$(< "$JQ_DIR/waves.jq")"
+ADD_JQ=$(< "$JQ_DIR/add.jq")
+readonly JQ_DIR STORIES_JQ WAVES_JQ ADD_JQ
 readonly SCHEDULED_STATES='["not_started","active"]'
 readonly UNFINISHED_STATES='["not_started","active","blocked"]'
 
-readonly ADD_JQ='
-def text: type == "string" and length > 0;
-def normalize: {id, name, title, area: (.area // ""), priority: (.priority // "P1"), estimate: (.estimate // ""),
-  acceptance_criteria, depends_on: (.depends_on // []), tasks: (.tasks // []), owns: (.owns // []), prd: (.prd // ""), test_filter,
-  state: "not_started", evidence: ""} + (if has("sprint") then {sprint} else {} end);
-([.epics[].stories[].id]) as $existing
-| ([$fragment.epics[]?.stories[]?]) as $new
-| ($existing + [$new[].id]) as $ids
-| ([$new[] | select((.id | text) and (.name | text) and (.title | text) and (.test_filter | text)
-      and (.acceptance_criteria | type == "array" and length > 0) | not) | .id // "a story without id"]
-    | map("\(.) needs id, name, title, test_filter and at least one acceptance criterion.")) as $incomplete
-| ($ids | group_by(.) | map(select(length > 1) | "\(.[0]) is used more than once.")) as $duplicates
-| ([$new[] | .id as $id | (.depends_on // [])[] | select(. as $dep | $ids | index($dep) | not)
-      | "\($id) depends on \(.), which does not exist."]) as $unknown
-| . as $current
-| ([$fragment.epics[]? | select(.id as $id | [$current.epics[].id] | index($id) | not)
-      | select(((.title | text) and has("sprint")) | not)
-      | "New epic \(.id) needs a title and a sprint (a number, or null to park it)."]) as $untitled
-| def repo_paths: type == "array" and all(.[]; type == "string" and length > 0 and (test("[*?\\[]|^/|(^|/)\\.\\.(/|$)") | not));
-  ([$new[] | select((.owns // []) | repo_paths | not)
-      | "\(.id) owns must be repo-relative paths without wildcards; end a directory with /."]
-   + (if ($fragment.shared // []) | repo_paths then [] else ["shared must be repo-relative paths without wildcards; end a directory with /."] end)) as $bad_paths
-| ($incomplete + $duplicates + $unknown + $untitled + $bad_paths) as $errors
-| if ($errors | length) > 0 then fail($errors) else . end
-| reduce ($fragment.epics // [])[] as $epic (.;
-    if any(.epics[]; .id == $epic.id)
-    then .epics |= map(if .id == $epic.id then .stories += [$epic.stories[]? | normalize] else . end)
-    else .epics += [{id: $epic.id, title: $epic.title, sprint: $epic.sprint, summary: ($epic.summary // ""),
-      stories: [$epic.stories[]? | normalize]}]
-    end)
-| .sprints = ((.sprints + ($fragment.sprints // [])) | unique_by(.sprint))
-| if ($fragment.shared // []) | length > 0 then .shared = ((.shared // []) + $fragment.shared | unique) else . end'
 
 fail() {
   echo "$1" >&2
@@ -228,6 +162,19 @@ unblock_story() {
   set_state "$1" not_started ""
 }
 
+validate_features() {
+  local errors
+  errors=$(jq -r "$STORIES_JQ"'
+    stories as $all | ($all | map(.id)) as $ids
+    | $all[] | . as $story
+    | (if (.state | IN("not_started", "active", "blocked", "passing")) then empty else "\(.id) has unknown state \(.state)." end),
+      (if (.state | IN("passing", "blocked")) and ((.evidence // "") == "") then "\(.id) is \(.state) with no evidence. Change state only through feature.sh." else empty end),
+      ((.depends_on // [])[] | select(. as $dep | $ids | index($dep) | not) | "\($story.id) depends on \(.), which does not exist.")
+  ' "$FEATURES_FILE")
+  [[ -z "$errors" ]] || fail "$errors"
+  echo "Backlog is consistent."
+}
+
 reset_backlog() {
   local active
   active=$(jq -r "$STORIES_JQ"' [stories[] | select(.state == "active") | .id] | join(", ")' "$FEATURES_FILE")
@@ -249,6 +196,7 @@ case "${1:-} $#" in
   "block 3") block_story "$2" "$3" ;;
   "unblock 2") unblock_story "$2" ;;
   "scope 2") check_scope "$2" ;;
+  "validate 1") validate_features ;;
   "reset 1") reset_backlog ;;
   *) fail "$USAGE" ;;
 esac

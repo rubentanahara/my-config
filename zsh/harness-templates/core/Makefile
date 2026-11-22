@@ -8,10 +8,10 @@ TEST_CMD := echo "set TEST_CMD in Makefile" && false
 TEST_STORY_CMD := echo "set TEST_STORY_CMD in Makefile (it receives FILTER)" && false
 RUN_CMD := echo "set RUN_CMD in Makefile" && false
 
-.PHONY: check setup build lint test test-story format run hooks clean
+.PHONY: check setup build lint test test-story format run hooks features clean
 
-check: hooks build lint test
-	@echo "CHECK PASSED: hooks, build, lint, tests"
+check: hooks features build lint test
+	@echo "CHECK PASSED: hooks, features, build, lint, tests"
 
 setup:
 	git config core.hooksPath .husky
@@ -52,6 +52,14 @@ hooks:
 		echo "CHECK FAILED at hooks. .codex/hooks.json differs from the hooks in .claude/settings.json. Edit .claude/settings.json, then run: jq '{hooks}' .claude/settings.json > .codex/hooks.json"; \
 		exit 1; }
 	@echo "OK   hooks"
+
+features:
+	@mkdir -p $(LOGS)
+	@bash scripts/agent/feature.sh validate > $(LOGS)/features.log 2>&1 || { \
+		cat $(LOGS)/features.log; \
+		echo "CHECK FAILED at features. Change feature_list.json only through scripts/agent/feature.sh."; \
+		exit 1; }
+	@echo "OK   features"
 
 format:
 	$(FORMAT_CMD)
