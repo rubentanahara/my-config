@@ -1,4 +1,5 @@
 LOGS := .agent
+HOOK_SCRIPTS_JQ := def scripts: [scan("scripts/agent/([a-z-]+)[.]") | .[0]];
 
 INSTALL_CMD := echo "set INSTALL_CMD in Makefile" && false
 BUILD_CMD := echo "set BUILD_CMD in Makefile" && false
@@ -8,10 +9,10 @@ TEST_CMD := echo "set TEST_CMD in Makefile" && false
 TEST_STORY_CMD := echo "set TEST_STORY_CMD in Makefile (it receives FILTER)" && false
 RUN_CMD := echo "set RUN_CMD in Makefile" && false
 
-.PHONY: check setup build lint test test-story format run hooks features clean
+.PHONY: check setup build lint test test-story format run hooks agents harness features clean
 
-check: hooks features build lint test
-	@echo "CHECK PASSED: hooks, features, build, lint, tests"
+check: hooks agents harness features build lint test
+	@echo "CHECK PASSED: hooks, agents, harness, features, build, lint, tests"
 
 setup:
 	git config core.hooksPath .husky
@@ -51,7 +52,27 @@ hooks:
 	@jq -n -e --slurpfile claude .claude/settings.json --slurpfile codex .codex/hooks.json '$$claude[0].hooks != null and $$claude[0].hooks == $$codex[0].hooks' > /dev/null || { \
 		echo "CHECK FAILED at hooks. .codex/hooks.json differs from the hooks in .claude/settings.json. Edit .claude/settings.json, then run: jq '{hooks}' .claude/settings.json > .codex/hooks.json"; \
 		exit 1; }
+	@jq -n -e --slurpfile claude .claude/settings.json --slurpfile agy .agents/hooks.json '$(HOOK_SCRIPTS_JQ) ($$claude[0].hooks | map_values([.[].hooks[].command | scripts] | add)) == ($$agy[0].harness | map_values([.[].command | scripts] | add))' > /dev/null || { \
+		echo "CHECK FAILED at hooks. .agents/hooks.json does not run the same scripts per event as .claude/settings.json. Make each event in .agents/hooks.json call the same scripts/agent scripts, with agy as the argument."; \
+		exit 1; }
 	@echo "OK   hooks"
+
+agents:
+	@generated=$$(mktemp -d); \
+	bash scripts/agent/sync-agents.sh .claude/agents $$generated/agents && diff -r $$generated/agents .codex/agents > /dev/null; drift=$$?; \
+	rm -rf $$generated; \
+	[ $$drift -eq 0 ] || { \
+		echo "CHECK FAILED at agents. .codex/agents differs from .claude/agents. Edit .claude/agents, then run: bash scripts/agent/sync-agents.sh"; \
+		exit 1; }
+	@echo "OK   agents"
+
+harness:
+	@mkdir -p $(LOGS)
+	@{ bash scripts/agent/run.test.sh && bash scripts/agent/sync-agents.test.sh; } > $(LOGS)/harness.log 2>&1 || { \
+		cat $(LOGS)/harness.log; \
+		echo "CHECK FAILED at harness. A scripts/agent test failed. Fix the script, not the test."; \
+		exit 1; }
+	@echo "OK   harness"
 
 features:
 	@mkdir -p $(LOGS)

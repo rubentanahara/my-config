@@ -30,6 +30,8 @@ Each guardrail names what enforces it, why it exists, and when it can go.
 ## Known gaps
 - `git push --no-verify` skips the git hooks, and a clone where `make setup` never ran has no git hooks. Branch protection on GitHub is the backstop.
 - Copilot CLI does not apply the deny rules in `.claude/settings.json`, so the git hooks and branch protection are its only push guards.
+- Copilot CLI runs the hooks in `.claude/settings.json` and loads `.mcp.json` only in a trusted folder: add the repository to `trustedFolders` in `~/.copilot/config.json`. The runner trusts the folder for its own Copilot sessions.
+- The runner's agy sessions block `git push` with a deny rule passed through `--settings`.
 - A user-level `PreToolUse` hook that rewrites and approves a Bash command can bypass the Claude deny rules.
 - Claude Code keeps at most 10,000 characters of a hook's output. `session-start.sh` cuts its context to 9,000.
 - Two sessions in one checkout can blame each other in the stop gate. Use separate worktrees.

@@ -41,6 +41,7 @@ $redPrefix = 'test(red)'
 $pollSeconds = 15
 $checksAppearRounds = 20
 $feedbackLines = 60
+$agyDenyPush = '{"permissions":{"deny":["command(git push)","command(regex:git .*push.*)"]}}'
 $slugMaxLength = 40
 
 function Main {
@@ -216,6 +217,7 @@ function Request-Story([string]$Id, [string]$Dir) {
         Write-Report "${Id}: ./make.ps1 setup failed in its worktree; see $(Get-StoryLogDir $Id)/setup.log"
         return $false
     }
+    Initialize-WorktreeIndex $Dir (Join-Path (Get-StoryLogDir $Id) 'codegraph.log')
     $state = Get-WorktreeState $Id
     switch ($state) {
         { $_ -in 'not_started', 'blocked' } { Invoke-Feature $Dir start $Id | Out-Null; return $LASTEXITCODE -eq 0 }
@@ -458,16 +460,17 @@ function Invoke-Session([string]$Dir, [string]$SessionCli, [string]$SessionModel
                 $null | codex exec -m $SessionModel --sandbox read-only -o $Out $Prompt *> "$Out.log"
                 Get-Content $Out -Tail 20 -ErrorAction SilentlyContinue
             }
-            'copilot:write' { copilot -p $Prompt --model $SessionModel -n $Name --allow-all --no-ask-user --deny-tool 'shell(git push)' 2>&1 | Tee-Object -FilePath $Out }
+            'copilot:write' { $env:COPILOT_ALLOW_ALL = 'true'; copilot -p $Prompt --model $SessionModel -n $Name --allow-all --no-ask-user --deny-tool 'shell(git push)' 2>&1 | Tee-Object -FilePath $Out }
             'copilot:read' {
                 copilot -p $Prompt --model $SessionModel -n $Name -s --no-ask-user --deny-tool write `
                     --allow-tool 'shell(git diff:*)' --allow-tool 'shell(git status:*)' --allow-tool 'shell(git log:*)' --allow-tool 'shell(git show:*)' `
                     --allow-tool 'shell(scripts/agent/feature.ps1 show:*)' --allow-tool 'shell(scripts/agent/feature.ps1 scope:*)' 2>&1 | Tee-Object -FilePath $Out
             }
-            'agy:write' { $null | agy -p $Prompt --model $SessionModel --dangerously-skip-permissions 2>&1 | Tee-Object -FilePath $Out }
-            'agy:read' { $null | agy -p $Prompt --model $SessionModel --mode auto --sandbox 2>&1 | Tee-Object -FilePath $Out }
+            'agy:write' { $null | agy -p $Prompt --model $SessionModel --dangerously-skip-permissions --settings $agyDenyPush 2>&1 | Tee-Object -FilePath $Out }
+            'agy:read' { $null | agy -p $Prompt --model $SessionModel --mode auto --sandbox --settings $agyDenyPush 2>&1 | Tee-Object -FilePath $Out }
         }
     } finally {
+        Remove-Item Env:COPILOT_ALLOW_ALL -ErrorAction SilentlyContinue
         Pop-Location
     }
 }
@@ -485,6 +488,18 @@ function Invoke-Make([string]$Dir, [Parameter(ValueFromRemainingArguments)][stri
 function Install-Dependencies([string]$Dir, [string]$Log) {
     Invoke-Make $Dir setup *> $Log
     $LASTEXITCODE -eq 0
+}
+
+function Initialize-WorktreeIndex([string]$Dir, [string]$Log) {
+    if (-not (Test-Path (Join-Path $script:Root '.codegraph')) -or (Test-Path (Join-Path $Dir '.codegraph/codegraph.db'))) { return }
+    if (-not (Get-Command codegraph -ErrorAction SilentlyContinue)) { return }
+    Push-Location $Dir
+    try {
+        codegraph init -y *> $Log
+        if ($LASTEXITCODE -ne 0) { Write-Report "codegraph could not index $Dir; agents there fall back to grep. Log: $Log" }
+    } finally {
+        Pop-Location
+    }
 }
 
 function Get-WorktreeFingerprint([string]$Dir) {

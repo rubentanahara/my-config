@@ -31,6 +31,7 @@ readonly POLL_SECONDS=15
 readonly CHECKS_APPEAR_ROUNDS=20
 readonly RED_PREFIX='test(red)'
 readonly FEEDBACK_LINES=60
+readonly AGY_DENY_PUSH='{"permissions":{"deny":["command(git push)","command(regex:git .*push.*)"]}}'
 readonly SLUG_MAX_LENGTH=40
 
 main() {
@@ -231,6 +232,7 @@ claim_story() {
     git worktree add -q -b "$branch" "$dir" HEAD || return 1
   fi
   install_dependencies "$dir" "$(story_log_dir "$id")/setup.log" || { report "$id: make setup failed in its worktree; see $(story_log_dir "$id")/setup.log"; return 1; }
+  index_worktree "$dir" "$(story_log_dir "$id")/codegraph.log"
   state=$(worktree_state "$id")
   case "$state" in
     not_started | blocked) (cd "$dir" && bash "$FEATURE" start "$id") || return 1 ;;
@@ -281,6 +283,11 @@ gate_story() {
 
 install_dependencies() {
   (cd "$1" && make setup > "$2" 2>&1)
+}
+
+index_worktree() {
+  [[ -d "$ROOT/.codegraph" && ! -f "$1/.codegraph/codegraph.db" ]] && command -v codegraph > /dev/null || return 0
+  (cd "$1" && codegraph init -y > "$2" 2>&1) || report "codegraph could not index $1; agents there fall back to grep. Log: $2"
 }
 
 tdd_commit_order() {
@@ -452,15 +459,15 @@ run_session() {
       codex exec -m "$model" --sandbox read-only -o "$out" "$prompt" < /dev/null > "$out.log" 2>&1
       tail -n 20 "$out" ;;
     copilot:write)
-      copilot -p "$prompt" --model "$model" -n "$name" --allow-all --no-ask-user --deny-tool 'shell(git push)' 2>&1 | tee "$out" ;;
+      COPILOT_ALLOW_ALL=true copilot -p "$prompt" --model "$model" -n "$name" --allow-all --no-ask-user --deny-tool 'shell(git push)' 2>&1 | tee "$out" ;;
     copilot:read)
       copilot -p "$prompt" --model "$model" -n "$name" -s --no-ask-user --deny-tool write \
         --allow-tool 'shell(git diff:*)' --allow-tool 'shell(git status:*)' --allow-tool 'shell(git log:*)' --allow-tool 'shell(git show:*)' \
         --allow-tool 'shell(scripts/agent/feature.sh show:*)' --allow-tool 'shell(scripts/agent/feature.sh scope:*)' 2>&1 | tee "$out" ;;
     agy:write)
-      agy -p "$prompt" --model "$model" --dangerously-skip-permissions < /dev/null 2>&1 | tee "$out" ;;
+      agy -p "$prompt" --model "$model" --dangerously-skip-permissions --settings "$AGY_DENY_PUSH" < /dev/null 2>&1 | tee "$out" ;;
     agy:read)
-      agy -p "$prompt" --model "$model" --mode auto --sandbox < /dev/null 2>&1 | tee "$out" ;;
+      agy -p "$prompt" --model "$model" --mode auto --sandbox --settings "$AGY_DENY_PUSH" < /dev/null 2>&1 | tee "$out" ;;
   esac
 }
 

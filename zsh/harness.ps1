@@ -128,8 +128,12 @@ function Sync-Harness {
     if (-not (Test-Path make.ps1)) {
         Write-Host "sync: make.ps1 and commands.mk are missing. Copy them from $overlay."
     }
+    & ./scripts/agent/sync-agents.ps1
+    if (Test-Path .gemini) { Write-Host 'sync: .gemini/ is from an older harness and nothing uses it now. Delete it if you do not use Gemini CLI.' }
+    Initialize-Codegraph
     Write-Host 'sync: scripts/agent and .husky updated from the template.'
     & ./make.ps1 hooks
+    & ./make.ps1 agents
 }
 
 function Sync-HarnessFile([string]$Target, [string]$TemplateText) {
@@ -234,6 +238,7 @@ function Invoke-Harness {
 
     Register-HarnessMcp
     Initialize-Codegraph
+    if (-not (Test-Path .codex/agents)) { & ./scripts/agent/sync-agents.ps1 }
     if ($Sync) { Sync-Harness }
     if ($Lang -and -not (Set-HarnessLang $Lang)) { return }
 
@@ -242,6 +247,7 @@ function Invoke-Harness {
     }
 
     Write-MissingToolWarnings
+    Write-Host "copilot: it loads repository hooks and .mcp.json only in trusted folders. Add $PWD to trustedFolders in ~/.copilot/config.json."
 
     if (-not $Fill) {
         Write-Host "harness ready in $PWD. Next: fill the commands.mk commands, AGENTS.md, ARCHITECTURE.md."

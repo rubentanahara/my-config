@@ -22,7 +22,7 @@ Language presets: `dotnet`, `go`, `node`, `python`, `rust`. For another language
 
 Then:
 
-1. Run `make setup && make check`. It must end with `CHECK PASSED`.
+1. Run `make setup && make check`. It must end with `CHECK PASSED`. Besides build, lint and tests, it checks that the hook files of every CLI run the same scripts, that `.codex/agents` matches `.claude/agents`, and that the `scripts/agent` tests pass.
 2. Fix every line the fill report lists as empty or `Unknown:`.
 3. Commit the harness with a `No-Tests: <reason>` line in the message. The TDD gate refuses a source commit without a red test commit or that waiver.
 4. Push the branch and merge it through a pull request. `.husky/pre-push` refuses pushes to `main`.
@@ -77,7 +77,7 @@ scripts/agent/run.sh --story F01                      # run one story only
 4. Has the checker CLI review the change in a fresh, read-only session with the `verify` skill.
 5. Opens a pull request, merges it once CI is green, pulls `main`, and starts the next wave.
 
-Each step gets three attempts. After the third failure the story is blocked, and the last finding is recorded.
+When `.codegraph/` exists, each story's worktree gets its own index, so agents see the branch's code. Each step gets three attempts. After the third failure the story is blocked, and the last finding is recorded.
 
 By hand, in one session:
 
@@ -115,9 +115,12 @@ Invoke-Harness -Sync
 | A story is blocked after 3 attempts | Read `.agent/runs/<id>/`, fix the cause, run `git worktree remove --force .worktrees/<id>`, then run the runner again. |
 | A repository still uses an old runner | Run `harness --sync`. |
 | A pull request is opened from the wrong GitHub account | Run `gh auth switch -u <account>`. |
+| Copilot ignores the hooks or MCP servers | Add the repository to `trustedFolders` in `~/.copilot/config.json`. |
+| `make check` fails at `agents` | Edit `.claude/agents`, then run `bash scripts/agent/sync-agents.sh` (or `./scripts/agent/sync-agents.ps1`). |
 | A first commit is refused by the TDD gate | Commit the failing tests as `test(red): ...` first, or add `No-Tests: <reason>` to the message. |
 
 ## Not tested yet
 
+- The runner with codex or copilot as the implementer.
 - The runner's conflict resolution step.
 - `harness.ps1` on a real Windows machine. It was tested with pwsh on macOS.

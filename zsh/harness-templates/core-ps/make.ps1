@@ -52,7 +52,40 @@ function Invoke-Hooks {
         Write-Host "CHECK FAILED at hooks. .codex/hooks.json differs from the hooks in .claude/settings.json. Edit .claude/settings.json, then run: jq '{hooks}' .claude/settings.json > .codex/hooks.json"
         exit 1
     }
+    $scriptsPerEvent = 'def scripts: [scan("scripts/agent/([a-z-]+)[.]") | .[0]];'
+    jq -n -e --slurpfile claude .claude/settings.json --slurpfile agy .agents/hooks.json "$scriptsPerEvent (`$claude[0].hooks | map_values([.[].hooks[].command | scripts] | add)) == (`$agy[0].harness | map_values([.[].command | scripts] | add))" *> $null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host 'CHECK FAILED at hooks. .agents/hooks.json does not run the same scripts per event as .claude/settings.json. Make each event in .agents/hooks.json call the same scripts/agent scripts, with agy as the argument.'
+        exit 1
+    }
     Write-Host 'OK   hooks'
+}
+
+function Invoke-Agents {
+    $generated = Join-Path ([System.IO.Path]::GetTempPath()) ([guid]::NewGuid())
+    try {
+        & "$PSScriptRoot/scripts/agent/sync-agents.ps1" .claude/agents "$generated/agents" *> $null
+        $expected = Get-ChildItem "$generated/agents" -File | ForEach-Object { "$($_.Name)`n$(Get-Content $_.FullName -Raw)" }
+        $actual = if (Test-Path .codex/agents) { Get-ChildItem .codex/agents -File | ForEach-Object { "$($_.Name)`n$(Get-Content $_.FullName -Raw)" } } else { @() }
+        if ((@($expected) -join "`n") -ne (@($actual) -join "`n")) {
+            Write-Host 'CHECK FAILED at agents. .codex/agents differs from .claude/agents. Edit .claude/agents, then run: ./scripts/agent/sync-agents.ps1'
+            exit 1
+        }
+    } finally {
+        Remove-Item $generated -Recurse -Force -ErrorAction SilentlyContinue
+    }
+    Write-Host 'OK   agents'
+}
+
+function Invoke-HarnessTests {
+    New-Item -ItemType Directory -Force $logs | Out-Null
+    pwsh -NoProfile -File "$PSScriptRoot/scripts/agent/run.test.ps1" *> "$logs/harness.log"
+    if ($LASTEXITCODE -ne 0) {
+        Get-Content "$logs/harness.log" | ForEach-Object { Write-Host $_ }
+        Write-Host 'CHECK FAILED at harness. A scripts/agent test failed. Fix the script, not the test.'
+        exit 1
+    }
+    Write-Host 'OK   harness'
 }
 
 function Invoke-Features {
@@ -77,8 +110,8 @@ function Invoke-Setup {
 
 switch ($Task) {
     'check' {
-        Invoke-Hooks; Invoke-Features; Invoke-Build; Invoke-Lint; Invoke-Test
-        Write-Host 'CHECK PASSED: hooks, features, build, lint, tests'
+        Invoke-Hooks; Invoke-Agents; Invoke-HarnessTests; Invoke-Features; Invoke-Build; Invoke-Lint; Invoke-Test
+        Write-Host 'CHECK PASSED: hooks, agents, harness, features, build, lint, tests'
     }
     'setup' { Invoke-Setup }
     'build' { Invoke-Build }
@@ -93,8 +126,10 @@ switch ($Task) {
     'format' { Invoke-CommandLine ((Read-Commands).FORMAT_CMD); Write-Host 'OK   format' }
     'run' { Invoke-CommandLine ((Read-Commands).RUN_CMD) }
     'hooks' { Invoke-Hooks }
+    'agents' { Invoke-Agents }
+    'harness' { Invoke-HarnessTests }
     'features' { Invoke-Features }
     'clean' { Remove-Item $logs -Recurse -Force -ErrorAction SilentlyContinue; Write-Host 'OK   clean' }
-    default { Write-Host "Unknown task '$Task'. Tasks: check setup build lint test test-story format run hooks features clean"; exit 1 }
+    default { Write-Host "Unknown task '$Task'. Tasks: check setup build lint test test-story format run hooks agents harness features clean"; exit 1 }
 }
 exit 0

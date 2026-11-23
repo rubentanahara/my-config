@@ -33,8 +33,11 @@ harness_sync() {
     harness_sync_file "$template" "${template#$HARNESS_TEMPLATES/core/}"
   done
   grep -q '^features:' Makefile 2> /dev/null || echo "sync: Makefile has no features target. Copy it and the check dependency from $HARNESS_TEMPLATES/core/Makefile."
+  bash scripts/agent/sync-agents.sh
+  [[ -d .gemini ]] && echo "sync: .gemini/ is from an older harness and nothing uses it now. Delete it if you do not use Gemini CLI."
+  harness_codegraph
   echo "sync: scripts/agent and .husky updated from the template."
-  make hooks
+  make hooks agents
 }
 
 harness_sync_file() {
@@ -138,6 +141,7 @@ harness() {
 
   mkdir -p .agent
   harness_codegraph
+  [[ -d .codex/agents ]] || bash scripts/agent/sync-agents.sh
 
   [[ -z $sync ]] || harness_sync
 
@@ -149,6 +153,7 @@ harness() {
   done
 
   command -v jq > /dev/null || echo "WARNING: jq is missing; scripts/agent needs it (brew install jq)."
+  command -v copilot > /dev/null && echo "copilot: it loads repository hooks and .mcp.json only in trusted folders. Add $PWD to trustedFolders in ~/.copilot/config.json."
   command -v gitleaks > /dev/null || echo "WARNING: gitleaks is missing; pre-commit cannot scan (brew install gitleaks)."
 
   if [[ -n $fill ]]; then
