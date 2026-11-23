@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-readonly USAGE='Usage: scripts/agent/run.sh [--cli claude|codex|copilot|gemini|agy] [--checker claude|codex|copilot|gemini|agy] [--model <m>] [--checker-model <m>] [--parallel N] [--no-merge] [--story <id>] [--dry-run]
+readonly USAGE='Usage: scripts/agent/run.sh [--cli claude|codex|copilot|agy] [--checker claude|codex|copilot|agy] [--model <m>] [--checker-model <m>] [--parallel N] [--no-merge] [--story <id>] [--dry-run]
 
 Runs the first wave of scripts/agent/feature.sh waves. Each story gets its own worktree and branch and goes through:
 implement (a session named "<id> · <name>"), make check, scope and test gate, an independent read-only review
@@ -9,8 +9,8 @@ implement (a session named "<id> · <name>"), make check, scope and test gate, a
 
   --cli       CLI that implements. Default: copilot.
   --checker   CLI that reviews. Default: the same as --cli.
-  --model     model of the implementer. Default: claude-sonnet-5.5 (copilot), claude-sonnet-5-5 (claude), gpt-5.6-terra (codex),
-              auto (gemini) or gemini-3.8-flash-high (agy).
+  --model     model of the implementer. Default: claude-sonnet-5.5 (copilot), claude-sonnet-5-5 (claude), gpt-5.6-terra (codex)
+              or gemini-3.8-flash-high (agy).
   --checker-model  model of the reviewer. Default: claude-opus-5.5 (copilot), otherwise the default of the checker CLI.
   --parallel  how many stories of a wave run at once, one tmux pane each. Default: 1.
   --no-merge  stop at open pull requests. Default: merge each pull request once CI is green, then run the next wave.
@@ -21,7 +21,6 @@ readonly CLAUDE_DEFAULT_MODEL=claude-sonnet-5-5
 readonly COPILOT_DEFAULT_MODEL=claude-sonnet-5.5
 readonly COPILOT_DEFAULT_CHECKER_MODEL=claude-opus-5.5
 readonly CODEX_DEFAULT_MODEL=gpt-5.6-terra
-readonly GEMINI_DEFAULT_MODEL=auto
 readonly AGY_DEFAULT_MODEL=gemini-3.8-flash-high
 readonly WORKTREES_DIR=.worktrees
 readonly RUNS_DIR=.agent/runs
@@ -72,7 +71,7 @@ parse_arguments() {
   CHECKER_MODEL=${CHECKER_MODEL:-$(default_checker_model "$CHECKER")}
   local cli
   for cli in "$CLI" "$CHECKER"; do
-    [[ " claude codex copilot gemini agy " == *" $cli "* ]] || fail "Unknown CLI '$cli'. Use claude, codex, copilot, gemini or agy."
+    [[ " claude codex copilot agy " == *" $cli "* ]] || fail "Unknown CLI '$cli'. Use claude, codex, copilot or agy."
     command -v "$cli" > /dev/null || fail "$cli is not installed."
   done
   [[ "$PARALLEL" =~ ^[1-9][0-9]*$ ]] || fail "--parallel takes a positive number."
@@ -434,7 +433,6 @@ default_model() {
     claude) echo "$CLAUDE_DEFAULT_MODEL" ;;
     codex) echo "$CODEX_DEFAULT_MODEL" ;;
     copilot) echo "$COPILOT_DEFAULT_MODEL" ;;
-    gemini) echo "$GEMINI_DEFAULT_MODEL" ;;
     agy) echo "$AGY_DEFAULT_MODEL" ;;
   esac
 }
@@ -459,10 +457,6 @@ run_session() {
       copilot -p "$prompt" --model "$model" -n "$name" -s --no-ask-user --deny-tool write \
         --allow-tool 'shell(git diff:*)' --allow-tool 'shell(git status:*)' --allow-tool 'shell(git log:*)' --allow-tool 'shell(git show:*)' \
         --allow-tool 'shell(scripts/agent/feature.sh show:*)' --allow-tool 'shell(scripts/agent/feature.sh scope:*)' 2>&1 | tee "$out" ;;
-    gemini:write)
-      gemini -p "$prompt" -m "$model" --approval-mode yolo < /dev/null 2>&1 | tee "$out" ;;
-    gemini:read)
-      gemini -p "$prompt" -m "$model" --approval-mode plan < /dev/null 2>&1 | tee "$out" ;;
     agy:write)
       agy -p "$prompt" --model "$model" --dangerously-skip-permissions < /dev/null 2>&1 | tee "$out" ;;
     agy:read)

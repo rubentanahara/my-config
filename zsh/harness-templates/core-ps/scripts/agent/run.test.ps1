@@ -37,7 +37,6 @@ try {
     Assert-Equal 'branch names are lowercase slugs' 'feat/f05-create-tag-v2' (Get-BranchName F05)
     Assert-Equal 'session names keep the story name' 'F05 · Create Tag (v2)!' (Get-SessionName F05)
     Assert-Equal 'slugs stop at the length limit without a trailing dash' ('a' * 40) (ConvertTo-Slug ('a' * 45))
-    Assert-Equal 'gemini defaults to auto' 'auto' $defaultModels['gemini']
     Assert-Equal 'agy defaults to gemini 3.8 flash high' 'gemini-3.8-flash-high' $defaultModels['agy']
 
     Set-Content pass.md "table`n`n**VERIFY: PASS**"

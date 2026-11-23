@@ -1,15 +1,13 @@
 harness_mcp() {
   [[ -f .mcp.json ]] && command -v jq > /dev/null || return 0
   local name
-  mkdir -p .codex .gemini .agents
+  mkdir -p .codex .agents
   for name in $(jq -r '.mcpServers | keys[]' .mcp.json); do
     grep -qxF "[mcp_servers.$name]" .codex/config.toml 2> /dev/null && continue
     jq -r --arg n "$name" '.mcpServers[$n] | "\n[mcp_servers.\($n)]\ncommand = \(.command | tojson)\nargs = \(.args // [] | tojson)"' .mcp.json >> .codex/config.toml
   done
-  [[ -f .gemini/settings.json ]] || echo '{}' > .gemini/settings.json
-  jq --slurpfile mcp .mcp.json '.mcpServers = $mcp[0].mcpServers + (.mcpServers // {})' .gemini/settings.json > .gemini/settings.json.tmp && mv .gemini/settings.json.tmp .gemini/settings.json
   [[ -e .agents/mcp_config.json ]] || ln -s ../.mcp.json .agents/mcp_config.json
-  echo "mcp: project-level only. claude and copilot read .mcp.json, agy reads .agents/mcp_config.json (a link to it), codex reads .codex/config.toml, gemini reads .gemini/settings.json."
+  echo "mcp: project-level only. claude and copilot read .mcp.json, agy reads .agents/mcp_config.json (a link to it), codex reads .codex/config.toml."
 }
 
 HARNESS_TEMPLATES="${${(%):-%x}:A:h}/harness-templates"
@@ -25,7 +23,7 @@ harness_sync() {
   cp -R "$HARNESS_TEMPLATES/core/scripts/agent/." scripts/agent/
   cp -R "$HARNESS_TEMPLATES/core/.husky/." .husky/
   local template
-  for template in "$HARNESS_TEMPLATES/core/".claude/{skills,agents}/**/*(.N) "$HARNESS_TEMPLATES/core/"{.claude/settings.json,.codex/hooks.json,.gemini/settings.json,.agents/hooks.json}(.N); do
+  for template in "$HARNESS_TEMPLATES/core/".claude/{skills,agents}/**/*(.N) "$HARNESS_TEMPLATES/core/"{.claude/settings.json,.codex/hooks.json,.agents/hooks.json}(.N); do
     harness_sync_file "$template" "${template#$HARNESS_TEMPLATES/core/}"
   done
   grep -q '^features:' Makefile 2> /dev/null || echo "sync: Makefile has no features target. Copy it and the check dependency from $HARNESS_TEMPLATES/core/Makefile."
@@ -39,7 +37,7 @@ harness_sync_file() {
     mkdir -p "${target:h}" && cp "$template" "$target" && echo "sync: added $target"
     return
   fi
-  harness_same_content "$template" "$target" && return
+  cmp -s "$template" "$target" && return
   if [[ ! -t 0 ]]; then
     echo "sync: kept $target, which differs from the template. Run harness --sync in a terminal to review it."
     return
@@ -52,20 +50,15 @@ harness_sync_file() {
   fi
 }
 
-harness_same_content() {
-  [[ $2 == .gemini/settings.json ]] || { cmp -s "$1" "$2"; return; }
-  [[ "$(jq -S 'del(.mcpServers)' "$1")" == "$(jq -S 'del(.mcpServers)' "$2")" ]]
-}
-
 harness_fill_check() {
   case $1 in
-    claude | codex | copilot | gemini | agy) ;;
-    *) echo "unknown --fill '$1'. Available: claude, codex, copilot, gemini, agy"; return 1 ;;
+    claude | codex | copilot | agy) ;;
+    *) echo "unknown --fill '$1'. Available: claude, codex, copilot, agy"; return 1 ;;
   esac
   (( $+commands[$1] )) || { echo "--fill $1: $1 is not installed."; return 1; }
 }
 
-typeset -A HARNESS_CHEAPEST_MODEL=(claude haiku codex gpt-6-luna copilot auto gemini flash-lite agy gemini-3.8-flash-low)
+typeset -A HARNESS_CHEAPEST_MODEL=(claude haiku codex gpt-6-luna copilot auto agy gemini-3.8-flash-low)
 
 harness_fill() {
   local cli=$1 model=${2:-$HARNESS_CHEAPEST_MODEL[$1]} prompt
@@ -75,7 +68,6 @@ harness_fill() {
     claude) command claude -p "$prompt" --model "$model" --permission-mode acceptEdits --allowedTools "Bash(make *)" "Bash(git log *)" "Bash(git ls-files *)" ;;
     codex) command codex exec -m "$model" -s workspace-write "$prompt" ;;
     copilot) command copilot -p "$prompt" --model "$model" --allow-tool=write --allow-tool='shell(make:*)' --allow-tool='shell(git:*)' --deny-tool='shell(git push)' ;;
-    gemini) command gemini -p "$prompt" --model "$model" --approval-mode auto_edit ;;
     agy) command agy -p "$prompt" --model "$model" --mode auto --sandbox ;;
   esac
 }

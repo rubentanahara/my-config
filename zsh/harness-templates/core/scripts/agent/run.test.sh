@@ -35,7 +35,6 @@ expect "copilot implements with sonnet 5.5" "claude-sonnet-5.5" "$(default_model
 expect "copilot reviews with opus 5.5" "claude-opus-5.5" "$(default_checker_model copilot)"
 expect "claude reviews with its implementer model" "claude-sonnet-5-5" "$(default_checker_model claude)"
 expect "codex defaults to gpt-5.6-terra" "gpt-5.6-terra" "$(default_model codex)"
-expect "gemini defaults to auto" "auto" "$(default_model gemini)"
 expect "agy defaults to gemini 3.8 flash high" "gemini-3.8-flash-high" "$(default_model agy)"
 expect "commit subjects start lowercase" "create Tag (v2)!" "$(lowercase_first "Create Tag (v2)!")"
 

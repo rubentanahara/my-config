@@ -92,5 +92,5 @@ jq -n --arg context "$context" --arg notice "$notice" --arg cli "$cli" '
   else {
     systemMessage: $notice,
     hookSpecificOutput: {hookEventName: "SessionStart", additionalContext: $context}
-  } + if $cli == "codex" or $cli == "gemini" then {} else {additionalContext: $context} end
+  } + if $cli == "codex" then {} else {additionalContext: $context} end
   end'

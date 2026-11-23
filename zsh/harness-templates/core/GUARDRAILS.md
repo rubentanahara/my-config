@@ -6,7 +6,7 @@ Each guardrail names what enforces it, why it exists, and when it can go.
 ## What every CLI gets
 | Guardrail | Enforced by | Why | Remove when |
 |---|---|---|---|
-| Session-start context: `make check` result, backlog, `PROGRESS.md` | `.claude/settings.json`, `.codex/hooks.json`, `.gemini/settings.json`, `.agents/hooks.json` (agy), `.github/hooks/session-kickoff.json` | A session starts from the real state, not from memory | never |
+| Session-start context: `make check` result, backlog, `PROGRESS.md` | `.claude/settings.json`, `.codex/hooks.json`, `.agents/hooks.json` (agy), `.github/hooks/session-kickoff.json` | A session starts from the real state, not from memory | never |
 | Stop is refused while `make check` fails (3 attempts, then the agent must report the failure) | `scripts/agent/stop-gate.sh` | "Should work" is not done | never |
 | Stop is refused while files changed but `PROGRESS.md` did not | `scripts/agent/stop-gate.sh` | The next session needs to know what changed and why | never |
 | Conventional Commits, no AI attribution in commit messages | `.husky/commit-msg` | Readable history | never |
@@ -36,7 +36,7 @@ Each guardrail names what enforces it, why it exists, and when it can go.
 
 ## Changing a guardrail
 - Hook logic lives only in `scripts/agent/`. `.codex/hooks.json` must match the hooks in `.claude/settings.json`: `make check` fails at `hooks` when they differ.
-- `.gemini/settings.json` and `.agents/hooks.json` use their own formats, so `make check` does not compare them. Change all four hook files in the same pull request.
+- `.agents/hooks.json` uses its own format, so `make check` does not compare it. Change all three hook files in the same pull request.
 - Never weaken a guardrail to get unblocked: no `--no-verify`, no disabled lint rule. Fix the cause, or `feature.sh block` the story with the reason.
 - Update this file in the same pull request.
 

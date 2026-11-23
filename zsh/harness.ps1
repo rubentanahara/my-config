@@ -1,5 +1,5 @@
 $script:HarnessTemplates = Join-Path $PSScriptRoot 'harness-templates'
-$script:CheapestModel = @{ claude = 'haiku'; codex = 'gpt-6-luna'; copilot = 'auto'; gemini = 'flash-lite'; agy = 'gemini-3.8-flash-low' }
+$script:CheapestModel = @{ claude = 'haiku'; codex = 'gpt-6-luna'; copilot = 'auto'; agy = 'gemini-3.8-flash-low' }
 $script:AgentDirectories = '.claude/skills', '.claude/agents', '.claude/hooks', '.claude/commands', '.claude/workflows', '.claude/routines',
     '.github/agents', '.github/prompts', '.github/instructions', '.github/workflows', '.github/hooks'
 $script:Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
@@ -8,8 +8,8 @@ function Find-Executable([string]$Name) {
     Get-Command $Name -CommandType Application, ExternalScript -ErrorAction SilentlyContinue | Select-Object -First 1
 }
 
-$script:BashOnlyFiles = 'Makefile', 'scripts/agent/*.sh', '.husky/*', '.claude/settings.json', '.codex/hooks.json', '.gemini/settings.json', '.agents/hooks.json', '.github/workflows/check.yml'
-$script:SyncedSettings = '.claude/settings.json', '.codex/hooks.json', '.gemini/settings.json', '.agents/hooks.json'
+$script:BashOnlyFiles = 'Makefile', 'scripts/agent/*.sh', '.husky/*', '.claude/settings.json', '.codex/hooks.json', '.agents/hooks.json', '.github/workflows/check.yml'
+$script:SyncedSettings = '.claude/settings.json', '.codex/hooks.json', '.agents/hooks.json'
 
 function Convert-ToPowerShellText([string]$Text) {
     $Text = $Text -replace '\b(feature|session-start|stop-gate|tdd-gate|tree-fingerprint|protect-main|run)\.sh\b', '$1.ps1'
@@ -52,17 +52,14 @@ function Add-GitignoreEntry([string]$Entry) {
 
 function Register-HarnessMcp {
     if (-not (Test-Path .mcp.json) -or -not (Find-Executable jq)) { return }
-    New-Item -ItemType Directory -Force .codex, .gemini, .agents | Out-Null
+    New-Item -ItemType Directory -Force .codex, .agents | Out-Null
     $codexConfig = if (Test-Path .codex/config.toml) { @(Get-Content .codex/config.toml) } else { @() }
     foreach ($name in jq -r '.mcpServers | keys[]' .mcp.json) {
         if ($codexConfig -contains "[mcp_servers.$name]") { continue }
         jq -r --arg n $name '.mcpServers[$n] | "\n[mcp_servers.\($n)]\ncommand = \(.command | tojson)\nargs = \(.args // [] | tojson)"' .mcp.json | Add-Content .codex/config.toml
     }
-    if (-not (Test-Path .gemini/settings.json)) { Write-TextFileNoBom .gemini/settings.json '{}' }
-    $merged = (jq --slurpfile mcp .mcp.json '.mcpServers = $mcp[0].mcpServers + (.mcpServers // {})' .gemini/settings.json) -join "`n"
-    Write-TextFileNoBom .gemini/settings.json "$merged`n"
     New-LinkOrCopy '.agents/mcp_config.json' '../.mcp.json'
-    Write-Host 'mcp: project-level only. claude and copilot read .mcp.json, agy reads .agents/mcp_config.json (a link to it), codex reads .codex/config.toml, gemini reads .gemini/settings.json.'
+    Write-Host 'mcp: project-level only. claude and copilot read .mcp.json, agy reads .agents/mcp_config.json (a link to it), codex reads .codex/config.toml.'
 }
 
 function Write-TextFileNoBom([string]$Path, [string]$Text) {
@@ -136,7 +133,7 @@ function Sync-HarnessFile([string]$Target, [string]$TemplateText) {
     $templateFile = New-TemporaryFile
     try {
         Write-TextFileNoBom $templateFile.FullName $TemplateText
-        if (Test-SameHarnessContent $templateFile.FullName $Target) { return }
+        if ((Get-Content $templateFile.FullName -Raw) -eq (Get-Content $Target -Raw)) { return }
         if ([Console]::IsInputRedirected) {
             Write-Host "sync: kept $Target, which differs from the template. Run Invoke-Harness -Sync in a terminal to review it."
             return
@@ -153,13 +150,6 @@ function Sync-HarnessFile([string]$Target, [string]$TemplateText) {
     }
 }
 
-function Test-SameHarnessContent([string]$TemplatePath, [string]$Target) {
-    if ($Target -ne '.gemini/settings.json') {
-        return (Get-Content $TemplatePath -Raw) -eq (Get-Content $Target -Raw)
-    }
-    ((jq -S 'del(.mcpServers)' $TemplatePath) -join "`n") -eq ((jq -S 'del(.mcpServers)' $Target) -join "`n")
-}
-
 function Invoke-HarnessFill([string]$Cli, [string]$Model) {
     if (-not $Model) { $Model = $script:CheapestModel[$Cli] }
     $prompt = Convert-ToPowerShellText (Get-Content (Join-Path $script:HarnessTemplates 'fill-prompt.md') -Raw)
@@ -169,7 +159,6 @@ function Invoke-HarnessFill([string]$Cli, [string]$Model) {
         'claude' { & $executable -p $prompt --model $Model --permission-mode acceptEdits --allowedTools 'Bash(./make.ps1 *)' 'Bash(git log *)' 'Bash(git ls-files *)' }
         'codex' { & $executable exec -m $Model -s workspace-write $prompt }
         'copilot' { & $executable -p $prompt --model $Model --allow-tool=write '--allow-tool=shell(./make.ps1:*)' '--allow-tool=shell(git:*)' '--deny-tool=shell(git push)' }
-        'gemini' { & $executable -p $prompt --model $Model --approval-mode auto_edit }
         'agy' { & $executable -p $prompt --model $Model --mode auto --sandbox }
     }
     return $LASTEXITCODE -eq 0
@@ -202,7 +191,7 @@ function Invoke-Harness {
         [Parameter(Position = 0)][string]$Dir = '.',
         [string]$Lang,
         [switch]$Sync,
-        [ValidateSet('claude', 'codex', 'copilot', 'gemini', 'agy')][string]$Fill,
+        [ValidateSet('claude', 'codex', 'copilot', 'agy')][string]$Fill,
         [string]$Model
     )
 

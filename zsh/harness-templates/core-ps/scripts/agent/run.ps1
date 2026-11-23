@@ -1,6 +1,6 @@
 param(
-    [ValidateSet('claude', 'codex', 'copilot', 'gemini', 'agy')][string]$Cli = 'copilot',
-    [ValidateSet('', 'claude', 'codex', 'copilot', 'gemini', 'agy')][string]$Checker = '',
+    [ValidateSet('claude', 'codex', 'copilot', 'agy')][string]$Cli = 'copilot',
+    [ValidateSet('', 'claude', 'codex', 'copilot', 'agy')][string]$Checker = '',
     [string]$Model = '',
     [string]$CheckerModel = '',
     [ValidateRange(1, 64)][int]$Parallel = 1,
@@ -13,7 +13,7 @@ param(
 . "$PSScriptRoot/common.ps1"
 
 $usage = @'
-Usage: scripts/agent/run.ps1 [-Cli claude|codex|copilot|gemini|agy] [-Checker <cli>] [-Model <m>] [-CheckerModel <m>] [-Parallel N] [-NoMerge] [-Story <id>] [-DryRun]
+Usage: scripts/agent/run.ps1 [-Cli claude|codex|copilot|agy] [-Checker <cli>] [-Model <m>] [-CheckerModel <m>] [-Parallel N] [-NoMerge] [-Story <id>] [-DryRun]
 
 Runs the first wave of scripts/agent/feature.ps1 waves. Each story gets its own worktree and branch and goes through:
 implement (a session named "<id> · <name>"), ./make.ps1 check, scope and test gate, an independent read-only review
@@ -21,8 +21,8 @@ implement (a session named "<id> · <name>"), ./make.ps1 check, scope and test g
 
   -Cli           CLI that implements. Default: copilot.
   -Checker       CLI that reviews. Default: the same as -Cli.
-  -Model         model of the implementer. Default: claude-sonnet-5.5 (copilot), claude-sonnet-5-5 (claude), gpt-5.6-terra (codex),
-                 auto (gemini) or gemini-3.8-flash-high (agy).
+  -Model         model of the implementer. Default: claude-sonnet-5.5 (copilot), claude-sonnet-5-5 (claude), gpt-5.6-terra (codex)
+                 or gemini-3.8-flash-high (agy).
   -CheckerModel  model of the reviewer. Default: claude-opus-5.5 (copilot), otherwise the default of the checker CLI.
   -Parallel      how many stories of a wave run at once, one background job each. Default: 1.
   -NoMerge       stop at open pull requests. Default: merge each pull request once CI is green, then run the next wave.
@@ -31,7 +31,7 @@ implement (a session named "<id> · <name>"), ./make.ps1 check, scope and test g
 '@
 
 $maxAttempts = 3
-$defaultModels = @{ claude = 'claude-sonnet-5-5'; copilot = 'claude-sonnet-5.5'; codex = 'gpt-5.6-terra'; gemini = 'auto'; agy = 'gemini-3.8-flash-high' }
+$defaultModels = @{ claude = 'claude-sonnet-5-5'; copilot = 'claude-sonnet-5.5'; codex = 'gpt-5.6-terra'; agy = 'gemini-3.8-flash-high' }
 $copilotDefaultCheckerModel = 'claude-opus-5.5'
 $worktreesDir = '.worktrees'
 $runsDir = '.agent/runs'
@@ -464,8 +464,6 @@ function Invoke-Session([string]$Dir, [string]$SessionCli, [string]$SessionModel
                     --allow-tool 'shell(git diff:*)' --allow-tool 'shell(git status:*)' --allow-tool 'shell(git log:*)' --allow-tool 'shell(git show:*)' `
                     --allow-tool 'shell(scripts/agent/feature.ps1 show:*)' --allow-tool 'shell(scripts/agent/feature.ps1 scope:*)' 2>&1 | Tee-Object -FilePath $Out
             }
-            'gemini:write' { $null | gemini -p $Prompt -m $SessionModel --approval-mode yolo 2>&1 | Tee-Object -FilePath $Out }
-            'gemini:read' { $null | gemini -p $Prompt -m $SessionModel --approval-mode plan 2>&1 | Tee-Object -FilePath $Out }
             'agy:write' { $null | agy -p $Prompt --model $SessionModel --dangerously-skip-permissions 2>&1 | Tee-Object -FilePath $Out }
             'agy:read' { $null | agy -p $Prompt --model $SessionModel --mode auto --sandbox 2>&1 | Tee-Object -FilePath $Out }
         }

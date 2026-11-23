@@ -87,5 +87,5 @@ $output = [ordered]@{
     systemMessage      = $notice
     hookSpecificOutput = [ordered]@{ hookEventName = 'SessionStart'; additionalContext = $context }
 }
-if ($cli -notin 'codex', 'gemini') { $output.additionalContext = $context }
+if ($cli -ne 'codex') { $output.additionalContext = $context }
 $output | ConvertTo-Json -Depth 4 -Compress
