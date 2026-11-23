@@ -1,3 +1,4 @@
+param([string]$HookCli = '')
 . "$PSScriptRoot/common.ps1"
 
 $progressFile = 'PROGRESS.md'
@@ -56,7 +57,7 @@ $baselineFile = ".agent/session-baseline$(if ($sessionId) { "-$sessionId" })"
 
 Enter-RepoRoot
 
-$cli = Get-CallingCli
+$cli = if ($HookCli) { $HookCli } else { Get-CallingCli }
 $checkOutput = @(& (Join-Path (Get-Location) 'make.ps1') check *>&1 | ForEach-Object { "$_" })
 $checkResult = if ($checkOutput.Count -gt 0) { $checkOutput[-1] } else { '' }
 
@@ -78,9 +79,13 @@ New-Item -ItemType Directory -Force (Split-Path $logFile) | Out-Null
 Save-SessionBaseline $baselineFile
 Add-Content $logFile "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') $notice"
 
+if ($cli -eq 'agy') {
+    @{ injectSteps = @(@{ systemMessage = @{ systemMessage = $context } }) } | ConvertTo-Json -Depth 5 -Compress
+    exit 0
+}
 $output = [ordered]@{
     systemMessage      = $notice
     hookSpecificOutput = [ordered]@{ hookEventName = 'SessionStart'; additionalContext = $context }
 }
-if ($cli -ne 'codex') { $output.additionalContext = $context }
+if ($cli -notin 'codex', 'gemini') { $output.additionalContext = $context }
 $output | ConvertTo-Json -Depth 4 -Compress

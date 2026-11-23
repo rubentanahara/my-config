@@ -1,0 +1,18 @@
+{
+  "harness": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/scripts/agent/session-start.ps1\" agy",
+        "timeout": 300
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/scripts/agent/stop-gate.ps1\" agy",
+        "timeout": 300
+      }
+    ]
+  }
+}

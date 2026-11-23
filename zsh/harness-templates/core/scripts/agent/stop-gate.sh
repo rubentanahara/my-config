@@ -9,6 +9,7 @@ readonly PASSED_FILE=$LOGS/stop-gate-passed
 readonly GAVE_UP_FILE=$LOGS/stop-gate-gave-up
 readonly PROGRESS_FILE=PROGRESS.md
 readonly FINGERPRINT_SCRIPT=scripts/agent/tree-fingerprint.sh
+readonly HOOK_CLI=${1:-}
 
 json_string() {
   local text=$1
@@ -21,12 +22,14 @@ json_string() {
 }
 
 block_stop() {
-  printf '{"decision":"block","reason":%s}\n' "$(json_string "$1")"
+  local decision=block
+  [[ "$HOOK_CLI" == agy ]] && decision=continue
+  printf '{"decision":"%s","reason":%s}\n' "$decision" "$(json_string "$1")"
   exit 0
 }
 
 session_id_from_hook_input() {
-  grep -oE '"session_?[iI]d" *: *"[^"]+"' | head -n 1 | sed -E 's/.*"([^"]+)"$/\1/' | tr -cd 'A-Za-z0-9_-'
+  grep -oE '"(session_?[iI]d|conversationId)" *: *"[^"]+"' | head -n 1 | sed -E 's/.*"([^"]+)"$/\1/' | tr -cd 'A-Za-z0-9_-'
 }
 
 next_attempt() {

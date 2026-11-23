@@ -1,5 +1,5 @@
 $script:HarnessTemplates = Join-Path $PSScriptRoot 'harness-templates'
-$script:CheapestModel = @{ claude = 'haiku'; codex = 'gpt-6-luna'; copilot = 'auto'; gemini = 'flash-lite' }
+$script:CheapestModel = @{ claude = 'haiku'; codex = 'gpt-6-luna'; copilot = 'auto'; gemini = 'flash-lite'; agy = 'gemini-3.8-flash-low' }
 $script:AgentDirectories = '.claude/skills', '.claude/agents', '.claude/hooks', '.claude/commands', '.claude/workflows', '.claude/routines',
     '.github/agents', '.github/prompts', '.github/instructions', '.github/workflows', '.github/hooks'
 $script:Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
@@ -8,10 +8,11 @@ function Find-Executable([string]$Name) {
     Get-Command $Name -CommandType Application, ExternalScript -ErrorAction SilentlyContinue | Select-Object -First 1
 }
 
-$script:BashOnlyFiles = 'Makefile', 'scripts/agent/*.sh', '.husky/*', '.claude/settings.json', '.codex/hooks.json', '.github/workflows/check.yml'
+$script:BashOnlyFiles = 'Makefile', 'scripts/agent/*.sh', '.husky/*', '.claude/settings.json', '.codex/hooks.json', '.gemini/settings.json', '.agents/hooks.json', '.github/workflows/check.yml'
+$script:SyncedSettings = '.claude/settings.json', '.codex/hooks.json', '.gemini/settings.json', '.agents/hooks.json'
 
 function Convert-ToPowerShellText([string]$Text) {
-    $Text = $Text -replace '\b(feature|session-start|stop-gate|tdd-gate|tree-fingerprint|protect-main)\.sh\b', '$1.ps1'
+    $Text = $Text -replace '\b(feature|session-start|stop-gate|tdd-gate|tree-fingerprint|protect-main|run)\.sh\b', '$1.ps1'
     $Text = $Text -replace '\bmake (check|setup|format|run|clean|build|lint|test-story|test)\b', './make.ps1 $1'
     $Text = $Text -replace 'FILTER=', '-Filter '
     $Text -replace '\bMakefile\b', 'commands.mk'
@@ -39,7 +40,7 @@ function New-LinkOrCopy([string]$Path, [string]$Target) {
         New-Item -ItemType SymbolicLink -Path $Path -Target $Target -ErrorAction Stop | Out-Null
     } catch {
         $resolved = Join-Path (Split-Path $Path) $Target
-        Copy-Item $resolved $Path
+        Copy-Item $resolved $Path -Recurse
         Write-Host "link: $Path copied from $Target because symbolic links are not allowed here"
     }
 }
@@ -50,18 +51,22 @@ function Add-GitignoreEntry([string]$Entry) {
 }
 
 function Register-HarnessMcp {
-    if (-not (Test-Path .mcp.json)) { return }
-    $servers = (Get-Content .mcp.json -Raw | ConvertFrom-Json).mcpServers
-    foreach ($agent in 'codex', 'copilot') {
-        $executable = Find-Executable $agent
-        if (-not $executable) { continue }
-        foreach ($server in $servers.PSObject.Properties) {
-            & $executable mcp get $server.Name *> $null
-            if ($LASTEXITCODE -eq 0) { continue }
-            & $executable mcp add $server.Name -- $server.Value.command @($server.Value.args) *> $null
-            if ($LASTEXITCODE -eq 0) { Write-Host "mcp: $agent <- $($server.Name)" }
-        }
+    if (-not (Test-Path .mcp.json) -or -not (Find-Executable jq)) { return }
+    New-Item -ItemType Directory -Force .codex, .gemini, .agents | Out-Null
+    $codexConfig = if (Test-Path .codex/config.toml) { @(Get-Content .codex/config.toml) } else { @() }
+    foreach ($name in jq -r '.mcpServers | keys[]' .mcp.json) {
+        if ($codexConfig -contains "[mcp_servers.$name]") { continue }
+        jq -r --arg n $name '.mcpServers[$n] | "\n[mcp_servers.\($n)]\ncommand = \(.command | tojson)\nargs = \(.args // [] | tojson)"' .mcp.json | Add-Content .codex/config.toml
     }
+    if (-not (Test-Path .gemini/settings.json)) { Write-TextFileNoBom .gemini/settings.json '{}' }
+    $merged = (jq --slurpfile mcp .mcp.json '.mcpServers = $mcp[0].mcpServers + (.mcpServers // {})' .gemini/settings.json) -join "`n"
+    Write-TextFileNoBom .gemini/settings.json "$merged`n"
+    New-LinkOrCopy '.agents/mcp_config.json' '../.mcp.json'
+    Write-Host 'mcp: project-level only. claude and copilot read .mcp.json, agy reads .agents/mcp_config.json (a link to it), codex reads .codex/config.toml, gemini reads .gemini/settings.json.'
+}
+
+function Write-TextFileNoBom([string]$Path, [string]$Text) {
+    [System.IO.File]::WriteAllText([System.IO.Path]::Combine((Get-Location).Path, $Path), $Text, $script:Utf8NoBom)
 }
 
 function Add-CiSetupStep([string]$Lang) {
@@ -104,10 +109,55 @@ function Sync-Harness {
     Copy-Item (Join-Path $core 'scripts/agent/jq') scripts/agent -Recurse -Force
     Copy-Item (Join-Path $overlay 'scripts/agent/*') scripts/agent -Recurse -Force
     Copy-Item (Join-Path $overlay '.husky/*') .husky -Force
+    foreach ($directory in '.claude/skills', '.claude/agents') {
+        $root = (Resolve-Path (Join-Path $core $directory)).Path
+        Get-ChildItem $root -Recurse -File | ForEach-Object {
+            $target = "$directory/" + ($_.FullName.Substring($root.Length + 1) -replace '\\', '/')
+            Sync-HarnessFile $target (Convert-ToPowerShellText (Get-Content $_.FullName -Raw))
+        }
+    }
+    foreach ($settings in $script:SyncedSettings) {
+        Sync-HarnessFile $settings (Get-Content (Join-Path $overlay $settings) -Raw)
+    }
     if (-not (Test-Path make.ps1)) {
         Write-Host "sync: make.ps1 and commands.mk are missing. Copy them from $overlay."
     }
     Write-Host 'sync: scripts/agent and .husky updated from the template.'
+    & ./make.ps1 hooks
+}
+
+function Sync-HarnessFile([string]$Target, [string]$TemplateText) {
+    if (-not (Test-Path $Target)) {
+        New-Item -ItemType Directory -Force (Split-Path $Target) | Out-Null
+        Write-TextFileNoBom $Target $TemplateText
+        Write-Host "sync: added $Target"
+        return
+    }
+    $templateFile = New-TemporaryFile
+    try {
+        Write-TextFileNoBom $templateFile.FullName $TemplateText
+        if (Test-SameHarnessContent $templateFile.FullName $Target) { return }
+        if ([Console]::IsInputRedirected) {
+            Write-Host "sync: kept $Target, which differs from the template. Run Invoke-Harness -Sync in a terminal to review it."
+            return
+        }
+        git --no-pager diff --no-index -- $Target $templateFile.FullName
+        if ((Read-Host "sync: replace $Target with the template above? [y/N]") -eq 'y') {
+            Write-TextFileNoBom $Target $TemplateText
+            Write-Host "sync: replaced $Target"
+        } else {
+            Write-Host "sync: kept $Target"
+        }
+    } finally {
+        Remove-Item $templateFile.FullName -Force
+    }
+}
+
+function Test-SameHarnessContent([string]$TemplatePath, [string]$Target) {
+    if ($Target -ne '.gemini/settings.json') {
+        return (Get-Content $TemplatePath -Raw) -eq (Get-Content $Target -Raw)
+    }
+    ((jq -S 'del(.mcpServers)' $TemplatePath) -join "`n") -eq ((jq -S 'del(.mcpServers)' $Target) -join "`n")
 }
 
 function Invoke-HarnessFill([string]$Cli, [string]$Model) {
@@ -120,8 +170,20 @@ function Invoke-HarnessFill([string]$Cli, [string]$Model) {
         'codex' { & $executable exec -m $Model -s workspace-write $prompt }
         'copilot' { & $executable -p $prompt --model $Model --allow-tool=write '--allow-tool=shell(./make.ps1:*)' '--allow-tool=shell(git:*)' '--deny-tool=shell(git push)' }
         'gemini' { & $executable -p $prompt --model $Model --approval-mode auto_edit }
+        'agy' { & $executable -p $prompt --model $Model --mode auto --sandbox }
     }
     return $LASTEXITCODE -eq 0
+}
+
+function Write-FillReport {
+    $pattern = '^<One line|set [A-Z_]+ in commands\.mk|^- [^:]+:$|^\| \| \||what lives here|YYYY-MM-DD|Unknown:'
+    $left = @(Select-String -Path AGENTS.md, ARCHITECTURE.md, SECURITY.md, PROGRESS.md, commands.mk -Pattern $pattern -ErrorAction SilentlyContinue)
+    if ($left.Count -eq 0) {
+        Write-Host 'fill: every field is filled.'
+        return
+    }
+    Write-Host 'fill: these lines are still empty or Unknown. A person must fill or confirm them:'
+    $left | ForEach-Object { Write-Host "$($_.Filename):$($_.LineNumber):$($_.Line)" }
 }
 
 function Write-MissingToolWarnings {
@@ -140,7 +202,7 @@ function Invoke-Harness {
         [Parameter(Position = 0)][string]$Dir = '.',
         [string]$Lang,
         [switch]$Sync,
-        [ValidateSet('claude', 'codex', 'copilot', 'gemini')][string]$Fill,
+        [ValidateSet('claude', 'codex', 'copilot', 'gemini', 'agy')][string]$Fill,
         [string]$Model
     )
 
@@ -166,7 +228,10 @@ function Invoke-Harness {
     New-LinkOrCopy 'CLAUDE.md' 'AGENTS.md'
     $script:AgentDirectories | ForEach-Object { New-Item -ItemType Directory -Force $_ | Out-Null }
     New-LinkOrCopy '.github/copilot-instructions.md' '../AGENTS.md'
+    New-Item -ItemType Directory -Force .agents | Out-Null
+    New-LinkOrCopy '.agents/skills' '../.claude/skills'
     Add-GitignoreEntry '.agent/'
+    Add-GitignoreEntry '.worktrees/'
     git config core.hooksPath .husky
 
     Register-HarnessMcp
@@ -184,7 +249,8 @@ function Invoke-Harness {
         return
     }
     if (-not (Invoke-HarnessFill $Fill $Model)) { Write-Host "WARNING: $Fill exited with an error. Review the md files." }
-    Write-Host "harness ready in $PWD. Review the filled md files and every 'Unknown:' line."
+    Write-FillReport
+    Write-Host "harness ready in $PWD. Review the filled md files."
 }
 
 Set-Alias harness Invoke-Harness

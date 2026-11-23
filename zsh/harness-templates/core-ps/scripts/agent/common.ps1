@@ -23,7 +23,7 @@ function Read-HookInput {
 }
 
 function Get-SessionId([string]$HookInput) {
-    if ($HookInput -match '"session_?[iI]d"\s*:\s*"([^"]+)"') { return ($Matches[1] -replace '[^A-Za-z0-9_-]', '') }
+    if ($HookInput -match '"(?:session_?[iI]d|conversationId)"\s*:\s*"([^"]+)"') { return ($Matches[1] -replace '[^A-Za-z0-9_-]', '') }
     ''
 }
 
@@ -34,8 +34,11 @@ function Get-TreeFingerprint {
         git diff HEAD --binary --output=$diffFile 2> $null
         $diffHash = (git hash-object $diffFile) -join ''
         $untracked = @(git ls-files --others --exclude-standard)
-        $untrackedHashes = if ($untracked.Count -gt 0) { ($untracked | git hash-object --stdin-paths) -join "`n" } else { '' }
-        ("$head`n$diffHash`n$untrackedHashes" | git hash-object --stdin) -join ''
+        $links = @($untracked | Where-Object { (Get-Item -LiteralPath $_ -Force).LinkType })
+        $files = @($untracked | Where-Object { $_ -notin $links })
+        $linkTargets = ($links | ForEach-Object { "$_ -> $((Get-Item -LiteralPath $_ -Force).Target)" }) -join "`n"
+        $untrackedHashes = if ($files.Count -gt 0) { ($files | git hash-object --stdin-paths) -join "`n" } else { '' }
+        ("$head`n$diffHash`n$linkTargets`n$untrackedHashes" | git hash-object --stdin) -join ''
     } finally {
         Remove-Item $diffFile -Force -ErrorAction SilentlyContinue
     }

@@ -1,0 +1,18 @@
+{
+  "harness": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "bash \"$(git rev-parse --show-toplevel)/scripts/agent/session-start.sh\" agy",
+        "timeout": 300
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "bash \"$(git rev-parse --show-toplevel)/scripts/agent/stop-gate.sh\" agy",
+        "timeout": 300
+      }
+    ]
+  }
+}

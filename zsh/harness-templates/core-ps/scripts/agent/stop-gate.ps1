@@ -1,3 +1,4 @@
+param([string]$HookCli = '')
 . "$PSScriptRoot/common.ps1"
 
 $maxAttempts = 3
@@ -6,7 +7,8 @@ $logs = '.agent'
 $progressFile = 'PROGRESS.md'
 
 function Block-Stop([string]$Reason) {
-    @{ decision = 'block'; reason = $Reason } | ConvertTo-Json -Compress
+    $decision = if ($HookCli -eq 'agy') { 'continue' } else { 'block' }
+    @{ decision = $decision; reason = $Reason } | ConvertTo-Json -Compress
     exit 0
 }
 

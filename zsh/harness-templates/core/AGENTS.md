@@ -32,6 +32,7 @@
 - `scripts/agent/feature.sh start <id>` before writing code, `show <id>` to read the story, `status` and `waves` for what is open. Do not read the whole `feature_list.json`.
 - Touch only what the active story needs: `feature.sh done` refuses files outside its `owns`. Note unrelated problems in `PROGRESS.md` instead of fixing them.
 - `feature.sh block <id> "<reason>"` when something outside the repo stops you.
+- `scripts/agent/run.sh` works the ready wave unattended: a worktree per story, test-first implementation, gate, an independent review in a fresh session, then a pull request and a merge once CI is green. Read the usage at its top before the first run.
 - Small fixes and questions need no story. The Definition of Done still applies.
 - Skills: `prd`, `backlog`, `feature`, `tdd`, `verify`, `ship`, `handoff`, `grilling`, `prompt-rewrite` (in `.claude/skills`).
 

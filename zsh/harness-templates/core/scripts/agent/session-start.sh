@@ -12,7 +12,7 @@ readonly FINGERPRINT_SCRIPT=scripts/agent/tree-fingerprint.sh
 readonly HOOK_INPUT_TIMEOUT_SECONDS=2
 hook_input=""
 [[ -t 0 ]] || IFS= read -r -d '' -t "$HOOK_INPUT_TIMEOUT_SECONDS" hook_input || true
-session_id=$(grep -oE '"session_?[iI]d" *: *"[^"]+"' <<< "$hook_input" | head -n 1 | sed -E 's/.*"([^"]+)"$/\1/' | tr -cd 'A-Za-z0-9_-')
+session_id=$(grep -oE '"(session_?[iI]d|conversationId)" *: *"[^"]+"' <<< "$hook_input" | head -n 1 | sed -E 's/.*"([^"]+)"$/\1/' | tr -cd 'A-Za-z0-9_-')
 readonly BASELINE_FILE=.agent/session-baseline${session_id:+-$session_id}
 readonly BASELINE_RETENTION_DAYS=7
 
@@ -64,7 +64,7 @@ calling_cli() {
   echo unknown
 }
 
-cli=$(calling_cli)
+cli=${1:-$(calling_cli)}
 check_output=$(make check 2>&1)
 check_result=$(echo "$check_output" | tail -n 1)
 
@@ -87,7 +87,10 @@ mkdir -p "$(dirname "$LOG_FILE")"
 record_session_baseline
 echo "$(date '+%Y-%m-%d %H:%M:%S') $notice" >> "$LOG_FILE"
 
-jq -n --arg context "$context" --arg notice "$notice" --arg cli "$cli" '{
-  systemMessage: $notice,
-  hookSpecificOutput: {hookEventName: "SessionStart", additionalContext: $context}
-} + if $cli == "codex" then {} else {additionalContext: $context} end'
+jq -n --arg context "$context" --arg notice "$notice" --arg cli "$cli" '
+  if $cli == "agy" then {injectSteps: [{systemMessage: {systemMessage: $context}}]}
+  else {
+    systemMessage: $notice,
+    hookSpecificOutput: {hookEventName: "SessionStart", additionalContext: $context}
+  } + if $cli == "codex" or $cli == "gemini" then {} else {additionalContext: $context} end
+  end'
