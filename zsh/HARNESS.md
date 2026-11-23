@@ -38,6 +38,8 @@ What the setup writes per project:
 
 Skills live in `.claude/skills`. `.agents/skills` links to them for Antigravity.
 
+If `codegraph` is installed, `harness` also runs `codegraph init -y` to build the code index in `.codegraph/` (only its own `.gitignore` is committed). The codegraph MCP server keeps the index in sync while it runs. Agents are told in `AGENTS.md` to use `codegraph explore` before grep. Without codegraph, `harness` prints a warning and continues.
+
 ## 2. Write stories
 
 With skills, inside any CLI:

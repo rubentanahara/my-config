@@ -10,6 +10,12 @@ harness_mcp() {
   echo "mcp: project-level only. claude and copilot read .mcp.json, agy reads .agents/mcp_config.json (a link to it), codex reads .codex/config.toml."
 }
 
+harness_codegraph() {
+  [[ -d .codegraph ]] && return 0
+  command -v codegraph > /dev/null || { echo "WARNING: codegraph is missing; the code index was not built (see the codegraph README to install it)."; return 0; }
+  codegraph init -y > .agent/codegraph-init.log 2>&1 && echo "codegraph: indexed. The MCP server keeps it in sync while it runs." || echo "WARNING: codegraph init failed. Log: .agent/codegraph-init.log"
+}
+
 HARNESS_TEMPLATES="${${(%):-%x}:A:h}/harness-templates"
 
 harness_lang_ci_setup() {
@@ -129,6 +135,9 @@ harness() {
   git config core.hooksPath .husky
 
   harness_mcp
+
+  mkdir -p .agent
+  harness_codegraph
 
   [[ -z $sync ]] || harness_sync
 

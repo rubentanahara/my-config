@@ -66,6 +66,15 @@ function Write-TextFileNoBom([string]$Path, [string]$Text) {
     [System.IO.File]::WriteAllText([System.IO.Path]::Combine((Get-Location).Path, $Path), $Text, $script:Utf8NoBom)
 }
 
+function Initialize-Codegraph {
+    if (Test-Path .codegraph) { return }
+    $codegraph = Find-Executable codegraph
+    if (-not $codegraph) { Write-Host 'WARNING: codegraph is missing; the code index was not built (see the codegraph README to install it).'; return }
+    New-Item -ItemType Directory -Force .agent | Out-Null
+    & $codegraph init -y *> .agent/codegraph-init.log
+    if ($LASTEXITCODE -eq 0) { Write-Host 'codegraph: indexed. The MCP server keeps it in sync while it runs.' } else { Write-Host 'WARNING: codegraph init failed. Log: .agent/codegraph-init.log' }
+}
+
 function Add-CiSetupStep([string]$Lang) {
     $snippet = Join-Path $script:HarnessTemplates "langs/$Lang.yml"
     $workflow = '.github/workflows/check.yml'
@@ -224,6 +233,7 @@ function Invoke-Harness {
     git config core.hooksPath .husky
 
     Register-HarnessMcp
+    Initialize-Codegraph
     if ($Sync) { Sync-Harness }
     if ($Lang -and -not (Set-HarnessLang $Lang)) { return }
 

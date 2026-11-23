@@ -20,6 +20,7 @@
 - Prefer these targets over raw tool commands. Fill in the commands in `Makefile` first.
 
 ## Read only what your task needs
+- To find or understand code, run `codegraph explore "<symbol or question>"` (or the `codegraph_explore` MCP tool) before grep or reading whole files.
 | Read | When |
 |---|---|
 | `ARCHITECTURE.md` | Before you add, move or rename code: layers, boundaries, conventions |
