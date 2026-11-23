@@ -838,7 +838,6 @@ eval "$(direnv hook zsh)"
 
 export ANTHROPIC_BASE_URL=http://127.0.0.1:8787
 
-
 function awsinv() {
   local region="${1:-us-east-2}"
   aws lightsail get-container-services --region "$region" --query 'containerServices[].[`"lightsail-container"`,containerServiceName,state]' --output text
