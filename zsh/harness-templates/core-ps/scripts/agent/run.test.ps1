@@ -69,6 +69,43 @@ not json at all
     Assert-Equal 'the raw stream is kept' '5' "$((Get-Content "$streamOut.jsonl").Count)"
     Assert-Equal 'the verdict reads from the final text' 'VERIFY: PASS' (Get-Verdict $streamOut)
 
+    Assert-Equal 'a backgrounded line gives the session id' '9a986fbf' (Get-LiveSessionId @('Starting background service…', 'backgrounded · 9a986fbf · F05 · review'))
+    Assert-Equal 'no backgrounded line gives no id' '' (Get-LiveSessionId @('Workspace not trusted.'))
+    Assert-Equal '-Live refuses other CLIs' '-Live works with claude only: it opens each session with claude --bg. Use -Cli claude -Checker claude, or drop -Live.' ((pwsh -NoProfile -File "$scriptsDir/run.ps1" -Live -Cli copilot 2>&1) -join '|')
+
+    $claudeHome = Join-Path ([System.IO.Path]::GetTempPath()) ([guid]::NewGuid())
+    New-Item -ItemType Directory -Force "$claudeHome/projects/-sandbox" | Out-Null
+    Set-Content "$claudeHome/projects/-sandbox/5dbbc910-aaaa.jsonl" @'
+{"type":"user","message":{"content":"go"}}
+{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Bash","input":{"command":"git diff main"}}]}}
+{"type":"assistant","isSidechain":true,"message":{"content":[{"type":"text","text":"subagent noise"}]}}
+{"type":"assistant","message":{"content":[{"type":"text","text":"Table\nVERIFY: PASS"}]}}
+'@
+    $liveOut = Join-Path $sandbox '.agent/runs/F05/review-2.md'
+    Set-Content live.ps1 @"
+. '$scriptsDir/run.ps1'
+function claude {
+    switch (`$args[0]) {
+        'agents' { '[{"id":"5dbbc910","state":"done","sessionId":"5dbbc910-aaaa"}]' }
+        'rm' { }
+        default { `$args | Set-Content '$sandbox/claude-args'; 'backgrounded · 5dbbc910 · F05 · review' }
+    }
+}
+`$Live = `$true
+`$env:CLAUDE_CONFIG_DIR = '$claudeHome'
+Remove-Item Env:TMUX -ErrorAction SilentlyContinue
+Invoke-Session '$sandbox' claude claude-opus-5-5 read 'F05 · review' 'Review F05' '$liveOut'
+"@
+    $liveShown = pwsh -NoProfile -File live.ps1 2> live.err
+    $claudeArgs = @(Get-Content "$sandbox/claude-args")
+    Assert-Equal 'a live session starts in the background' 'True' "$($claudeArgs -contains '--bg')"
+    Assert-Equal 'a live review never waits on a prompt' 'dontAsk' $claudeArgs[[array]::IndexOf($claudeArgs, '--permission-mode') + 1]
+    Assert-Equal 'a live session prints how to open it' '1' "$(@(Get-Content live.err | Where-Object { $_ -like '*claude attach 5dbbc910*' }).Count)"
+    Assert-Equal 'a live session keeps its last main-thread answer' 'Table|VERIFY: PASS' ((Get-Content $liveOut) -join '|')
+    Assert-Equal 'a live session prints its answer' 'Table|VERIFY: PASS' ($liveShown -join '|')
+    Assert-Equal 'a live session records its steps' '1' "$(@(Get-Content (Join-Path $sandbox '.agent/runs/F05/progress.log') | Where-Object { $_ -eq 'F05 · review › Bash git diff main' }).Count)"
+    Remove-Item $claudeHome -Recurse -Force
+
     $watchOutput = pwsh -NoProfile -File "$scriptsDir/watch.ps1" -Once 2>&1
     Assert-Equal 'watch shows the story result' '1' "$(@($watchOutput | Where-Object { $_ -like 'F05  shipped https://example/pull/1*' }).Count)"
     Assert-Equal 'watch shows the last steps' '1' "$(@($watchOutput | Where-Object { $_ -like '*F05 · review › Bash make test-story*' }).Count)"

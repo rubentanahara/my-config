@@ -67,6 +67,7 @@ scripts/agent/run.sh --dry-run                        # print the plan, start no
 scripts/agent/run.sh --cli claude --checker agy       # one vendor implements, another reviews
 scripts/agent/run.sh --parallel 2 --no-merge          # two stories at once, stop at open pull requests
 scripts/agent/run.sh --story F01                      # run one story only
+scripts/agent/run.sh --cli claude --live              # open each claude session as a live TUI (in tmux)
 ```
 
 `--cli` and `--checker` accept `claude`, `codex`, `copilot` and `agy`. For each story the runner:
@@ -83,6 +84,7 @@ To follow a run:
 
 - claude sessions print one line per step in the runner's terminal, such as `F01 · Subscription-wide view › Bash make check`. Other CLIs print only their final message.
 - `scripts/agent/watch.sh` in a second terminal shows, per story: its result, its attempts, its commits and changed files, and its last five steps. `--once` prints once, and `watch.sh F01` shows one story.
+- `--live` (claude only) runs every session as a real Claude Code session in the background (`claude --bg`) instead of `claude -p`. Inside tmux, each session opens in its own window running `claude attach <id>`, so you watch the implementer, then the reviewer, as they work. The window closes when the session is done. Outside tmux, the runner prints the `claude attach <id>` command. You can type into a session, and the runner waits until it is done. Review sessions use `--permission-mode dontAsk`, so they never stop at a permission prompt.
 - `.agent/runs/<id>/` holds `progress.log` (every step), each session's final text (`implement-N.log`, `review-N.md`), the raw stream next to it (`*.jsonl`), and `check-N.log`.
 
 By hand, in one session:

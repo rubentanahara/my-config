@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-readonly USAGE='Usage: scripts/agent/run.sh [--cli claude|codex|copilot|agy] [--checker claude|codex|copilot|agy] [--model <m>] [--checker-model <m>] [--parallel N] [--no-merge] [--story <id>] [--dry-run]
+readonly USAGE='Usage: scripts/agent/run.sh [--cli claude|codex|copilot|agy] [--checker claude|codex|copilot|agy] [--model <m>] [--checker-model <m>] [--parallel N] [--no-merge] [--live] [--story <id>] [--dry-run]
 
 Runs the first wave of scripts/agent/feature.sh waves. Each story gets its own worktree and branch and goes through:
 implement (a session named "<id> · <name>"), make check, scope and test gate, an independent read-only review
@@ -15,6 +15,9 @@ claude sessions print one line per step. Watch every story from a second termina
   --checker-model  model of the reviewer. Default: claude-opus-5.5 (copilot), otherwise the default of the checker CLI.
   --parallel  how many stories of a wave run at once, one tmux pane each. Default: 1.
   --no-merge  stop at open pull requests. Default: merge each pull request once CI is green, then run the next wave.
+  --live      claude only. Start each session as an interactive background session (claude --bg) instead of claude -p.
+              Inside tmux each one opens in a new window running claude attach, which closes when the session is done.
+              Outside tmux the runner prints the claude attach command. You can type into a session; the runner waits until it is done.
   --story     run only this story.
   --dry-run   print what would run, and start nothing.'
 readonly MAX_ATTEMPTS=3
@@ -36,6 +39,8 @@ readonly AGY_DENY_PUSH='{"permissions":{"deny":["command(git push)","command(reg
 readonly SLUG_MAX_LENGTH=40
 STREAM_JQ=$(< "$(dirname "${BASH_SOURCE[0]}")/jq/stream.jq")
 readonly STREAM_JQ
+readonly LIVE_READ_PERMISSION_MODE=dontAsk
+readonly LIVE_SETTINGS='{"enableAllProjectMcpServers":true}'
 
 main() {
   parse_arguments "$@"
@@ -56,7 +61,7 @@ main() {
 }
 
 parse_arguments() {
-  CLI=copilot CHECKER="" MODEL="" CHECKER_MODEL="" PARALLEL=1 MERGE=true ONLY_STORY="" DRY_RUN=false
+  CLI=copilot CHECKER="" MODEL="" CHECKER_MODEL="" PARALLEL=1 MERGE=true ONLY_STORY="" DRY_RUN=false LIVE=false
   while (( $# > 0 )); do
     case "$1" in
       --cli) CLI=${2:?$USAGE}; shift 2 ;;
@@ -65,6 +70,7 @@ parse_arguments() {
       --checker-model) CHECKER_MODEL=${2:?$USAGE}; shift 2 ;;
       --parallel) PARALLEL=${2:?$USAGE}; shift 2 ;;
       --no-merge) MERGE=false; shift ;;
+      --live) LIVE=true; shift ;;
       --story) ONLY_STORY=${2:?$USAGE}; shift 2 ;;
       --dry-run) DRY_RUN=true; shift ;;
       *) fail "$USAGE" ;;
@@ -73,6 +79,9 @@ parse_arguments() {
   CHECKER=${CHECKER:-$CLI}
   MODEL=${MODEL:-$(default_model "$CLI")}
   CHECKER_MODEL=${CHECKER_MODEL:-$(default_checker_model "$CHECKER")}
+  if $LIVE && [[ "$CLI" != claude || "$CHECKER" != claude ]]; then
+    fail "--live works with claude only: it opens each session with claude --bg. Use --cli claude --checker claude, or drop --live."
+  fi
   local cli
   for cli in "$CLI" "$CHECKER"; do
     [[ " claude codex copilot agy " == *" $cli "* ]] || fail "Unknown CLI '$cli'. Use claude, codex, copilot or agy."
@@ -132,7 +141,7 @@ waiting_summary() {
 
 print_plan() {
   local id
-  echo "Base: $BASE_BRANCH ($(git rev-parse --short HEAD)). Implementer: $CLI ($MODEL). Reviewer: $CHECKER ($CHECKER_MODEL), fresh read-only session. Parallel: $PARALLEL. Merge: $MERGE."
+  echo "Base: $BASE_BRANCH ($(git rev-parse --short HEAD)). Implementer: $CLI ($MODEL). Reviewer: $CHECKER ($CHECKER_MODEL), fresh read-only session. Parallel: $PARALLEL. Merge: $MERGE. Live: $LIVE."
   echo "Wave:"
   for id in $1; do
     echo "  $(session_name "$id")  branch $(branch_name "$id")  worktree $WORKTREES_DIR/$id  tests $(story_field "$id" test_filter)"
@@ -171,7 +180,7 @@ run_in_panes() {
     tmux select-pane -t "$pane" -T "$(session_name "$id")"
     tmux set-option -p -t "$pane" allow-set-title off > /dev/null
     tmux select-layout -t "$window" tiled > /dev/null
-    tmux send-keys -t "$pane" "bash $0 --story $id --cli $CLI --checker $CHECKER --model $MODEL --checker-model $CHECKER_MODEL; echo 'Pane done. Press Enter to close.'; read" Enter
+    tmux send-keys -t "$pane" "bash $0 --story $id --cli $CLI --checker $CHECKER --model $MODEL --checker-model $CHECKER_MODEL$($LIVE && echo ' --live'); echo 'Pane done. Press Enter to close.'; read" Enter
   done
   tmux kill-pane -t "$first_pane"
   tmux select-layout -t "$window" tiled > /dev/null
@@ -451,12 +460,12 @@ run_session() {
   local cli=$1 model=$2 mode=$3 name=$4 prompt=$5 out=$6
   case "$cli:$mode" in
     claude:write)
-      claude -p "$prompt" --model "$model" -n "$name" --output-format stream-json --verbose --permission-mode bypassPermissions \
-        --disallowedTools "Bash(git push *)" < /dev/null 2>&1 | show_claude_stream "$name" "$out" ;;
+      run_claude "$model" "$name" "$prompt" "$out" --permission-mode bypassPermissions --disallowedTools "Bash(git push *)" ;;
     claude:read)
-      claude -p "$prompt" --model "$model" -n "$name" --output-format stream-json --verbose --disallowedTools Edit Write NotebookEdit "Bash(make format)" \
+      run_claude "$model" "$name" "$prompt" "$out" $($LIVE && echo "--permission-mode $LIVE_READ_PERMISSION_MODE") \
+        --disallowedTools Edit Write NotebookEdit "Bash(make format)" \
         "Bash(scripts/agent/feature.sh start *)" "Bash(scripts/agent/feature.sh done *)" "Bash(scripts/agent/feature.sh block *)" \
-        "Bash(scripts/agent/feature.sh add *)" < /dev/null 2>&1 | show_claude_stream "$name" "$out" ;;
+        "Bash(scripts/agent/feature.sh add *)" ;;
     codex:write)
       codex exec -m "$model" --dangerously-bypass-approvals-and-sandbox "$prompt" < /dev/null 2>&1 | tee "$out" ;;
     codex:read)
@@ -473,6 +482,56 @@ run_session() {
     agy:read)
       agy -p "$prompt" --model "$model" --mode auto --sandbox --settings "$AGY_DENY_PUSH" < /dev/null 2>&1 | tee "$out" ;;
   esac
+}
+
+run_claude() {
+  local model=$1 name=$2 prompt=$3 out=$4
+  shift 4
+  if $LIVE; then
+    run_claude_live "$model" "$name" "$prompt" "$out" "$@"
+    return
+  fi
+  claude -p "$prompt" --model "$model" -n "$name" --output-format stream-json --verbose "$@" < /dev/null 2>&1 | show_claude_stream "$name" "$out"
+}
+
+run_claude_live() {
+  local model=$1 name=$2 prompt=$3 out=$4 id window="" transcript
+  shift 4
+  id=$(claude "$prompt" --bg -n "$name" --model "$model" --settings "$LIVE_SETTINGS" "$@" < /dev/null 2>&1 | tee "$out.start" | live_session_id)
+  if [[ -z "$id" ]]; then
+    report "$name: claude --bg did not start: $(head -n 1 "$out.start")"
+    cp "$out.start" "$out"
+    return 1
+  fi
+  report "$name: live session $id. Open it with: claude attach $id"
+  [[ -n "${TMUX:-}" ]] && window=$(tmux new-window -n "${name:0:$SLUG_MAX_LENGTH}" -P -F '#{window_id}' "claude attach $id" 2> /dev/null)
+  transcript=$(live_transcript "$(wait_for_live_session "$id")")
+  [[ -n "$window" ]] && tmux kill-window -t "$window" 2> /dev/null
+  claude rm "$id" > /dev/null 2>&1
+  jq -R -r --arg name "$name" "$STREAM_JQ progress(\$name)" "$transcript" 2> /dev/null | tee -a "$(dirname "$out")/progress.log" >&2
+  jq -R -s -r "$STREAM_JQ last_main_text" "$transcript" > "$out" 2> /dev/null
+  cat "$out"
+}
+
+live_session_id() {
+  sed -n 's/^backgrounded · \([0-9a-f][0-9a-f]*\) · .*/\1/p' | head -n 1
+}
+
+wait_for_live_session() {
+  local id=$1 listing state
+  while true; do
+    if listing=$(claude agents --json --all 2> /dev/null); then
+      state=$(jq -r --arg id "$id" '.[] | select(.id == $id) | "\(.state // "")/\(.sessionId // "")"' <<< "$listing")
+      [[ -z "$state" || "$state" == done/* || "$state" == stopped/* || "$state" == failed/* ]] && break
+    fi
+    sleep "$POLL_SECONDS"
+  done
+  echo "${state#*/}"
+}
+
+live_transcript() {
+  [[ -n "$1" ]] || return 0
+  find "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/projects" -maxdepth 2 -name "$1.jsonl" 2> /dev/null | head -n 1
 }
 
 show_claude_stream() {

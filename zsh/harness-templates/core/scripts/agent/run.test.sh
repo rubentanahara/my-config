@@ -68,6 +68,38 @@ expect "the final text is printed" "Done.|VERIFY: PASS|not json at all" "$(paste
 expect "the raw stream is kept" "5" "$(wc -l < "$stream_out.jsonl" | tr -d ' ')"
 expect "the verdict reads from the final text" "VERIFY: PASS" "$(verdict_of "$stream_out")"
 
+expect "a backgrounded line gives the session id" "9a986fbf" "$(printf 'Starting background service…\nbackgrounded · 9a986fbf · F05 · review\n' | live_session_id)"
+expect "no backgrounded line gives no id" "" "$(printf 'Workspace not trusted.\n' | live_session_id)"
+expect "--live refuses other CLIs" "--live works with claude only: it opens each session with claude --bg. Use --cli claude --checker claude, or drop --live." "$(parse_arguments --live --cli copilot 2>&1)"
+
+claude_home=$(mktemp -d)
+mkdir -p "$claude_home/projects/-sandbox"
+cat > "$claude_home/projects/-sandbox/5dbbc910-aaaa.jsonl" << 'JSONL'
+{"type":"user","message":{"content":"go"}}
+{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Bash","input":{"command":"git diff main"}}]}}
+{"type":"assistant","isSidechain":true,"message":{"content":[{"type":"text","text":"subagent noise"}]}}
+{"type":"assistant","message":{"content":[{"type":"text","text":"Table\nVERIFY: PASS"}]}}
+JSONL
+claude() {
+  case "$1" in
+    agents) echo '[{"id":"5dbbc910","state":"done","sessionId":"5dbbc910-aaaa"}]' ;;
+    rm) ;;
+    *) printf '%s\n' "$@" > "$sandbox/claude-args"; echo "backgrounded · 5dbbc910 · F05 · review" ;;
+  esac
+}
+LIVE=true CLAUDE_CONFIG_DIR=$claude_home
+live_out="$sandbox/$RUNS_DIR/F05/review-2.md"
+live_shown=$(unset TMUX; run_session claude claude-opus-5-5 read "F05 · review" "Review F05" "$live_out" 2> live.err)
+expect "a live session starts in the background" "--bg" "$(grep -x -- --bg "$sandbox/claude-args")"
+expect "a live review never waits on a prompt" "dontAsk" "$(grep -x -A1 -- --permission-mode "$sandbox/claude-args" | tail -n 1)"
+expect "a live session prints how to open it" "1" "$(grep -c 'claude attach 5dbbc910' live.err)"
+expect "a live session keeps its last main-thread answer" "Table|VERIFY: PASS" "$(paste -sd '|' "$live_out")"
+expect "a live session prints its answer" "Table|VERIFY: PASS" "$(paste -sd '|' - <<< "$live_shown")"
+expect "a live session records its steps" "1" "$(grep -c 'F05 · review › Bash git diff main' "$sandbox/$RUNS_DIR/F05/progress.log")"
+unset -f claude
+LIVE=false
+rm -rf "$claude_home"
+
 watch_output=$(bash "$SCRIPTS_DIR/watch.sh" --once 2>&1)
 expect "watch shows the story result" "1" "$(grep -c '^F05  shipped https://example/pull/1' <<< "$watch_output")"
 expect "watch shows the last steps" "1" "$(grep -c 'F05 · review › Bash make test-story' <<< "$watch_output")"

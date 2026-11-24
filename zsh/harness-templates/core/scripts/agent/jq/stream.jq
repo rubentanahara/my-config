@@ -6,6 +6,10 @@ def progress($name):
   | if .type == "assistant" then .message.content[]? | select(.type == "tool_use") | "\($name) › \(.name) \(.input | step_target | one_line)"
     elif .type == "raw" and (.text | length) > 0 then "\($name) › \(.text | one_line)"
     else empty end;
+def last_main_text:
+  [split("\n")[] | fromjson? | objects | select(.type == "assistant" and .isSidechain != true)
+   | [.message.content[]? | select(.type == "text") | .text] | select(length > 0) | join("\n")]
+  | last // "";
 def final_text:
   stream_event
   | if .type == "result" then .result // empty

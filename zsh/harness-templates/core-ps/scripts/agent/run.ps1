@@ -5,6 +5,7 @@ param(
     [string]$CheckerModel = '',
     [ValidateRange(1, 64)][int]$Parallel = 1,
     [switch]$NoMerge,
+    [switch]$Live,
     [string]$Story = '',
     [switch]$DryRun,
     [switch]$Help
@@ -13,7 +14,7 @@ param(
 . "$PSScriptRoot/common.ps1"
 
 $usage = @'
-Usage: scripts/agent/run.ps1 [-Cli claude|codex|copilot|agy] [-Checker <cli>] [-Model <m>] [-CheckerModel <m>] [-Parallel N] [-NoMerge] [-Story <id>] [-DryRun]
+Usage: scripts/agent/run.ps1 [-Cli claude|codex|copilot|agy] [-Checker <cli>] [-Model <m>] [-CheckerModel <m>] [-Parallel N] [-NoMerge] [-Live] [-Story <id>] [-DryRun]
 
 Runs the first wave of scripts/agent/feature.ps1 waves. Each story gets its own worktree and branch and goes through:
 implement (a session named "<id> · <name>"), ./make.ps1 check, scope and test gate, an independent read-only review
@@ -27,6 +28,9 @@ claude sessions print one line per step. Watch every story from a second termina
   -CheckerModel  model of the reviewer. Default: claude-opus-5.5 (copilot), otherwise the default of the checker CLI.
   -Parallel      how many stories of a wave run at once, one background job each. Default: 1.
   -NoMerge       stop at open pull requests. Default: merge each pull request once CI is green, then run the next wave.
+  -Live          claude only. Start each session as an interactive background session (claude --bg) instead of claude -p,
+                 and print the claude attach command that opens it. Inside tmux each one opens in a new window, which
+                 closes when the session is done. You can type into a session; the runner waits until it is done.
   -Story         run only this story.
   -DryRun        print what would run, and start nothing.
 '@
@@ -44,6 +48,8 @@ $checksAppearRounds = 20
 $feedbackLines = 60
 $agyDenyPush = '{"permissions":{"deny":["command(git push)","command(regex:git .*push.*)"]}}'
 $slugMaxLength = 40
+$liveReadPermissionMode = 'dontAsk'
+$liveSettings = '{"enableAllProjectMcpServers":true}'
 
 function Main {
     if ($Help) { Write-Host $usage; exit 0 }
@@ -70,6 +76,9 @@ function Resolve-Arguments {
     if (-not $script:Model) { $script:Model = $defaultModels[$Cli] }
     if (-not $script:CheckerModel) {
         $script:CheckerModel = if ($script:Checker -eq 'copilot') { $copilotDefaultCheckerModel } else { $defaultModels[$script:Checker] }
+    }
+    if ($Live -and ($Cli -ne 'claude' -or $script:Checker -ne 'claude')) {
+        Stop-Harness '-Live works with claude only: it opens each session with claude --bg. Use -Cli claude -Checker claude, or drop -Live.'
     }
     foreach ($name in $Cli, $script:Checker) {
         if (-not (Get-Command $name -ErrorAction SilentlyContinue)) { Stop-Harness "$name is not installed." }
@@ -120,7 +129,7 @@ function Get-WaitingSummary {
 }
 
 function Show-Plan([string[]]$Ids) {
-    Write-Host "Base: $script:BaseBranch ($((git rev-parse --short HEAD) -join '')). Implementer: $Cli ($script:Model). Reviewer: $script:Checker ($script:CheckerModel), fresh read-only session. Parallel: $Parallel. Merge: $(-not $NoMerge)."
+    Write-Host "Base: $script:BaseBranch ($((git rev-parse --short HEAD) -join '')). Implementer: $Cli ($script:Model). Reviewer: $script:Checker ($script:CheckerModel), fresh read-only session. Parallel: $Parallel. Merge: $(-not $NoMerge). Live: $([bool]$Live)."
     Write-Host 'Wave:'
     foreach ($id in $Ids) {
         Write-Host "  $(Get-SessionName $id)  branch $(Get-BranchName $id)  worktree $worktreesDir/$id  tests $(Get-StoryField $id test_filter)"
@@ -143,6 +152,7 @@ function Invoke-InJobs([string[]]$Ids) {
         New-Item -ItemType Directory -Force (Get-StoryLogDir $id) | Out-Null
         Remove-Item (Get-ResultFile $id) -Force -ErrorAction SilentlyContinue
         $arguments = @('-NoProfile', '-File', $PSCommandPath, '-Story', $id, '-Cli', $Cli, '-Checker', $script:Checker, '-Model', $script:Model, '-CheckerModel', $script:CheckerModel)
+        if ($Live) { $arguments += '-Live' }
         $log = Join-Path (Get-StoryLogDir $id) 'runner.log'
         Start-Job -Name $id -ArgumentList $script:Root, $log, $arguments -ScriptBlock {
             param($root, $log, $arguments)
@@ -450,14 +460,12 @@ function Invoke-Session([string]$Dir, [string]$SessionCli, [string]$SessionModel
     Push-Location $Dir
     try {
         switch ("${SessionCli}:$Mode") {
-            'claude:write' {
-                $null | claude -p $Prompt --model $SessionModel -n $Name --output-format stream-json --verbose --permission-mode bypassPermissions `
-                    --disallowedTools 'Bash(git push *)' 2>&1 | Show-ClaudeStream $Name $Out
-            }
+            'claude:write' { Invoke-Claude $SessionModel $Name $Prompt $Out @('--permission-mode', 'bypassPermissions', '--disallowedTools', 'Bash(git push *)') }
             'claude:read' {
-                $null | claude -p $Prompt --model $SessionModel -n $Name --output-format stream-json --verbose --disallowedTools Edit Write NotebookEdit 'Bash(./make.ps1 format)' `
-                    'Bash(scripts/agent/feature.ps1 start *)' 'Bash(scripts/agent/feature.ps1 done *)' 'Bash(scripts/agent/feature.ps1 block *)' `
-                    'Bash(scripts/agent/feature.ps1 add *)' 2>&1 | Show-ClaudeStream $Name $Out
+                $readMode = if ($Live) { @('--permission-mode', $liveReadPermissionMode) } else { @() }
+                Invoke-Claude $SessionModel $Name $Prompt $Out ($readMode + @('--disallowedTools', 'Edit', 'Write', 'NotebookEdit', 'Bash(./make.ps1 format)',
+                    'Bash(scripts/agent/feature.ps1 start *)', 'Bash(scripts/agent/feature.ps1 done *)', 'Bash(scripts/agent/feature.ps1 block *)',
+                    'Bash(scripts/agent/feature.ps1 add *)'))
             }
             'codex:write' { $null | codex exec -m $SessionModel --dangerously-bypass-approvals-and-sandbox $Prompt 2>&1 | Tee-Object -FilePath $Out }
             'codex:read' {
@@ -509,6 +517,62 @@ function Initialize-WorktreeIndex([string]$Dir, [string]$Log) {
 function Get-WorktreeFingerprint([string]$Dir) {
     Push-Location $Dir
     try { Get-TreeFingerprint } finally { Pop-Location }
+}
+
+function Invoke-Claude([string]$SessionModel, [string]$Name, [string]$Prompt, [string]$Out, [string[]]$Options) {
+    if ($Live) { return Invoke-ClaudeLive $SessionModel $Name $Prompt $Out $Options }
+    $null | claude -p $Prompt --model $SessionModel -n $Name --output-format stream-json --verbose @Options 2>&1 | Show-ClaudeStream $Name $Out
+}
+
+function Invoke-ClaudeLive([string]$SessionModel, [string]$Name, [string]$Prompt, [string]$Out, [string[]]$Options) {
+    $started = @($null | claude $Prompt --bg -n $Name --model $SessionModel --settings $liveSettings @Options 2>&1 | ForEach-Object { "$_" })
+    $id = Get-LiveSessionId $started
+    if (-not $id) {
+        Write-Report "${Name}: claude --bg did not start: $($started | Select-Object -First 1)"
+        $started | Set-Content $Out
+        return
+    }
+    Write-Report "${Name}: live session $id. Open it with: claude attach $id"
+    $window = ''
+    if ($env:TMUX) { $window = (tmux new-window -n $Name.Substring(0, [Math]::Min($Name.Length, $slugMaxLength)) -P -F '#{window_id}' "claude attach $id" 2> $null) -join '' }
+    $transcript = Get-LiveTranscript (Wait-LiveSession $id)
+    if ($window) { tmux kill-window -t $window 2> $null }
+    claude rm $id *> $null
+    if (-not $transcript) { Set-Content $Out ''; return }
+    $streamJq = Get-Content (Get-StreamJqPath) -Raw
+    $progress = Join-Path (Split-Path $Out) 'progress.log'
+    foreach ($step in (jq -R -r --arg name $Name "$streamJq progress(`$name)" $transcript)) {
+        [Console]::Error.WriteLine($step)
+        Add-Content $progress $step
+    }
+    jq -R -s -r "$streamJq last_main_text" $transcript | Set-Content $Out
+    Get-Content $Out
+}
+
+function Get-LiveSessionId([string[]]$Lines) {
+    foreach ($line in $Lines) {
+        if ($line -match '^backgrounded · ([0-9a-f]+) · ') { return $Matches[1] }
+    }
+    ''
+}
+
+function Wait-LiveSession([string]$Id) {
+    while ($true) {
+        $listing = (claude agents --json --all 2> $null) -join "`n"
+        $sessions = try { @($listing | ConvertFrom-Json -ErrorAction Stop) } catch { $null }
+        if ($null -ne $sessions) {
+            $session = $sessions | Where-Object { $_.id -eq $Id } | Select-Object -First 1
+            if (-not $session -or $session.state -in 'done', 'stopped', 'failed') { return "$($session.sessionId)" }
+        }
+        Start-Sleep -Seconds $pollSeconds
+    }
+}
+
+function Get-LiveTranscript([string]$SessionId) {
+    if (-not $SessionId) { return '' }
+    $configDir = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-Path $HOME '.claude' }
+    $found = Get-ChildItem (Join-Path $configDir 'projects') -Filter "$SessionId.jsonl" -Recurse -Depth 1 -File -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($found) { $found.FullName } else { '' }
 }
 
 function Show-ClaudeStream {
