@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -uo pipefail
+unset GIT_DIR GIT_INDEX_FILE GIT_WORK_TREE
 
 readonly SCRIPTS_DIR="$(cd "$(dirname "$0")" && pwd)"
 failures=0

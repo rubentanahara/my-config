@@ -45,18 +45,29 @@ harness_makefile_rule() {
 
 harness_merge_makefile() {
   local name target
-  for name in LOGS HOOK_SCRIPTS_JQ INSTALL_CMD TEST_STORY_CMD; do
+  for name in LOGS HOOK_SCRIPTS_JQ INSTALL_CMD TEST_STORY_CMD FORMAT_CMD; do
     grep -q "^$name :=" Makefile || { echo; grep "^$name :=" "$HARNESS_TEMPLATES/core/Makefile"; } >> Makefile
   done
-  for target in setup test-story hooks agents harness features; do
+  for target in setup format test-story hooks agents harness features; do
     grep -q "^$target:" Makefile && continue
     { echo; echo ".PHONY: $target"; harness_makefile_rule $target; } >> Makefile
     echo "makefile: added the $target target"
   done
-  grep -Eq '^check:.*\<hooks\>' Makefile && return 0
-  grep -q '^check:' Makefile || { echo; echo ".PHONY: check"; } >> Makefile
-  { echo; echo "check: hooks agents harness features"; } >> Makefile
-  echo "makefile: check now also runs hooks agents harness features"
+  if ! grep -Eq '^check:.*\<hooks\>' Makefile; then
+    grep -q '^check:' Makefile || { echo; echo ".PHONY: check"; } >> Makefile
+    { echo; echo "$HARNESS_CHECK_RULE"; } >> Makefile
+    echo "makefile: check now also runs hooks agents harness features"
+  fi
+  harness_check_passed_line
+}
+
+HARNESS_CHECK_RULE="check: hooks agents harness features"
+
+harness_check_passed_line() {
+  grep -q 'CHECK PASSED' Makefile && return 0
+  awk '/^check:/ { in_check = 1; next } in_check && /^\t/ { found = 1 } { in_check = 0 } END { exit !found }' Makefile && return 0
+  awk -v rule="$HARNESS_CHECK_RULE" '{ print } $0 == rule { print "\t@echo \"CHECK PASSED\"" }' Makefile > Makefile.tmp && mv Makefile.tmp Makefile
+  echo "makefile: check now prints CHECK PASSED when it passes"
 }
 
 harness_sync() {

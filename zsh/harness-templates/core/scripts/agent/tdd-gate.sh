@@ -52,4 +52,4 @@ if ! has_waiver && ! has_red_commit_on_branch; then
   refuse "source changed but this branch has no 'test(red): ...' commit. Commit the failing tests first, or add a line 'No-Tests: <reason>' to the message."
 fi
 
-make check > /dev/null 2>&1 || refuse "make check fails. A green commit needs passing build, lint and tests. Run make check."
+env -u GIT_DIR -u GIT_INDEX_FILE -u GIT_WORK_TREE make check > /dev/null 2>&1 || refuse "make check fails. A green commit needs passing build, lint and tests. Run make check."

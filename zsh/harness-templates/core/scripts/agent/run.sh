@@ -4,7 +4,7 @@ set -uo pipefail
 readonly USAGE='Usage: scripts/agent/run.sh [--cli claude|codex|copilot|agy] [--checker claude|codex|copilot|agy] [--model <m>] [--checker-model <m>] [--parallel N] [--no-merge] [--live] [--story <id>] [--dry-run]
 
 Runs the first wave of scripts/agent/feature.sh waves. Each story gets its own worktree and branch and goes through:
-implement (a session named "<id> · <name>"), make check, scope and test gate, an independent read-only review
+implement (a session named "<id> · <name>"), make check, scope and test gate (plus make test-integration when the Makefile has it), an independent read-only review
 (the verify skill, in a fresh session), feature.sh done, then a commit, a push and a pull request.
 claude sessions print one line per step. Watch every story from a second terminal with scripts/agent/watch.sh.
 
@@ -37,6 +37,7 @@ readonly RED_PREFIX='test(red)'
 readonly FEEDBACK_LINES=60
 readonly AGY_DENY_PUSH='{"permissions":{"deny":["command(git push)","command(regex:git .*push.*)"]}}'
 readonly SLUG_MAX_LENGTH=40
+readonly INTEGRATION_TARGET=test-integration
 STREAM_JQ=$(< "$(dirname "${BASH_SOURCE[0]}")/jq/stream.jq")
 readonly STREAM_JQ
 readonly LIVE_READ_PERMISSION_MODE=dontAsk
@@ -291,6 +292,25 @@ gate_story() {
     tail -n "$FEEDBACK_LINES" "$dir/$RUNNER_DIR/tests.log"
     return 1
   fi
+  integration_tests "$dir"
+}
+
+integration_tests() {
+  local dir=$1 log="$1/$RUNNER_DIR/integration.log"
+  rm -f "$log"
+  grep -q "^$INTEGRATION_TARGET:" "$dir/Makefile" 2> /dev/null || return 0
+  (cd "$dir" && make "$INTEGRATION_TARGET" > "$log" 2>&1) && return 0
+  echo "make $INTEGRATION_TARGET failed. Its last lines:"
+  tail -n "$FEEDBACK_LINES" "$log"
+  return 1
+}
+
+evidence_note() {
+  if [[ -f "$1/$RUNNER_DIR/integration.log" ]]; then
+    echo "The runner already ran make check, which passed, the story's tests and make $INTEGRATION_TARGET. Their output is in $RUNNER_DIR/tests.log and $RUNNER_DIR/integration.log: read them instead of building or running the tests."
+  else
+    echo "The runner already ran make check, which passed, and the story's tests. Their output is in $RUNNER_DIR/tests.log: read it instead of building or running the tests."
+  fi
 }
 
 install_dependencies() {
@@ -344,7 +364,7 @@ review_story() {
   out="$(story_log_dir "$id")/review-$attempt.md"
   prompt="Session \"$id · review\". You are the independent reviewer of story $id. You did not write this code. Run the verify skill for $id.
 The change is git diff $(git -C "$dir" merge-base HEAD "$BASE_BRANCH") plus the untracked files git status lists.
-The runner already ran make check, which passed, and the story's tests. Their output is in $RUNNER_DIR/tests.log: read it instead of building or running the tests.
+$(evidence_note "$dir")
 Do not edit, create or delete any file. End with the VERIFY line."
   before=$(cd "$dir" && bash "$FINGERPRINT")
   (cd "$dir" && run_session "$CHECKER" "$CHECKER_MODEL" read "$id · review" "$prompt" "$out") >&2

@@ -74,7 +74,7 @@ scripts/agent/run.sh --cli claude --live              # open each claude session
 
 1. Creates a worktree in `.worktrees/<id>` and runs `make setup` in it.
 2. Has the implementer commit the failing tests as `test(red): ...`, then the code as `feat(<id>): ...`.
-3. Runs `make check`, the scope check, the `PROGRESS.md` check, and proves the story's tests fail on the red commit and pass at the end.
+3. Runs `make check`, the scope check, the `PROGRESS.md` check, and proves the story's tests fail on the red commit and pass at the end. When the Makefile has a `test-integration` target, it runs that too and saves the output to `.agent/runner/integration.log`, so the reviewer can check criteria that need it.
 4. Has the checker CLI review the change in a fresh, read-only session with the `verify` skill.
 5. Opens a pull request, merges it once CI is green, pulls `main`, and starts the next wave.
 

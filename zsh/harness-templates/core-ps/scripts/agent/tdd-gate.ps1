@@ -33,8 +33,18 @@ function Test-Waiver {
 }
 
 function Test-Passes([string]$Task) {
-    & $makeScript $Task *> $null
-    $LASTEXITCODE -eq 0
+    $hookGitVariables = 'GIT_DIR', 'GIT_INDEX_FILE', 'GIT_WORK_TREE'
+    $saved = @{}
+    foreach ($name in $hookGitVariables) {
+        $saved[$name] = [Environment]::GetEnvironmentVariable($name)
+        [Environment]::SetEnvironmentVariable($name, $null)
+    }
+    try {
+        & $makeScript $Task *> $null
+        $LASTEXITCODE -eq 0
+    } finally {
+        foreach ($name in $hookGitVariables) { [Environment]::SetEnvironmentVariable($name, $saved[$name]) }
+    }
 }
 
 $subject = @(Get-Content $MessageFile)[0]

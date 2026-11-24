@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -uo pipefail
+unset GIT_DIR GIT_INDEX_FILE GIT_WORK_TREE
 
 readonly SCRIPTS_DIR="$(cd "$(dirname "$0")" && pwd)"
 failures=0
@@ -99,6 +100,26 @@ expect "a live session records its steps" "1" "$(grep -c 'F05 · review › Bash
 unset -f claude
 LIVE=false
 rm -rf "$claude_home"
+
+integration_repo=$(mktemp -d)
+mkdir -p "$integration_repo/$RUNNER_DIR"
+integration_tests "$integration_repo" > /dev/null && result=ok || result=refused
+expect "a repo without test-integration skips the integration gate" "ok" "$result"
+expect "a repo without test-integration writes no integration log" "absent" "$([[ -e "$integration_repo/$RUNNER_DIR/integration.log" ]] && echo present || echo absent)"
+printf 'test-integration:\n\t@echo All integration tests passed!\n' > "$integration_repo/Makefile"
+integration_tests "$integration_repo" > /dev/null && result=ok || result=refused
+expect "passing integration tests pass the gate" "ok" "$result"
+expect "the integration log is kept for the reviewer" "All integration tests passed!" "$(cat "$integration_repo/$RUNNER_DIR/integration.log")"
+printf 'test-integration:\n\t@echo Subscriptions panel not visible; exit 1\n' > "$integration_repo/Makefile"
+integration_feedback=$(integration_tests "$integration_repo") && result=ok || result=refused
+expect "failing integration tests fail the gate" "refused" "$result"
+expect "the gate names the failing integration run" "make test-integration failed. Its last lines:" "$(head -n 1 <<< "$integration_feedback")"
+expect "the gate shows the integration output" "1" "$(grep -c 'Subscriptions panel not visible' <<< "$integration_feedback")"
+rm -rf "$integration_repo"
+mkdir -p "$sandbox/$RUNNER_DIR" && touch "$sandbox/$RUNNER_DIR/integration.log"
+expect "the review names both logs" "The runner already ran make check, which passed, the story's tests and make test-integration. Their output is in $RUNNER_DIR/tests.log and $RUNNER_DIR/integration.log: read them instead of building or running the tests." "$(evidence_note "$sandbox")"
+rm "$sandbox/$RUNNER_DIR/integration.log"
+expect "the review names only the story tests without an integration log" "The runner already ran make check, which passed, and the story's tests. Their output is in $RUNNER_DIR/tests.log: read it instead of building or running the tests." "$(evidence_note "$sandbox")"
 
 watch_output=$(bash "$SCRIPTS_DIR/watch.sh" --once 2>&1)
 expect "watch shows the story result" "1" "$(grep -c '^F05  shipped https://example/pull/1' <<< "$watch_output")"
