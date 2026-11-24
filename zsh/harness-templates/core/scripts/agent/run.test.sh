@@ -107,7 +107,7 @@ integration_tests "$integration_repo" > /dev/null && result=ok || result=refused
 expect "a repo without test-integration skips the integration gate" "ok" "$result"
 expect "a repo without test-integration writes no integration log" "absent" "$([[ -e "$integration_repo/$RUNNER_DIR/integration.log" ]] && echo present || echo absent)"
 printf 'test-integration:\n\t@echo All integration tests passed!\n' > "$integration_repo/Makefile"
-integration_tests "$integration_repo" > /dev/null && result=ok || result=refused
+MAKEFLAGS=w integration_tests "$integration_repo" > /dev/null && result=ok || result=refused
 expect "passing integration tests pass the gate" "ok" "$result"
 expect "the integration log is kept for the reviewer" "All integration tests passed!" "$(cat "$integration_repo/$RUNNER_DIR/integration.log")"
 printf 'test-integration:\n\t@echo Subscriptions panel not visible; exit 1\n' > "$integration_repo/Makefile"

@@ -299,7 +299,7 @@ integration_tests() {
   local dir=$1 log="$1/$RUNNER_DIR/integration.log"
   rm -f "$log"
   grep -q "^$INTEGRATION_TARGET:" "$dir/Makefile" 2> /dev/null || return 0
-  (cd "$dir" && make "$INTEGRATION_TARGET" > "$log" 2>&1) && return 0
+  (cd "$dir" && make --no-print-directory "$INTEGRATION_TARGET" > "$log" 2>&1) && return 0
   echo "make $INTEGRATION_TARGET failed. Its last lines:"
   tail -n "$FEEDBACK_LINES" "$log"
   return 1
