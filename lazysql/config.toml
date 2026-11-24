@@ -2,14 +2,14 @@
 Name = "Production database"
 Provider = "mysql"
 DBName = "mozartnet"
-URL = "Server=ftpinfotek.dnsalias.net;Database=mozartnet;uid=mozart;password=mozart123;"
+URL = ""
 ReadOnly = true
 
 [[database]]
 Name = "Development database"
 Provider = "mysql"
 DBName = "mozartnetdev"
-URL = "Server=mozartdesarrollo.dnsalias.net;Database=mozartnetdev;uid=mozart;password=mozart123;"
+URL = ""
 
 [application]
 DefaultPageSize = 300
