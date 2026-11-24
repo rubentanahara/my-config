@@ -25,6 +25,26 @@ harness_lang_ci_setup() {
   awk -v snippet="$snippet" '{ print } /uses: actions\/checkout@/ { while ((getline line < snippet) > 0) print line }' "$workflow" > "$workflow.tmp" && mv "$workflow.tmp" "$workflow"
 }
 
+harness_makefile_rule() {
+  awk -v target="$1" '$0 ~ "^" target ":" { found = 1; print; next } found && /^\t/ { print; next } { found = 0 }' "$HARNESS_TEMPLATES/core/Makefile"
+}
+
+harness_merge_makefile() {
+  local name target
+  for name in LOGS HOOK_SCRIPTS_JQ INSTALL_CMD; do
+    grep -q "^$name :=" Makefile || { echo; grep "^$name :=" "$HARNESS_TEMPLATES/core/Makefile"; } >> Makefile
+  done
+  for target in setup hooks agents harness features; do
+    grep -q "^$target:" Makefile && continue
+    { echo; echo ".PHONY: $target"; harness_makefile_rule $target; } >> Makefile
+    echo "makefile: added the $target target"
+  done
+  grep -Eq '^check:.*\<hooks\>' Makefile && return 0
+  grep -q '^check:' Makefile || { echo; echo ".PHONY: check"; } >> Makefile
+  { echo; echo "check: hooks agents harness features"; } >> Makefile
+  echo "makefile: check now also runs hooks agents harness features"
+}
+
 harness_sync() {
   cp -R "$HARNESS_TEMPLATES/core/scripts/agent/." scripts/agent/
   cp -R "$HARNESS_TEMPLATES/core/.husky/." .husky/
@@ -32,7 +52,10 @@ harness_sync() {
   for template in "$HARNESS_TEMPLATES/core/".claude/{skills,agents}/**/*(.N) "$HARNESS_TEMPLATES/core/"{.claude/settings.json,.codex/hooks.json,.agents/hooks.json}(.N); do
     harness_sync_file "$template" "${template#$HARNESS_TEMPLATES/core/}"
   done
-  grep -q '^features:' Makefile 2> /dev/null || echo "sync: Makefile has no features target. Copy it and the check dependency from $HARNESS_TEMPLATES/core/Makefile."
+  local target
+  for target in features setup; do
+    grep -q "^$target:" Makefile 2> /dev/null || echo "sync: Makefile has no $target target. Copy it from $HARNESS_TEMPLATES/core/Makefile and add it to .PHONY."
+  done
   bash scripts/agent/sync-agents.sh
   [[ -d .gemini ]] && echo "sync: .gemini/ is from an older harness and nothing uses it now. Delete it if you do not use Gemini CLI."
   harness_codegraph
@@ -117,7 +140,12 @@ harness() {
 
   if [[ ! -d .git ]]; then git init -q && echo "git: initialized"; fi
 
+  local had_makefile=0
+  [[ -f Makefile ]] && had_makefile=1
+
   cp -Rn "$HARNESS_TEMPLATES/core/." .
+
+  (( had_makefile )) && harness_merge_makefile
 
   [[ -e CLAUDE.md ]] || ln -s AGENTS.md CLAUDE.md
 
