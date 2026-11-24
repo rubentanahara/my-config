@@ -45,10 +45,10 @@ harness_makefile_rule() {
 
 harness_merge_makefile() {
   local name target
-  for name in LOGS HOOK_SCRIPTS_JQ INSTALL_CMD; do
+  for name in LOGS HOOK_SCRIPTS_JQ INSTALL_CMD TEST_STORY_CMD; do
     grep -q "^$name :=" Makefile || { echo; grep "^$name :=" "$HARNESS_TEMPLATES/core/Makefile"; } >> Makefile
   done
-  for target in setup hooks agents harness features; do
+  for target in setup test-story hooks agents harness features; do
     grep -q "^$target:" Makefile && continue
     { echo; echo ".PHONY: $target"; harness_makefile_rule $target; } >> Makefile
     echo "makefile: added the $target target"
@@ -67,7 +67,7 @@ harness_sync() {
     harness_sync_file "$template" "${template#$HARNESS_TEMPLATES/core/}"
   done
   local target
-  for target in features setup; do
+  for target in features setup test-story; do
     grep -q "^$target:" Makefile 2> /dev/null || echo "sync: Makefile has no $target target. Copy it from $HARNESS_TEMPLATES/core/Makefile and add it to .PHONY."
   done
   bash scripts/agent/sync-agents.sh

@@ -19,5 +19,13 @@ echo "stale" > scripts/agent/stop-gate.sh
 zsh -c "source $HARNESS; harness . --sync" > /dev/null 2>&1
 expect "sync restores scripts/agent" grep -q MAX_ATTEMPTS scripts/agent/stop-gate.sh
 
+MERGED=$(mktemp -d)
+cd "$MERGED" && git init -q -b main
+printf 'build:\n\t@true\n' > Makefile
+zsh -c "source $HARNESS; harness . --lang go" > /dev/null 2>&1
+expect "existing Makefile gets test-story" grep -q '^test-story:' Makefile
+expect "existing Makefile gets the go TEST_STORY_CMD" grep -qF 'TEST_STORY_CMD := go test ./... -run "$$FILTER"' Makefile
+rm -rf "$MERGED"
+
 echo "failures: $failures"
 exit $((failures > 0))
