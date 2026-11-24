@@ -10,6 +10,20 @@ harness_mcp() {
   echo "mcp: project-level only. claude and copilot read .mcp.json, agy reads .agents/mcp_config.json (a link to it), codex reads .codex/config.toml."
 }
 
+harness_copilot_trust() {
+  local config="$HOME/.copilot/config.json" body updated
+  command -v copilot > /dev/null || return 0
+  if [[ ! -f $config ]] || ! command -v jq > /dev/null; then
+    echo "copilot: it loads repository hooks and .mcp.json only in trusted folders. Add $PWD to trustedFolders in ~/.copilot/config.json."
+    return 0
+  fi
+  body=$(grep -v '^//' "$config")
+  jq -e --arg dir "$PWD" '(.trustedFolders // []) | index($dir)' <<< "$body" > /dev/null && return 0
+  updated=$(jq --arg dir "$PWD" '.trustedFolders = ((.trustedFolders // []) + [$dir])' <<< "$body") || { echo "WARNING: could not parse $config; add $PWD to trustedFolders yourself."; return 0; }
+  { grep '^//' "$config"; echo "$updated"; } > "$config.tmp" && cat "$config.tmp" > "$config" && rm "$config.tmp"
+  echo "copilot: added $PWD to trustedFolders in ~/.copilot/config.json."
+}
+
 harness_codegraph() {
   [[ -d .codegraph ]] && return 0
   command -v codegraph > /dev/null || { echo "WARNING: codegraph is missing; the code index was not built (see the codegraph README to install it)."; return 0; }
@@ -106,6 +120,7 @@ harness_fill() {
 
 harness_fill_report() {
   local left
+  [[ -f AGENTS.md ]] || { echo "fill: AGENTS.md is missing, nothing was filled."; return 1; }
   left=$(grep -nE '^<One line|set [A-Z_]+ in Makefile|^- [^:]+:$|^\| \| \||what lives here|YYYY-MM-DD|Unknown:' AGENTS.md ARCHITECTURE.md SECURITY.md PROGRESS.md Makefile 2> /dev/null)
   if [[ -z $left ]]; then
     echo "fill: every field is filled."
@@ -135,6 +150,7 @@ harness() {
   zparseopts -D -E -- -lang:=lang -sync=sync -fill:=fill -model:=model
   [[ -z $lang || -f "$HARNESS_TEMPLATES/langs/${lang[2]}.mk" ]] || { harness_lang "${lang[2]}"; return 1; }
   [[ -z $fill ]] || harness_fill_check "${fill[2]}" || return 1
+  [[ -d $HARNESS_TEMPLATES/core ]] || { echo "harness: templates not found at '$HARNESS_TEMPLATES'. Run: source ~/.config/zsh/harness.zsh"; return 1; }
   local dir="${1:-.}"
   mkdir -p "$dir" && cd "$dir" || return 1
 
@@ -181,12 +197,12 @@ harness() {
   done
 
   command -v jq > /dev/null || echo "WARNING: jq is missing; scripts/agent needs it (brew install jq)."
-  command -v copilot > /dev/null && echo "copilot: it loads repository hooks and .mcp.json only in trusted folders. Add $PWD to trustedFolders in ~/.copilot/config.json."
+  harness_copilot_trust
   command -v gitleaks > /dev/null || echo "WARNING: gitleaks is missing; pre-commit cannot scan (brew install gitleaks)."
 
   if [[ -n $fill ]]; then
     harness_fill "${fill[2]}" "${model[2]}" || echo "WARNING: ${fill[2]} exited with an error. Review the md files."
-    harness_fill_report
+    harness_fill_report || return 1
     echo "harness ready in $PWD. Review the filled md files."
   else
     echo "harness ready in $PWD. Next: fill the Makefile commands, AGENTS.md, ARCHITECTURE.md."
