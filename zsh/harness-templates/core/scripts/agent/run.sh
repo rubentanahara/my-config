@@ -6,6 +6,7 @@ readonly USAGE='Usage: scripts/agent/run.sh [--cli claude|codex|copilot|agy] [--
 Runs the first wave of scripts/agent/feature.sh waves. Each story gets its own worktree and branch and goes through:
 implement (a session named "<id> · <name>"), make check, scope and test gate, an independent read-only review
 (the verify skill, in a fresh session), feature.sh done, then a commit, a push and a pull request.
+claude sessions print one line per step. Watch every story from a second terminal with scripts/agent/watch.sh.
 
   --cli       CLI that implements. Default: copilot.
   --checker   CLI that reviews. Default: the same as --cli.
@@ -33,6 +34,8 @@ readonly RED_PREFIX='test(red)'
 readonly FEEDBACK_LINES=60
 readonly AGY_DENY_PUSH='{"permissions":{"deny":["command(git push)","command(regex:git .*push.*)"]}}'
 readonly SLUG_MAX_LENGTH=40
+STREAM_JQ=$(< "$(dirname "${BASH_SOURCE[0]}")/jq/stream.jq")
+readonly STREAM_JQ
 
 main() {
   parse_arguments "$@"
@@ -448,11 +451,12 @@ run_session() {
   local cli=$1 model=$2 mode=$3 name=$4 prompt=$5 out=$6
   case "$cli:$mode" in
     claude:write)
-      claude -p "$prompt" --model "$model" -n "$name" --permission-mode bypassPermissions --disallowedTools "Bash(git push *)" < /dev/null 2>&1 | tee "$out" ;;
+      claude -p "$prompt" --model "$model" -n "$name" --output-format stream-json --verbose --permission-mode bypassPermissions \
+        --disallowedTools "Bash(git push *)" < /dev/null 2>&1 | show_claude_stream "$name" "$out" ;;
     claude:read)
-      claude -p "$prompt" --model "$model" -n "$name" --disallowedTools Edit Write NotebookEdit "Bash(make format)" \
+      claude -p "$prompt" --model "$model" -n "$name" --output-format stream-json --verbose --disallowedTools Edit Write NotebookEdit "Bash(make format)" \
         "Bash(scripts/agent/feature.sh start *)" "Bash(scripts/agent/feature.sh done *)" "Bash(scripts/agent/feature.sh block *)" \
-        "Bash(scripts/agent/feature.sh add *)" < /dev/null 2>&1 | tee "$out" ;;
+        "Bash(scripts/agent/feature.sh add *)" < /dev/null 2>&1 | show_claude_stream "$name" "$out" ;;
     codex:write)
       codex exec -m "$model" --dangerously-bypass-approvals-and-sandbox "$prompt" < /dev/null 2>&1 | tee "$out" ;;
     codex:read)
@@ -469,6 +473,13 @@ run_session() {
     agy:read)
       agy -p "$prompt" --model "$model" --mode auto --sandbox --settings "$AGY_DENY_PUSH" < /dev/null 2>&1 | tee "$out" ;;
   esac
+}
+
+show_claude_stream() {
+  local name=$1 out=$2
+  tee "$out.jsonl" | jq -R -r --unbuffered --arg name "$name" "$STREAM_JQ progress(\$name)" | tee -a "$(dirname "$out")/progress.log" >&2
+  jq -R -r "$STREAM_JQ final_text" "$out.jsonl" > "$out"
+  cat "$out"
 }
 
 verdict_of() {

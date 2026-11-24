@@ -79,6 +79,12 @@ scripts/agent/run.sh --story F01                      # run one story only
 
 When `.codegraph/` exists, each story's worktree gets its own index, so agents see the branch's code. Each step gets three attempts. After the third failure the story is blocked, and the last finding is recorded.
 
+To follow a run:
+
+- claude sessions print one line per step in the runner's terminal, such as `F01 · Subscription-wide view › Bash make check`. Other CLIs print only their final message.
+- `scripts/agent/watch.sh` in a second terminal shows, per story: its result, its attempts, its commits and changed files, and its last five steps. `--once` prints once, and `watch.sh F01` shows one story.
+- `.agent/runs/<id>/` holds `progress.log` (every step), each session's final text (`implement-N.log`, `review-N.md`), the raw stream next to it (`*.jsonl`), and `check-N.log`.
+
 By hand, in one session:
 
 ```
@@ -105,7 +111,7 @@ Invoke-Harness -Sync
 ./scripts/agent/run.ps1 -Cli claude -Checker agy -Parallel 2
 ```
 
-`-Parallel` runs each story as a background job. Follow one with `Get-Content -Wait .agent/runs/<id>/runner.log`.
+`-Parallel` runs each story as a background job. Follow one with `Get-Content -Wait .agent/runs/<id>/runner.log`, or every story with `./scripts/agent/watch.ps1`.
 
 ## When something goes wrong
 

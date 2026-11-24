@@ -18,6 +18,7 @@ Usage: scripts/agent/run.ps1 [-Cli claude|codex|copilot|agy] [-Checker <cli>] [-
 Runs the first wave of scripts/agent/feature.ps1 waves. Each story gets its own worktree and branch and goes through:
 implement (a session named "<id> · <name>"), ./make.ps1 check, scope and test gate, an independent read-only review
 (the verify skill, in a fresh session), feature.ps1 done, then a commit, a push and a pull request.
+claude sessions print one line per step. Watch every story from a second terminal with scripts/agent/watch.ps1.
 
   -Cli           CLI that implements. Default: copilot.
   -Checker       CLI that reviews. Default: the same as -Cli.
@@ -449,11 +450,14 @@ function Invoke-Session([string]$Dir, [string]$SessionCli, [string]$SessionModel
     Push-Location $Dir
     try {
         switch ("${SessionCli}:$Mode") {
-            'claude:write' { $null | claude -p $Prompt --model $SessionModel -n $Name --permission-mode bypassPermissions --disallowedTools 'Bash(git push *)' 2>&1 | Tee-Object -FilePath $Out }
+            'claude:write' {
+                $null | claude -p $Prompt --model $SessionModel -n $Name --output-format stream-json --verbose --permission-mode bypassPermissions `
+                    --disallowedTools 'Bash(git push *)' 2>&1 | Show-ClaudeStream $Name $Out
+            }
             'claude:read' {
-                $null | claude -p $Prompt --model $SessionModel -n $Name --disallowedTools Edit Write NotebookEdit 'Bash(./make.ps1 format)' `
+                $null | claude -p $Prompt --model $SessionModel -n $Name --output-format stream-json --verbose --disallowedTools Edit Write NotebookEdit 'Bash(./make.ps1 format)' `
                     'Bash(scripts/agent/feature.ps1 start *)' 'Bash(scripts/agent/feature.ps1 done *)' 'Bash(scripts/agent/feature.ps1 block *)' `
-                    'Bash(scripts/agent/feature.ps1 add *)' 2>&1 | Tee-Object -FilePath $Out
+                    'Bash(scripts/agent/feature.ps1 add *)' 2>&1 | Show-ClaudeStream $Name $Out
             }
             'codex:write' { $null | codex exec -m $SessionModel --dangerously-bypass-approvals-and-sandbox $Prompt 2>&1 | Tee-Object -FilePath $Out }
             'codex:read' {
@@ -505,6 +509,34 @@ function Initialize-WorktreeIndex([string]$Dir, [string]$Log) {
 function Get-WorktreeFingerprint([string]$Dir) {
     Push-Location $Dir
     try { Get-TreeFingerprint } finally { Pop-Location }
+}
+
+function Show-ClaudeStream {
+    param([string]$Name, [string]$Out, [Parameter(ValueFromPipeline)]$Line)
+    begin {
+        $streamJq = Get-Content (Get-StreamJqPath) -Raw
+        $progress = Join-Path (Split-Path $Out) 'progress.log'
+        $raw = "$Out.jsonl"
+        Set-Content $raw -Value $null -NoNewline
+    }
+    process {
+        $text = "$Line"
+        Add-Content $raw $text
+        foreach ($step in ($text | jq -R -r --arg name $Name "$streamJq progress(`$name)")) {
+            [Console]::Error.WriteLine($step)
+            Add-Content $progress $step
+        }
+    }
+    end {
+        jq -R -r "$streamJq final_text" $raw | Set-Content $Out
+        Get-Content $Out
+    }
+}
+
+function Get-StreamJqPath {
+    $installed = Join-Path $PSScriptRoot 'jq/stream.jq'
+    if (Test-Path $installed) { return $installed }
+    Join-Path $PSScriptRoot '../../../core/scripts/agent/jq/stream.jq'
 }
 
 function Get-Verdict([string]$Path) {

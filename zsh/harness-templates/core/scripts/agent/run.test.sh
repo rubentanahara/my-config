@@ -52,6 +52,27 @@ expect "result_of reads a matching result" "https://example/pull/1" "$(result_of
 expect "result_of refuses another outcome" "" "$(result_of F05 blocked)"
 expect "a story without a worktree has no worktree state" "" "$(worktree_state F05)"
 
+cat > stream.jsonl << 'JSONL'
+{"type":"system","subtype":"init"}
+{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Read","input":{"file_path":"src/Tags/tag.go"}}]}}
+{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Bash","input":{"command":"make test-story FILTER=TagTests\nsecond line"}}]}}
+{"type":"result","subtype":"success","result":"Done.\nVERIFY: PASS"}
+not json at all
+JSONL
+stream_out="$sandbox/$RUNS_DIR/F05/review-1.md"
+stream_shown=$(show_claude_stream "F05 · review" "$stream_out" < stream.jsonl 2> stream.err)
+expect "the stream shows one line per step" "F05 · review › Read src/Tags/tag.go|F05 · review › Bash make test-story FILTER=TagTests|F05 · review › not json at all" "$(paste -sd '|' stream.err)"
+expect "the stream appends its steps to progress.log" "3" "$(wc -l < "$sandbox/$RUNS_DIR/F05/progress.log" | tr -d ' ')"
+expect "the session output file holds the final text and raw lines" "Done.|VERIFY: PASS|not json at all" "$(paste -sd '|' "$stream_out")"
+expect "the final text is printed" "Done.|VERIFY: PASS|not json at all" "$(paste -sd '|' - <<< "$stream_shown")"
+expect "the raw stream is kept" "5" "$(wc -l < "$stream_out.jsonl" | tr -d ' ')"
+expect "the verdict reads from the final text" "VERIFY: PASS" "$(verdict_of "$stream_out")"
+
+watch_output=$(bash "$SCRIPTS_DIR/watch.sh" --once 2>&1)
+expect "watch shows the story result" "1" "$(grep -c '^F05  shipped https://example/pull/1' <<< "$watch_output")"
+expect "watch shows the last steps" "1" "$(grep -c 'F05 · review › Bash make test-story' <<< "$watch_output")"
+expect "watch filters by story id" "No story has started yet. run.sh writes to .agent/runs/<id>." "$(bash "$SCRIPTS_DIR/watch.sh" --once F99 2>&1)"
+
 tdd_repo=$(mktemp -d)
 git -C "$tdd_repo" init -q -b main
 git -C "$tdd_repo" -c user.email=t@t -c user.name=t commit -q --allow-empty -m base

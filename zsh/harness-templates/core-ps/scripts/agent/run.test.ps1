@@ -53,6 +53,27 @@ try {
     Assert-Equal 'Get-Result refuses another outcome' '' (Get-Result F05 blocked)
     Assert-Equal 'a story without a worktree has no worktree state' '' (Get-WorktreeState F05)
 
+    Set-Content stream.jsonl @'
+{"type":"system","subtype":"init"}
+{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Read","input":{"file_path":"src/Tags/tag.go"}}]}}
+{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Bash","input":{"command":"make test-story FILTER=TagTests\nsecond line"}}]}}
+{"type":"result","subtype":"success","result":"Done.\nVERIFY: PASS"}
+not json at all
+'@
+    $streamOut = Join-Path $sandbox '.agent/runs/F05/review-1.md'
+    $streamShown = pwsh -NoProfile -Command ". '$scriptsDir/run.ps1'; Get-Content stream.jsonl | Show-ClaudeStream 'F05 · review' '$streamOut'" 2> stream.err
+    Assert-Equal 'the stream shows one line per step' 'F05 · review › Read src/Tags/tag.go|F05 · review › Bash make test-story FILTER=TagTests|F05 · review › not json at all' ((Get-Content stream.err) -join '|')
+    Assert-Equal 'the stream appends its steps to progress.log' '3' "$((Get-Content (Join-Path $sandbox '.agent/runs/F05/progress.log')).Count)"
+    Assert-Equal 'the session output file holds the final text and raw lines' 'Done.|VERIFY: PASS|not json at all' ((Get-Content $streamOut) -join '|')
+    Assert-Equal 'the final text is printed' 'Done.|VERIFY: PASS|not json at all' ($streamShown -join '|')
+    Assert-Equal 'the raw stream is kept' '5' "$((Get-Content "$streamOut.jsonl").Count)"
+    Assert-Equal 'the verdict reads from the final text' 'VERIFY: PASS' (Get-Verdict $streamOut)
+
+    $watchOutput = pwsh -NoProfile -File "$scriptsDir/watch.ps1" -Once 2>&1
+    Assert-Equal 'watch shows the story result' '1' "$(@($watchOutput | Where-Object { $_ -like 'F05  shipped https://example/pull/1*' }).Count)"
+    Assert-Equal 'watch shows the last steps' '1' "$(@($watchOutput | Where-Object { $_ -like '*F05 · review › Bash make test-story*' }).Count)"
+    Assert-Equal 'watch filters by story id' 'No story has started yet. run.ps1 writes to .agent/runs/<id>.' ((pwsh -NoProfile -File "$scriptsDir/watch.ps1" -Once -Story F99 2>&1) -join '|')
+
     New-Item -ItemType Directory -Force "$tddRepo/src" | Out-Null
     git -C $tddRepo init -q -b main
     New-Commit $tddRepo base
